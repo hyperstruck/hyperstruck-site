@@ -50,8 +50,6 @@ export default function AppLayout() {
   const footerLinks = useMemo(
     () => [
       { label: 'Pricing', to: '/pricing' },
-      { label: 'Request sandbox access', href: contactHref },
-      { label: 'hello@hyperstruck.com', href: contactHref },
     ],
     [],
   );
@@ -104,15 +102,6 @@ export default function AppLayout() {
                 </Stack>
 
                 <Stack direction="row" spacing={1.5}>
-                  <Button
-                    variant="text"
-                    component="a"
-                    href={contactHref}
-                    startIcon={<MailOutlineRoundedIcon />}
-                    sx={{ color: 'text.secondary' }}
-                  >
-                    Contact us
-                  </Button>
                   <Button
                     variant="contained"
                     component="a"

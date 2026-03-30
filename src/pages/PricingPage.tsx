@@ -61,9 +61,9 @@ export default function PricingPage() {
                 background:
                   tier.featured
                     ? `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.16)} 0%, ${alpha(
-                        theme.palette.background.paper,
-                        0.96,
-                      )} 100%)`
+                      theme.palette.background.paper,
+                      0.96,
+                    )} 100%)`
                     : undefined,
               }}
             >
@@ -154,26 +154,6 @@ export default function PricingPage() {
             </Card>
           ))}
         </Box>
-
-        <Card sx={{ mt: 8, p: { xs: 3, md: 4 } }}>
-          <Stack
-            direction={{ xs: 'column', md: 'row' }}
-            spacing={3}
-            justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', md: 'center' }}
-          >
-            <Box sx={{ maxWidth: 700 }}>
-              <Typography variant="h4">Need a custom deployment or security review?</Typography>
-              <Typography color="text.secondary" sx={{ mt: 1.5, lineHeight: 1.7 }}>
-                Every contact-oriented action in the site now routes directly to {contactEmail}, so
-                your visitors always have a real next step instead of a placeholder button.
-              </Typography>
-            </Box>
-            <Button component="a" href={contactHref} variant="contained" size="large">
-              Email Hyperstruck
-            </Button>
-          </Stack>
-        </Card>
 
         <Box sx={{ mt: 8 }}>
           <Typography variant="h3" textAlign="center" sx={{ mb: 4 }}>
