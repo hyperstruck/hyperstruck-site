@@ -193,28 +193,17 @@ export default function AppLayout() {
               Product
             </Typography>
             <Stack spacing={1.25} sx={{ mt: 1 }}>
-              {footerLinks.map((item) =>
-                item.to ? (
-                  <Link
-                    key={item.label}
-                    component={NavLink}
-                    to={item.to}
-                    underline="hover"
-                    color="text.secondary"
-                  >
-                    {item.label}
-                  </Link>
-                ) : (
-                  <Link
-                    key={item.label}
-                    href={item.href}
-                    underline="hover"
-                    color="text.secondary"
-                  >
-                    {item.label}
-                  </Link>
-                ),
-              )}
+              {footerLinks.map((item) => (
+                <Link
+                  key={item.label}
+                  component={NavLink}
+                  to={item.to}
+                  underline="hover"
+                  color="text.secondary"
+                >
+                  {item.label}
+                </Link>
+              ))}
             </Stack>
           </Box>
 
