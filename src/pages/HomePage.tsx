@@ -20,7 +20,6 @@ import {
   metrics,
   valuePillars,
 } from '../data/siteContent';
-import { contactHref } from '../theme/tokens';
 
 const accentColorMap = {
   primary: 'primary.main',
@@ -130,8 +129,8 @@ export default function HomePage() {
                 Explore pricing
               </Button>
               <Button
-                component="a"
-                href={contactHref}
+                component={RouterLink}
+                to="/signup"
                 variant="outlined"
                 startIcon={<MailOutlineRoundedIcon />}
                 sx={{
@@ -407,7 +406,7 @@ export default function HomePage() {
             <Button component={RouterLink} to="/pricing" variant="contained" size="large">
               View pricing
             </Button>
-            <Button component="a" href={contactHref} variant="outlined" size="large">
+            <Button component={RouterLink} to="/signup" variant="outlined" size="large">
               Talk to an engineer
             </Button>
           </Stack>

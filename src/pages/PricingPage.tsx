@@ -15,9 +15,9 @@ import {
   Typography,
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
+import { Link as RouterLink } from 'react-router-dom';
 
 import { featureRows, pricingTiers } from '../data/siteContent';
-import { contactEmail, contactHref } from '../theme/tokens';
 
 export default function PricingPage() {
   const theme = useTheme();
@@ -136,8 +136,8 @@ export default function PricingPage() {
                   </Stack>
 
                   <Button
-                    component="a"
-                    href={contactHref}
+                    component={RouterLink}
+                    to="/signup"
                     fullWidth
                     variant="contained"
                     startIcon={<MailOutlineRoundedIcon />}
@@ -168,8 +168,8 @@ export default function PricingPage() {
                 Learning is the system’s ability to turn experience into better future judgment. It captures what matters, strengthens what proves useful, lets low-value signals fade, and applies the right insight at the right moment so agents become sharper, more specialized, and more effective over time.
               </Typography>
             </Box>
-            <Button component="a" href={contactHref} variant="contained" size="large">
-              Email Hyperstruck
+            <Button component={RouterLink} to="/signup" variant="contained" size="large">
+              Join waitlist
             </Button>
           </Stack>
         </Card>

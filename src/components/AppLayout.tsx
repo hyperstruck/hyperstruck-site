@@ -16,13 +16,14 @@ import {
 } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 import { useMemo, useState } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, Link as RouterLink } from 'react-router-dom';
 
-import { contactEmail, contactHref } from '../theme/tokens';
+import { contactEmail } from '../theme/tokens';
 
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Pricing', to: '/pricing' },
+  { label: 'Sign up', to: '/signup' },
 ] as const;
 
 const navLinkStyles = {
@@ -104,8 +105,8 @@ export default function AppLayout() {
                 <Stack direction="row" spacing={1.5}>
                   <Button
                     variant="contained"
-                    component="a"
-                    href={contactHref}
+                    component={RouterLink}
+                    to="/signup"
                     sx={{
                       backgroundImage: theme.custom.gradients.primary,
                       boxShadow: theme.custom.shadows.glow,
@@ -154,7 +155,7 @@ export default function AppLayout() {
             </Link>
           ))}
           <Divider />
-          <Button component="a" href={contactHref} variant="contained">
+          <Button component={RouterLink} to="/signup" variant="contained">
             Contact {contactEmail}
           </Button>
         </Stack>
@@ -213,8 +214,8 @@ export default function AppLayout() {
             </Typography>
             <Stack spacing={1.25} sx={{ mt: 1 }}>
               <Typography color="text.secondary">Ready to explore a custom deployment?</Typography>
-              <Link href={contactHref} underline="hover">
-                {contactEmail}
+              <Link component={RouterLink} to="/signup" underline="hover">
+                Join the waitlist
               </Link>
             </Stack>
           </Box>
