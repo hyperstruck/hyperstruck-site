@@ -7,6 +7,11 @@ React + TypeScript marketing site built with Vite and MUI.
 - `pnpm`
 - A recent version of Node.js
 
+
+## Environment variables set in the build pipeline e.g. Netlify
+- VITE_SUPABASE_URL 
+- VITE_SUPABASE_ANON_KEY
+
 ## Getting Started
 
 Install dependencies:

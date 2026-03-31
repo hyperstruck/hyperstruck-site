@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import AppLayout from './components/AppLayout';
 import HomePage from './pages/HomePage';
 import PricingPage from './pages/PricingPage';
+import SignupPage from './pages/SignupPage';
 import appTheme from './theme/appTheme';
 
 function ScrollToTop() {
@@ -27,6 +28,7 @@ export default function App() {
           <Route element={<AppLayout />}>
             <Route index element={<HomePage />} />
             <Route path="/pricing" element={<PricingPage />} />
+            <Route path="/signup" element={<SignupPage />} />
           </Route>
         </Routes>
       </BrowserRouter>
