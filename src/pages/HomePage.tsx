@@ -13,19 +13,12 @@ import {
 import { alpha, useTheme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 
+import CoreValuePillarsSection from '../components/CoreValuePillarsSection';
+import LearningModulesSection from '../components/LearningModulesSection';
 import {
   architectureNodes,
-  compatibilityItems,
   heroHighlights,
-  metrics,
-  valuePillars,
 } from '../data/siteContent';
-
-const accentColorMap = {
-  primary: 'primary.main',
-  secondary: 'secondary.main',
-  tertiary: '#d0bcff',
-} as const;
 
 const nodePlacementMap = {
   topLeft: { top: 20, left: 0, transform: 'translateX(40px)' },
@@ -33,32 +26,6 @@ const nodePlacementMap = {
   bottomLeft: { bottom: 20, left: 0, transform: 'translateX(16px)' },
   bottomRight: { bottom: 20, right: 0, transform: 'translateX(-16px)' },
 } as const;
-
-function SectionHeading({
-  eyebrow,
-  title,
-  description,
-}: {
-  eyebrow: string;
-  title: string;
-  description?: string;
-}) {
-  return (
-    <Stack spacing={2} sx={{ maxWidth: 720 }}>
-      <Typography variant="overline" color="secondary.main">
-        {eyebrow}
-      </Typography>
-      <Typography variant="h2" sx={{ fontSize: { xs: '2.4rem', md: '3.5rem' } }}>
-        {title}
-      </Typography>
-      {description ? (
-        <Typography color="text.secondary" sx={{ fontSize: { xs: '1rem', md: '1.15rem' } }}>
-          {description}
-        </Typography>
-      ) : null}
-    </Stack>
-  );
-}
 
 export default function HomePage() {
   const theme = useTheme();
@@ -108,9 +75,9 @@ export default function HomePage() {
               color="text.secondary"
               sx={{ maxWidth: 680, fontSize: { xs: '1.05rem', md: '1.25rem' }, lineHeight: 1.7 }}
             >
-              Hyperstruck Core turns generic agents into domain specialists with deeper memory,
-              stronger learning loops, and production-ready orchestration across the systems teams
-              already trust.
+              Hyperstruck Core turns generic agents into domain specialists with unparalleled
+              learning, higher-quality execution, and production-ready orchestration across the
+              systems teams already trust.
             </Typography>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
@@ -268,120 +235,8 @@ export default function HomePage() {
           </Box>
         </Box>
 
-        <Box sx={{ mt: { xs: 9, md: 13 } }}>
-          <SectionHeading
-            eyebrow="Why teams choose Core"
-            title="A reusable intelligence layer for specialist agents."
-            description="Design tokens, shared surfaces, and consistent interaction patterns now live in a real theme instead of one giant HTML file."
-          />
-
-          <Box
-            sx={{
-              mt: 5,
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-              gap: 3,
-            }}
-          >
-            {valuePillars.map((pillar) => {
-              const Icon = pillar.icon;
-              const accentColor = accentColorMap[pillar.accent];
-
-              return (
-                <Card
-                  key={pillar.title}
-                  sx={{
-                    p: 4,
-                    minHeight: pillar.featured ? 320 : 260,
-                    gridColumn: pillar.featured ? { md: 'span 1' } : undefined,
-                    background:
-                      pillar.featured
-                        ? `linear-gradient(180deg, ${alpha('#d0bcff', 0.12)} 0%, ${alpha(
-                          theme.palette.background.paper,
-                          0.85,
-                        )} 100%)`
-                        : undefined,
-                  }}
-                >
-                  <Icon sx={{ fontSize: 40, color: accentColor }} />
-                  <Typography variant="h4" sx={{ mt: 3, mb: 2 }}>
-                    {pillar.title}
-                  </Typography>
-                  <Typography color="text.secondary" sx={{ lineHeight: 1.75 }}>
-                    {pillar.description}
-                  </Typography>
-                </Card>
-              );
-            })}
-          </Box>
-        </Box>
-
-        <Card sx={{ mt: { xs: 8, md: 12 }, p: { xs: 4, md: 5 } }}>
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: { xs: '1fr', md: '1.1fr 0.9fr' },
-              gap: 4,
-              alignItems: 'center',
-            }}
-          >
-            <Box>
-              <Typography variant="h3" sx={{ mb: 2 }}>
-                Drop-in compatibility across APIs, MCP, Claude Code and Cursor skills.
-              </Typography>
-              <Typography color="text.secondary" sx={{ maxWidth: 680, lineHeight: 1.75 }}>
-                Hyperstruck Core integrates cleanly into the tools your team already uses. Unlock your agent's intelligence with API calls.
-              </Typography>
-            </Box>
-
-            <Stack direction="row" spacing={2} justifyContent={{ xs: 'flex-start', md: 'flex-end' }}>
-              {compatibilityItems.map((item) => {
-                const Icon = item.icon;
-                return (
-                  <Card
-                    key={item.label}
-                    sx={{
-                      width: 112,
-                      height: 112,
-                      display: 'grid',
-                      placeItems: 'center',
-                      textAlign: 'center',
-                    }}
-                  >
-                    <Stack spacing={1} alignItems="center">
-                      <Icon sx={{ color: accentColorMap[item.accent] }} />
-                      <Typography variant="body2">{item.label}</Typography>
-                    </Stack>
-                  </Card>
-                );
-              })}
-            </Stack>
-          </Box>
-        </Card>
-
-        <Box
-          sx={{
-            mt: { xs: 9, md: 13 },
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
-            gap: 3,
-          }}
-        >
-          {metrics.map((metric) => {
-            const Icon = metric.icon;
-            return (
-              <Card key={metric.value} sx={{ p: 4 }}>
-                <Stack direction="row" spacing={2} alignItems="center">
-                  <Icon color="primary" />
-                  <Typography variant="h4">{metric.value}</Typography>
-                </Stack>
-                <Typography color="text.secondary" sx={{ mt: 2, lineHeight: 1.7 }}>
-                  {metric.label}
-                </Typography>
-              </Card>
-            );
-          })}
-        </Box>
+        <LearningModulesSection />
+        <CoreValuePillarsSection />
 
         <Card
           sx={{
@@ -399,12 +254,12 @@ export default function HomePage() {
             Ready to unify your intelligence stack?
           </Typography>
           <Typography color="text.secondary" sx={{ maxWidth: 760, mx: 'auto', mb: 4, lineHeight: 1.75 }}>
-            Start building with a more maintainable frontend foundation and a clear path for teams
-            to contact Hyperstruck directly when they are ready to deploy.
+            Start building with the most sophisticated cognitive orchestration layer ever
+            engineered. No credit card required for sandbox access.
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
             <Button component={RouterLink} to="/pricing" variant="contained" size="large">
-              View pricing
+              Get started free
             </Button>
             <Button component={RouterLink} to="/signup" variant="outlined" size="large">
               Talk to an engineer
