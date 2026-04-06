@@ -31,49 +31,28 @@ function createMaterial(
   });
 }
 
-function createBulb(
+function createOrb(
   registerGeometry: <T extends THREE.BufferGeometry>(geometry: T) => T,
   registerMaterial: <T extends THREE.Material>(material: T) => T,
   color: string,
-  scale = 1,
+  radius: number,
+  emissiveIntensity: number,
 ): {
-  group: THREE.Group;
-  headMaterial: THREE.MeshPhysicalMaterial;
+  mesh: THREE.Mesh;
+  material: THREE.MeshPhysicalMaterial;
 } {
-  const group = new THREE.Group();
-  const headMaterial = registerMaterial(
-    createMaterial(color, { emissive: color, emissiveIntensity: 0.32 }),
-  );
-  const baseMaterial = registerMaterial(
-    createMaterial('#a8b0c3', {
-      emissive: '#a8b0c3',
-      emissiveIntensity: 0.08,
-      opacity: 0.82,
+  const material = registerMaterial(
+    createMaterial(color, {
+      emissive: color,
+      emissiveIntensity,
     }),
   );
-
-  const head = new THREE.Mesh(
-    registerGeometry(new THREE.SphereGeometry(0.16, 16, 16)),
-    headMaterial,
+  const mesh = new THREE.Mesh(
+    registerGeometry(new THREE.SphereGeometry(radius, 20, 20)),
+    material,
   );
-  head.position.y = 0.12;
 
-  const neck = new THREE.Mesh(
-    registerGeometry(new THREE.CylinderGeometry(0.05, 0.06, 0.12, 12)),
-    baseMaterial,
-  );
-  neck.position.y = -0.02;
-
-  const base = new THREE.Mesh(
-    registerGeometry(new THREE.CylinderGeometry(0.09, 0.12, 0.12, 12)),
-    baseMaterial,
-  );
-  base.position.y = -0.16;
-
-  group.add(head, neck, base);
-  group.scale.setScalar(scale);
-
-  return { group, headMaterial };
+  return { mesh, material };
 }
 
 function createDashedLine(
@@ -105,6 +84,25 @@ function createVariantScene(
 ): DisposableScene {
   const rootGroup = new THREE.Group();
   scene.add(rootGroup);
+  rootGroup.scale.setScalar(
+    variant === 'confidence' ? 1.36 : variant === 'architecture' ? 1.24 : 1.18,
+  );
+  rootGroup.rotation.x =
+    variant === 'verification'
+      ? -0.42
+      : variant === 'architecture'
+        ? -0.34
+        : variant === 'confidence'
+          ? -0.24
+          : -0.18;
+  rootGroup.rotation.y =
+    variant === 'experiential'
+      ? -0.38
+      : variant === 'architecture'
+        ? -0.28
+        : variant === 'verification'
+          ? -0.2
+          : -0.14;
 
   const geometries: THREE.BufferGeometry[] = [];
   const materials: THREE.Material[] = [];
@@ -166,43 +164,89 @@ function createVariantScene(
       registerGeometry(new THREE.BoxGeometry(1.12, 1.12, 0.34)),
       panelMaterial,
     );
+    cpu.position.z = 0.12;
     rootGroup.add(cpu);
+
+    const cpuCore = new THREE.Mesh(
+      registerGeometry(new THREE.BoxGeometry(0.58, 0.58, 0.22)),
+      accentMaterial,
+    );
+    cpuCore.position.set(0, 0, 0.4);
+    rootGroup.add(cpuCore);
+
+    const cpuPins = Array.from({ length: 12 }, (_, index) => {
+      const pin = new THREE.Mesh(
+        registerGeometry(new THREE.BoxGeometry(0.08, 0.16, 0.08)),
+        softMaterial,
+      );
+      const side = index < 3 ? 'top' : index < 6 ? 'right' : index < 9 ? 'bottom' : 'left';
+      const offset = ((index % 3) - 1) * 0.36;
+
+      if (side === 'top') {
+        pin.position.set(offset, 0.72, 0.04);
+      } else if (side === 'right') {
+        pin.position.set(0.72, offset, 0.04);
+      } else if (side === 'bottom') {
+        pin.position.set(offset, -0.72, 0.04);
+      } else {
+        pin.position.set(-0.72, offset, 0.04);
+      }
+
+      rootGroup.add(pin);
+      return pin;
+    });
+
+    const traceLines = [
+      [-0.96, 0.7, -0.24, 0.28],
+      [0.96, 0.7, 0.24, 0.28],
+      [-0.96, -0.7, -0.24, -0.28],
+      [0.96, -0.7, 0.24, -0.28],
+      [-0.86, 0, -0.34, 0],
+      [0.86, 0, 0.34, 0],
+    ].map(([x1, y1, x2, y2]) => {
+      const geometry = registerGeometry(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(x1, y1, 0.02),
+          new THREE.Vector3(x2, y2, 0.28),
+        ]),
+      );
+      const line = new THREE.Line(geometry, accentLineMaterial);
+      rootGroup.add(line);
+      return line;
+    });
 
     const ballColors = ['#4cd7f6', '#d0bcff', '#8083ff', '#acedff', '#e9ddff', '#5de0e6'];
     const movingBalls = Array.from({ length: 12 }, (_, index) => {
       const color = ballColors[index % ballColors.length];
-      const mesh = new THREE.Mesh(
-        registerGeometry(new THREE.SphereGeometry(0.12, 16, 16)),
-        registerMaterial(
-          createMaterial(color, { emissive: color, emissiveIntensity: 0.34 }),
-        ),
-      );
-      rootGroup.add(mesh);
-      return mesh;
+      const orb = createOrb(registerGeometry, registerMaterial, color, 0.12, 0.34);
+      rootGroup.add(orb.mesh);
+      return orb;
     });
 
     const targetDots = Array.from({ length: 12 }, (_, index) => {
       const row = Math.floor(index / 4);
       const column = index % 4;
       const color = ballColors[index % ballColors.length];
-      const mesh = new THREE.Mesh(
-        registerGeometry(new THREE.SphereGeometry(0.1, 14, 14)),
-        registerMaterial(
-          createMaterial(color, {
-            emissive: color,
-            emissiveIntensity: 0.12,
-            opacity: 0.2,
-          }),
-        ),
-      );
-      mesh.position.set(1.62 + column * 0.42, 0.48 - row * 0.42, 0);
-      rootGroup.add(mesh);
-      return mesh;
+      const orb = createOrb(registerGeometry, registerMaterial, color, 0.1, 0.12);
+      orb.mesh.position.set(1.62 + column * 0.42, 0.48 - row * 0.42, 0);
+      orb.material.opacity = 0.2;
+      rootGroup.add(orb.mesh);
+      return orb;
     });
 
     return {
       update: (elapsedSeconds: number) => {
-        cpu.rotation.y = Math.sin(elapsedSeconds * 0.8) * 0.05;
+        cpu.rotation.y = Math.sin(elapsedSeconds * 0.8) * 0.08;
+        cpu.rotation.x = Math.cos(elapsedSeconds * 0.55) * 0.04;
+        cpuCore.rotation.z = Math.sin(elapsedSeconds * 0.9) * 0.08;
+
+        cpuPins.forEach((pin, index) => {
+          pin.position.z = 0.04 + Math.max(0, Math.sin(elapsedSeconds * 1.6 + index * 0.5)) * 0.08;
+        });
+        traceLines.forEach((line, index) => {
+          const material = line.material as THREE.LineBasicMaterial;
+          material.opacity = 0.24 + Math.max(0, Math.sin(elapsedSeconds * 1.8 + index * 0.8)) * 0.4;
+        });
 
         movingBalls.forEach((ball, index) => {
           const cycle = (elapsedSeconds * 0.18 + index / movingBalls.length) % 1;
@@ -212,26 +256,33 @@ function createVariantScene(
 
           if (cycle < 0.45) {
             const t = cycle / 0.45;
-            ball.position.set(
+            ball.mesh.position.set(
               -3.1 + t * 2.45,
               sourceY + Math.sin(elapsedSeconds * 2.3 + index) * 0.12,
-              0,
+              Math.sin(elapsedSeconds * 1.7 + index * 0.55) * 0.32,
             );
-            ball.scale.setScalar(1);
+            ball.mesh.scale.setScalar(1);
           } else if (cycle < 0.58) {
             const t = (cycle - 0.45) / 0.13;
-            ball.position.set(-0.2 + t * 0.4, sourceY * (1 - t) * 0.18, 0);
-            ball.scale.setScalar(1 - t * 0.45);
+            ball.mesh.position.set(
+              -0.2 + t * 0.4,
+              sourceY * (1 - t) * 0.18,
+              0.1 + Math.sin(elapsedSeconds * 2.2 + index) * 0.12,
+            );
+            ball.mesh.scale.setScalar(1 - t * 0.45);
           } else {
             const t = (cycle - 0.58) / 0.42;
-            ball.position.set(0.55 + t * 2.35, THREE.MathUtils.lerp(0, targetY, t), 0);
-            ball.scale.setScalar(0.6 + t * 0.4);
+            ball.mesh.position.set(
+              0.55 + t * 2.35,
+              THREE.MathUtils.lerp(0, targetY, t),
+              0.18 + Math.cos(elapsedSeconds * 1.3 + index * 0.5) * 0.16,
+            );
+            ball.mesh.scale.setScalar(0.6 + t * 0.4);
           }
         });
 
         targetDots.forEach((dot, index) => {
-          const material = dot.material as THREE.MeshPhysicalMaterial;
-          material.opacity = 0.12 + Math.max(0, Math.sin(elapsedSeconds * 2 + index * 0.45)) * 0.18;
+          dot.material.opacity = 0.12 + Math.max(0, Math.sin(elapsedSeconds * 2 + index * 0.45)) * 0.18;
         });
       },
       dispose: () => {
@@ -243,67 +294,72 @@ function createVariantScene(
   }
 
   if (variant === 'confidence') {
+    const graphLeft = -2.72;
+    const graphRight = 2.72;
+    const graphBottom = -1.82;
+    const graphTop = 1.32;
+
     const axes = registerGeometry(
       new THREE.BufferGeometry().setFromPoints([
-        new THREE.Vector3(-3.1, -1.8, 0),
-        new THREE.Vector3(-3.1, 1.65, 0),
-        new THREE.Vector3(-3.1, -1.8, 0),
-        new THREE.Vector3(3.05, -1.8, 0),
+        new THREE.Vector3(graphLeft, graphBottom, 0),
+        new THREE.Vector3(graphLeft, graphTop, 0),
+        new THREE.Vector3(graphLeft, graphBottom, 0),
+        new THREE.Vector3(graphRight, graphBottom, 0),
       ]),
     );
     rootGroup.add(new THREE.LineSegments(axes, subtleLineMaterial));
 
-    rootGroup.add(
-      createDashedLine(
-        registerGeometry,
-        registerMaterial,
-        [new THREE.Vector3(-1.05, -1.8, 0), new THREE.Vector3(-1.05, 1.4, 0)],
-        '#cfd4ff',
-        0.36,
-      ),
-    );
-    rootGroup.add(
-      createDashedLine(
-        registerGeometry,
-        registerMaterial,
-        [new THREE.Vector3(1.1, -1.8, 0), new THREE.Vector3(1.1, 1.4, 0)],
-        '#cfd4ff',
-        0.36,
-      ),
-    );
-
-    const curvePoints = Array.from({ length: 40 }, (_, index) => {
-      const t = index / 39;
-      const x = -2.75 + t * 5.35;
-      const y = -1.1 + t * 2.1 + Math.sin(t * Math.PI * 1.6) * 0.28;
-      return new THREE.Vector3(x, y, 0);
+    const curvePoints = Array.from({ length: 48 }, (_, index) => {
+      const t = index / 47;
+      const x = THREE.MathUtils.lerp(-2.46, 2.42, t);
+      const exponentialRise = (Math.exp(t * 2.4) - 1) / (Math.exp(2.4) - 1);
+      const y = THREE.MathUtils.lerp(-1.18, 1.22, exponentialRise);
+      return new THREE.Vector3(x, y, t * 0.46);
     });
     const curve = registerGeometry(new THREE.BufferGeometry().setFromPoints(curvePoints));
     rootGroup.add(new THREE.Line(curve, accentLineMaterial));
 
-    const bulbs = Array.from({ length: 8 }, (_, index) => {
-      const bulb = createBulb(
+    const guidePoints = [-2.12, -0.48, 1.28].map((x, index) => {
+      const orb = createOrb(
         registerGeometry,
         registerMaterial,
-        index % 2 === 0 ? accentColor : '#cfd4ff',
-        0.9,
+        index === 2 ? accentColor : '#cfd4ff',
+        index === 2 ? 0.18 : 0.14,
+        index === 2 ? 0.6 : 0.22,
       );
-      rootGroup.add(bulb.group);
-      return bulb;
+      const t = index / 2;
+      const exponentialRise = (Math.exp(t * 2.4) - 1) / (Math.exp(2.4) - 1);
+      orb.mesh.position.set(x, THREE.MathUtils.lerp(-1.02, 1.02, exponentialRise), t * 0.38);
+      rootGroup.add(orb.mesh);
+      return orb;
+    });
+
+    const memoryOrbs = Array.from({ length: 7 }, (_, index) => {
+      const color = index < 3 ? '#4cd7f6' : index < 5 ? '#cfd4ff' : accentColor;
+      const orb = createOrb(registerGeometry, registerMaterial, color, 0.14, 0.32);
+      rootGroup.add(orb.mesh);
+      return { ...orb, offset: index / 7 };
     });
 
     return {
       update: (elapsedSeconds: number) => {
-        bulbs.forEach((bulb, index) => {
-          const t = (elapsedSeconds * 0.08 + index / bulbs.length) % 1;
-          const x = -2.7 + t * 5.3;
-          const y =
-            -1.08 +
-            t * 2.1 +
-            Math.sin(t * Math.PI * 1.6) * 0.28 +
-            Math.sin(elapsedSeconds * 2 + index) * 0.04;
-          bulb.group.position.set(x, y, 0);
-          bulb.headMaterial.emissiveIntensity = x > 1.1 ? 0.72 : x > -1.05 ? 0.42 : 0.22;
+        guidePoints.forEach((orb, index) => {
+          orb.mesh.position.z = index * 0.18 + Math.sin(elapsedSeconds * 1.2 + index) * 0.08;
+          orb.material.emissiveIntensity =
+            (index === 2 ? 0.5 : 0.18) + Math.max(0, Math.sin(elapsedSeconds * 1.6 + index * 0.7)) * 0.16;
+        });
+
+        memoryOrbs.forEach((orb, index) => {
+          const t = (elapsedSeconds * 0.09 + orb.offset) % 1;
+          const exponentialRise = (Math.exp(t * 2.6) - 1) / (Math.exp(2.6) - 1);
+          const x = THREE.MathUtils.lerp(-2.42, 2.38, t);
+          const y = THREE.MathUtils.lerp(-1.12, 1.18, exponentialRise);
+          const z = 0.12 + Math.sin(elapsedSeconds * 1.9 + index * 0.8) * 0.28 + t * 0.46;
+
+          orb.mesh.position.set(x, y, z);
+          orb.mesh.scale.setScalar(0.9 + exponentialRise * 0.28);
+          orb.material.emissiveIntensity = 0.22 + exponentialRise * 0.46;
+          orb.material.opacity = 0.58 + exponentialRise * 0.34;
         });
       },
       dispose: () => {
@@ -316,9 +372,9 @@ function createVariantScene(
 
   if (variant === 'verification') {
     const platforms = [
-      { width: 4.8, y: -1.4, count: 8 },
-      { width: 3.45, y: 0, count: 5 },
-      { width: 2.15, y: 1.35, count: 2 },
+      { width: 4.8, y: -1.4 },
+      { width: 3.45, y: 0 },
+      { width: 2.15, y: 1.35 },
     ];
 
     platforms.forEach((platform, index) => {
@@ -330,33 +386,52 @@ function createVariantScene(
       rootGroup.add(mesh);
     });
 
-    const bulbs = platforms.flatMap((platform, platformIndex) =>
-      Array.from({ length: platform.count }, (_, index) => {
-        const color =
-          platformIndex === 0 ? '#4cd7f6' : platformIndex === 1 ? '#cfd4ff' : accentColor;
-        const bulb = createBulb(registerGeometry, registerMaterial, color, 0.82);
-        const usableWidth = platform.width - 0.6;
-        const x = -usableWidth / 2 + ((index + 1) * usableWidth) / (platform.count + 1);
-        bulb.group.position.set(x, platform.y + 0.34, 0);
-        rootGroup.add(bulb.group);
-        return { ...bulb, baseX: x, baseY: platform.y + 0.34, platformIndex };
-      }),
-    );
+    const bottomColor = new THREE.Color('#4cd7f6');
+    const middleColor = new THREE.Color('#cfd4ff');
+    const topColor = new THREE.Color(accentColor);
+
+    const travelingOrbs = Array.from({ length: 9 }, (_, index) => {
+      const orb = createOrb(registerGeometry, registerMaterial, '#4cd7f6', 0.13, 0.28);
+      rootGroup.add(orb.mesh);
+      return { ...orb, offset: index / 9 };
+    });
 
     return {
       update: (elapsedSeconds: number) => {
-        bulbs.forEach((bulb, index) => {
-          const oscillation = Math.max(0, Math.sin(elapsedSeconds * 1.4 + index * 0.55));
-          const rise =
-            bulb.platformIndex === 0
-              ? oscillation * 0.3
-              : bulb.platformIndex === 1
-                ? oscillation * 0.16
-                : oscillation * 0.08;
-          bulb.group.position.x = bulb.baseX + Math.sin(elapsedSeconds + index) * 0.03;
-          bulb.group.position.y = bulb.baseY + rise;
-          bulb.headMaterial.emissiveIntensity =
-            bulb.platformIndex === 2 ? 0.62 : bulb.platformIndex === 1 ? 0.42 : 0.26;
+        travelingOrbs.forEach((orb, index) => {
+          const t = (elapsedSeconds * 0.07 + orb.offset) % 1;
+          let x = 0;
+          let y = 0;
+          let color = bottomColor;
+          let intensity = 0.28;
+
+          if (t < 0.56) {
+            const phase = t / 0.56;
+            x = -1.9 + phase * 3.8;
+            y = platforms[0].y + 0.34 + Math.sin(phase * Math.PI * 2 + index * 0.4) * 0.05;
+            orb.mesh.position.z = Math.sin(elapsedSeconds * 1.7 + index) * 0.32;
+          } else if (t < 0.84) {
+            const phase = (t - 0.56) / 0.28;
+            x = THREE.MathUtils.lerp(0.9, 0.1, phase);
+            y = THREE.MathUtils.lerp(platforms[0].y + 0.34, platforms[1].y + 0.34, phase);
+            color = new THREE.Color().lerpColors(bottomColor, middleColor, phase);
+            intensity = 0.28 + phase * 0.16;
+            orb.mesh.position.z = 0.18 + Math.sin(elapsedSeconds * 1.4 + index * 0.6) * 0.18;
+          } else {
+            const phase = (t - 0.84) / 0.16;
+            x = THREE.MathUtils.lerp(0.05, 0, phase);
+            y = THREE.MathUtils.lerp(platforms[1].y + 0.34, platforms[2].y + 0.34, phase);
+            color = new THREE.Color().lerpColors(middleColor, topColor, phase);
+            intensity = 0.44 + phase * 0.18;
+            orb.mesh.position.z = 0.36 + Math.sin(elapsedSeconds * 1.3 + index * 0.6) * 0.12;
+          }
+
+          orb.mesh.position.x = x;
+          orb.mesh.position.y = y;
+          orb.material.color.copy(color);
+          orb.material.emissive.copy(color);
+          orb.material.emissiveIntensity = intensity;
+          orb.mesh.scale.setScalar(0.92 + intensity * 0.18);
         });
       },
       dispose: () => {
@@ -387,38 +462,28 @@ function createVariantScene(
       rootGroup.add(new THREE.Line(notch, accentLineMaterial));
 
       return [-0.58, -0.26, 0.32].map((offset, nodeIndex) => {
-        const mesh = new THREE.Mesh(
-          registerGeometry(new THREE.SphereGeometry(0.08, 14, 14)),
-          registerMaterial(
-            createMaterial(nodeIndex === 1 ? accentColor : '#cfd4ff', {
-              emissive: nodeIndex === 1 ? accentColor : '#cfd4ff',
-              emissiveIntensity: 0.08,
-              opacity: 0.34,
-            }),
-          ),
-        );
-        mesh.position.set(x + (nodeIndex - 1) * 0.18, offset, 0);
-        rootGroup.add(mesh);
-        return { mesh, threshold: notchIndex / notchPositions.length };
+        const color = nodeIndex === 1 ? accentColor : '#cfd4ff';
+        const orb = createOrb(registerGeometry, registerMaterial, color, 0.08, 0.08);
+        orb.mesh.position.set(x + (nodeIndex - 1) * 0.18, offset, 0);
+        orb.material.opacity = 0.34;
+        rootGroup.add(orb.mesh);
+        return { ...orb, threshold: notchIndex / notchPositions.length };
       });
     });
 
-    const sweep = new THREE.Mesh(
-      registerGeometry(new THREE.SphereGeometry(0.12, 16, 16)),
-      accentMaterial,
-    );
-    rootGroup.add(sweep);
+    const sweep = createOrb(registerGeometry, registerMaterial, accentColor, 0.12, 0.48);
+    rootGroup.add(sweep.mesh);
 
     return {
       update: (elapsedSeconds: number) => {
         const t = (elapsedSeconds * 0.12) % 1;
-        sweep.position.set(-3 + t * 6, 0, 0);
+        sweep.mesh.position.set(-3 + t * 6, 0, 0.22 + Math.sin(elapsedSeconds * 2.1) * 0.12);
 
-        nodes.forEach(({ mesh, threshold }) => {
-          const material = mesh.material as THREE.MeshPhysicalMaterial;
-          const active = t > threshold;
-          material.emissiveIntensity = active ? 0.54 : 0.06;
-          material.opacity = active ? 0.96 : 0.24;
+        nodes.forEach((orb) => {
+          const active = t > orb.threshold;
+          orb.material.emissiveIntensity = active ? 0.54 : 0.06;
+          orb.material.opacity = active ? 0.96 : 0.24;
+          orb.mesh.position.z = active ? 0.12 : 0;
         });
       },
       dispose: () => {
@@ -432,73 +497,220 @@ function createVariantScene(
   if (variant === 'conflict') {
     const leftColor = '#4cd7f6';
     const rightColor = '#d0bcff';
-    const leftBall = new THREE.Mesh(
-      registerGeometry(new THREE.SphereGeometry(0.22, 18, 18)),
-      registerMaterial(createMaterial(leftColor, { emissive: leftColor, emissiveIntensity: 0.4 })),
-    );
-    const rightBall = new THREE.Mesh(
-      registerGeometry(new THREE.SphereGeometry(0.22, 18, 18)),
-      registerMaterial(createMaterial(rightColor, { emissive: rightColor, emissiveIntensity: 0.4 })),
-    );
-    rootGroup.add(leftBall, rightBall);
+    const leftColorValue = new THREE.Color(leftColor);
+    const rightColorValue = new THREE.Color(rightColor);
+    const intermediateWinnerColor = new THREE.Color('#a7d3ff');
+    const leftBall = createOrb(registerGeometry, registerMaterial, leftColor, 0.22, 0.4);
+    const rightBall = createOrb(registerGeometry, registerMaterial, rightColor, 0.22, 0.4);
+    rootGroup.add(leftBall.mesh, rightBall.mesh);
 
     const particles = Array.from({ length: 18 }, (_, index) => {
       const color = index % 2 === 0 ? leftColor : rightColor;
-      const mesh = new THREE.Mesh(
-        registerGeometry(new THREE.SphereGeometry(0.05, 12, 12)),
-        registerMaterial(createMaterial(color, { emissive: color, emissiveIntensity: 0.3 })),
-      );
-      rootGroup.add(mesh);
-      return mesh;
+      const orb = createOrb(registerGeometry, registerMaterial, color, 0.05, 0.26);
+      rootGroup.add(orb.mesh);
+      return { ...orb, isWinningColor: index % 2 === 1 };
     });
 
-    const survivor = new THREE.Mesh(
-      registerGeometry(new THREE.SphereGeometry(0.24, 18, 18)),
-      registerMaterial(createMaterial(rightColor, { emissive: rightColor, emissiveIntensity: 0.5 })),
-    );
-    rootGroup.add(survivor);
+    const survivor = createOrb(registerGeometry, registerMaterial, rightColor, 0.24, 0.5);
+    rootGroup.add(survivor.mesh);
 
     return {
       update: (elapsedSeconds: number) => {
-        const t = (elapsedSeconds * 0.2) % 1;
+        const t = (elapsedSeconds * 0.115) % 1;
 
-        if (t < 0.38) {
-          const approach = t / 0.38;
-          leftBall.visible = true;
-          rightBall.visible = true;
-          survivor.visible = false;
+        leftBall.material.color.copy(leftColorValue);
+        leftBall.material.emissive.copy(leftColorValue);
+        rightBall.material.color.copy(rightColorValue);
+        rightBall.material.emissive.copy(rightColorValue);
+        survivor.material.color.copy(rightColorValue);
+        survivor.material.emissive.copy(rightColorValue);
+
+        if (t < 0.18) {
+          const approach = t / 0.18;
+          leftBall.mesh.visible = true;
+          rightBall.mesh.visible = true;
+          survivor.mesh.visible = false;
+          leftBall.material.opacity = 0.94;
+          rightBall.material.opacity = 0.94;
+          leftBall.material.emissiveIntensity = 0.4;
+          rightBall.material.emissiveIntensity = 0.4;
           particles.forEach((particle) => {
-            particle.visible = false;
+            particle.mesh.visible = false;
+            particle.material.opacity = 0;
+            particle.material.emissiveIntensity = 0.12;
           });
-          leftBall.position.set(-2.4 + approach * 2.1, 0, 0);
-          rightBall.position.set(2.4 - approach * 2.1, 0, 0);
-        } else if (t < 0.6) {
-          const explode = (t - 0.38) / 0.22;
-          leftBall.visible = false;
-          rightBall.visible = false;
-          survivor.visible = false;
+          leftBall.mesh.position.set(
+            -2.45 + approach * 1.75,
+            Math.sin(approach * Math.PI) * 0.12,
+            -0.12 + approach * 0.1,
+          );
+          rightBall.mesh.position.set(
+            2.45 - approach * 1.75,
+            Math.sin(approach * Math.PI + Math.PI * 0.45) * 0.12,
+            0.26 - approach * 0.08,
+          );
+          leftBall.mesh.scale.setScalar(1);
+          rightBall.mesh.scale.setScalar(1);
+        } else if (t < 0.28) {
+          const recoil = (t - 0.18) / 0.1;
+          const contactPulse = Math.sin(recoil * Math.PI);
+          const separation = THREE.MathUtils.lerp(0.68, 1.24, recoil);
+
+          leftBall.mesh.visible = true;
+          rightBall.mesh.visible = true;
+          survivor.mesh.visible = false;
+          leftBall.material.opacity = 0.94;
+          rightBall.material.opacity = 0.94;
+          leftBall.material.emissiveIntensity = 0.42 + contactPulse * 0.26;
+          rightBall.material.emissiveIntensity = 0.42 + contactPulse * 0.26;
+
+          leftBall.mesh.position.set(
+            -separation,
+            Math.sin(recoil * Math.PI * 1.1) * 0.16,
+            -0.08 + contactPulse * 0.1,
+          );
+          rightBall.mesh.position.set(
+            separation,
+            -Math.sin(recoil * Math.PI * 1.05) * 0.14,
+            0.18 - contactPulse * 0.08,
+          );
+          leftBall.mesh.scale.setScalar(1 + contactPulse * 0.12);
+          rightBall.mesh.scale.setScalar(1 + contactPulse * 0.12);
+
           particles.forEach((particle, index) => {
-            particle.visible = true;
             const angle = (index / particles.length) * Math.PI * 2;
-            const radius = explode * 0.95;
-            particle.position.set(
+            const radius = 0.12 + contactPulse * 0.42;
+            particle.mesh.visible = true;
+            particle.mesh.position.set(
               Math.cos(angle) * radius,
-              Math.sin(angle * 1.4) * radius * 0.58,
-              0,
+              Math.sin(angle * 1.35) * radius * 0.42,
+              Math.cos(angle * 0.8) * radius * 0.2,
             );
-            const material = particle.material as THREE.MeshPhysicalMaterial;
-            material.opacity = 0.8 - explode * 0.48;
+            particle.material.opacity = contactPulse * 0.24;
+            particle.material.emissiveIntensity = 0.1 + contactPulse * 0.12;
           });
+        } else if (t < 0.74) {
+          const debate = (t - 0.28) / 0.46;
+          const exchanges = debate * Math.PI * 6;
+          const swing = Math.cos(exchanges);
+          const impactPulse = Math.pow(Math.max(0, Math.cos(exchanges * 0.5)), 6);
+          const separation = 0.95 + swing * 0.55;
+          const arcY = Math.sin(exchanges * 0.62) * 0.38;
+          const arcZ = Math.sin(exchanges * 0.92) * 0.46;
+
+          leftBall.mesh.visible = true;
+          rightBall.mesh.visible = true;
+          survivor.mesh.visible = false;
+          leftBall.material.opacity = 0.94;
+          rightBall.material.opacity = 0.94;
+
+          leftBall.mesh.position.set(-separation, arcY, -0.14 + arcZ * 0.3);
+          rightBall.mesh.position.set(separation, -arcY * 0.75, 0.2 - arcZ * 0.2);
+          leftBall.mesh.scale.setScalar(1 + impactPulse * 0.18);
+          rightBall.mesh.scale.setScalar(1 + impactPulse * 0.18);
+          leftBall.material.emissiveIntensity = 0.34 + impactPulse * 0.42;
+          rightBall.material.emissiveIntensity = 0.34 + impactPulse * 0.42;
+
+          particles.forEach((particle, index) => {
+            particle.mesh.visible = true;
+            const angle = (index / particles.length) * Math.PI * 2 + exchanges * 0.35;
+            const radius = 0.18 + impactPulse * 0.95 + Math.sin(exchanges + index) * 0.04;
+            const direction = particle.isWinningColor ? 1 : -1;
+            particle.mesh.position.set(
+              Math.cos(angle) * radius * 0.9,
+              Math.sin(angle * 1.6) * radius * 0.46,
+              Math.cos(angle * 0.8) * radius * 0.56 + direction * impactPulse * 0.12,
+            );
+            particle.material.opacity = 0.14 + impactPulse * 0.72;
+            particle.material.emissiveIntensity = 0.1 + impactPulse * 0.32;
+          });
+        } else if (t < 0.88) {
+          const resolve = (t - 0.74) / 0.14;
+          const mergeBlend = Math.sin(resolve * Math.PI);
+          const survivorColor = new THREE.Color().lerpColors(
+            leftColorValue,
+            rightColorValue,
+            THREE.MathUtils.smoothstep(resolve, 0.38, 1),
+          );
+
+          leftBall.mesh.visible = true;
+          rightBall.mesh.visible = true;
+          survivor.mesh.visible = true;
+
+          leftBall.mesh.position.set(
+            THREE.MathUtils.lerp(-0.92, -0.1, resolve),
+            THREE.MathUtils.lerp(0.18, 0.02, resolve),
+            THREE.MathUtils.lerp(-0.12, 0.08, resolve),
+          );
+          rightBall.mesh.position.set(
+            THREE.MathUtils.lerp(0.92, 0.1, resolve),
+            THREE.MathUtils.lerp(-0.12, -0.02, resolve),
+            THREE.MathUtils.lerp(0.18, 0.1, resolve),
+          );
+          leftBall.mesh.scale.setScalar(1 - resolve * 0.28);
+          rightBall.mesh.scale.setScalar(1 - resolve * 0.12);
+          leftBall.material.opacity = 0.92 - resolve * 0.72;
+          rightBall.material.opacity = 0.92 - resolve * 0.4;
+          leftBall.material.emissiveIntensity = 0.38 - resolve * 0.18;
+          rightBall.material.emissiveIntensity = 0.42 + resolve * 0.08;
+
+          particles.forEach((particle, index) => {
+            particle.mesh.visible = true;
+            const angle = (index / particles.length) * Math.PI * 2;
+            const startRadius = particle.isWinningColor ? 0.92 : 0.74;
+            const radius = THREE.MathUtils.lerp(startRadius, particle.isWinningColor ? 0.22 : 1.58, resolve);
+            particle.mesh.position.set(
+              Math.cos(angle) * radius,
+              Math.sin(angle * 1.35) * radius * 0.48,
+              Math.cos(angle * 0.85) * radius * 0.34,
+            );
+            particle.material.opacity = particle.isWinningColor
+              ? 0.78 - resolve * 0.58
+              : 0.54 - resolve * 0.54;
+            particle.material.emissiveIntensity = particle.isWinningColor
+              ? 0.34 + resolve * 0.1
+              : 0.18 - resolve * 0.16;
+          });
+
+          survivor.mesh.scale.setScalar(0.72 + resolve * 0.74 + mergeBlend * 0.06);
+          survivor.mesh.position.set(0, 0, 0.16 + resolve * 0.12);
+          survivor.material.color.copy(survivorColor);
+          survivor.material.emissive.copy(survivorColor);
+          survivor.material.opacity = 0.5 + resolve * 0.42;
+          survivor.material.emissiveIntensity = 0.42 + resolve * 0.3;
         } else {
-          const reform = (t - 0.6) / 0.4;
-          leftBall.visible = false;
-          rightBall.visible = false;
+          const hold = (t - 0.88) / 0.12;
+          const survivorColor = new THREE.Color().lerpColors(
+            intermediateWinnerColor,
+            rightColorValue,
+            hold,
+          );
+          leftBall.mesh.visible = false;
+          rightBall.mesh.visible = true;
+          survivor.mesh.visible = true;
           particles.forEach((particle) => {
-            particle.visible = false;
+            particle.mesh.visible = particle.isWinningColor;
+            if (particle.isWinningColor) {
+              particle.mesh.position.multiplyScalar(0.94);
+              particle.material.opacity = 0.08 * (1 - hold);
+            }
           });
-          survivor.visible = true;
-          survivor.scale.setScalar(0.7 + reform * 0.36);
-          survivor.position.set(reform * 0.42, 0, 0);
+
+          rightBall.mesh.position.set(
+            THREE.MathUtils.lerp(0.1, 0.02, hold),
+            THREE.MathUtils.lerp(-0.02, 0, hold),
+            THREE.MathUtils.lerp(0.1, 0.2, hold),
+          );
+          rightBall.mesh.scale.setScalar(0.88 - hold * 0.22);
+          rightBall.material.opacity = 0.52 * (1 - hold);
+          rightBall.material.emissiveIntensity = 0.46 * (1 - hold * 0.5);
+
+          survivor.mesh.scale.setScalar(1.5 + Math.sin(hold * Math.PI) * 0.06);
+          survivor.mesh.position.set(0, 0, 0.28);
+          survivor.material.color.copy(survivorColor);
+          survivor.material.emissive.copy(survivorColor);
+          survivor.material.opacity = 0.92;
+          survivor.material.emissiveIntensity = 0.72 + hold * 0.12;
         }
       },
       dispose: () => {
@@ -543,13 +755,10 @@ function createVariantScene(
   rootGroup.add(new THREE.LineSegments(graphEdges, accentLineMaterial));
 
   const graphMeshes = graphNodes.map((node) => {
-    const mesh = new THREE.Mesh(
-      registerGeometry(new THREE.SphereGeometry(0.09, 14, 14)),
-      registerMaterial(createMaterial(accentColor, { emissive: accentColor, emissiveIntensity: 0.14 })),
-    );
-    mesh.position.copy(node);
-    rootGroup.add(mesh);
-    return mesh;
+    const orb = createOrb(registerGeometry, registerMaterial, accentColor, 0.09, 0.14);
+    orb.mesh.position.copy(node);
+    rootGroup.add(orb.mesh);
+    return orb;
   });
 
   const vectorBars = Array.from({ length: 8 }, (_, index) => {
@@ -583,10 +792,10 @@ function createVariantScene(
 
   return {
     update: (elapsedSeconds: number) => {
-      graphMeshes.forEach((mesh, index) => {
-        const material = mesh.material as THREE.MeshPhysicalMaterial;
-        material.emissiveIntensity =
+      graphMeshes.forEach((orb, index) => {
+        orb.material.emissiveIntensity =
           0.12 + Math.max(0, Math.sin(elapsedSeconds * 2 + index * 0.6)) * 0.46;
+        orb.mesh.position.z = Math.sin(elapsedSeconds * 1.7 + index * 0.6) * 0.18;
       });
 
       vectorBars.forEach((mesh, index) => {
@@ -598,6 +807,7 @@ function createVariantScene(
         const lit = Math.sin(elapsedSeconds * 1.5 + index * 0.6) > 0.35;
         material.emissiveIntensity = lit ? 0.28 : 0.06;
         material.opacity = lit ? 0.92 : 0.28;
+        mesh.position.z = lit ? 0.16 : 0;
       });
     },
     dispose: () => {
@@ -617,9 +827,9 @@ function renderOverlay(
       <Box
         sx={{
           position: 'absolute',
-          top: '50%',
+          top: 16,
           left: '50%',
-          transform: 'translate(-50%, -50%)',
+          transform: 'translateX(-50%)',
           px: 1.5,
           py: 0.6,
           borderRadius: 1.5,
@@ -642,20 +852,23 @@ function renderOverlay(
       <Box
         sx={{
           position: 'absolute',
-          left: 18,
-          right: 18,
-          bottom: 16,
-          display: 'grid',
-          gridTemplateColumns: 'repeat(3, 1fr)',
-          gap: 1,
+          left: '10%',
+          width: '80%',
+          bottom: '8%',
+          display: 'flex',
+          justifyContent: 'space-between',
           pointerEvents: 'none',
         }}
       >
-        {['Low confidence', 'Neutral confidence', 'High confidence'].map((label) => (
+        {['Low confidence', 'High confidence'].map((label) => (
           <Typography
             key={label}
             variant="caption"
-            sx={{ color: 'text.secondary', textAlign: 'center' }}
+            sx={{
+              width: '50%',
+              color: 'text.secondary',
+              textAlign: 'center',
+            }}
           >
             {label}
           </Typography>
@@ -669,18 +882,22 @@ function renderOverlay(
       <Box
         sx={{
           position: 'absolute',
-          top: 20,
+          inset: 0,
           left: 18,
-          display: 'grid',
-          gap: 8,
           pointerEvents: 'none',
         }}
       >
-        {['Graph', 'Vector', 'Relational'].map((label) => (
+        {[
+          { label: 'Graph', top: '18%' },
+          { label: 'Vector', top: '47%' },
+          { label: 'Relational', top: '76%' },
+        ].map((item) => (
           <Typography
-            key={label}
+            key={item.label}
             variant="caption"
             sx={{
+              position: 'absolute',
+              top: item.top,
               color: 'text.secondary',
               backgroundColor: alpha('#0b0e14', 0.38),
               px: 1,
@@ -689,7 +906,7 @@ function renderOverlay(
               width: 'fit-content',
             }}
           >
-            {label}
+            {item.label}
           </Typography>
         ))}
       </Box>
@@ -713,8 +930,8 @@ export default function ThreeModulePreview({
     }
 
     const scene = new THREE.Scene();
-    const camera = new THREE.OrthographicCamera(-4, 4, 3, -3, 0.1, 100);
-    camera.position.set(0, 0, 10);
+    const camera = new THREE.PerspectiveCamera(34, 1, 0.1, 100);
+    camera.position.set(0, 0.25, 8.2);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -743,11 +960,7 @@ export default function ThreeModulePreview({
         return;
       }
 
-      const aspect = width / height;
-      camera.left = -4 * aspect;
-      camera.right = 4 * aspect;
-      camera.top = 3.2;
-      camera.bottom = -3.2;
+      camera.aspect = width / height;
       camera.updateProjectionMatrix();
 
       renderer.setSize(width, height, false);
@@ -782,13 +995,13 @@ export default function ThreeModulePreview({
     <Box
       sx={{
         position: 'relative',
-        minHeight: { xs: 280, md: 420 },
+        minHeight: { xs: 220, sm: 260, md: 320 },
         borderRadius: 4,
         overflow: 'hidden',
         background: `linear-gradient(180deg, ${alpha('#101419', 0.92)} 0%, ${alpha(accentColor, 0.08)} 100%)`,
         border: `1px solid ${alpha(accentColor, 0.14)}`,
         boxShadow: `inset 0 1px 0 ${alpha('#ffffff', 0.05)}`,
-        transform: `translate3d(0, ${(0.5 - progress) * 26}px, 0)`,
+        transform: `translate3d(0, ${(0.5 - progress) * 18}px, 0)`,
         transition: 'transform 160ms linear',
       }}
     >
