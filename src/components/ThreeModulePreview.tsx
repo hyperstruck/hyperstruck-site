@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
@@ -922,8 +922,13 @@ export default function ThreeModulePreview({
   variant,
 }: ThreeModulePreviewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const showAnimation = useMediaQuery('(min-width:600px)');
 
   useEffect(() => {
+    if (!showAnimation) {
+      return undefined;
+    }
+
     const container = containerRef.current;
     if (!container) {
       return undefined;
@@ -992,7 +997,7 @@ export default function ThreeModulePreview({
       renderer.dispose();
       container.removeChild(renderer.domElement);
     };
-  }, [accentColor, variant]);
+  }, [accentColor, showAnimation, variant]);
 
   return (
     <Box
@@ -1020,8 +1025,8 @@ export default function ThreeModulePreview({
           pointerEvents: 'none',
         }}
       />
-      <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} />
-      {renderOverlay(variant, accentColor)}
+      {showAnimation ? <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} /> : null}
+      {showAnimation ? renderOverlay(variant, accentColor) : null}
     </Box>
   );
 }
