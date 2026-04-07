@@ -1,4 +1,4 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useMediaQuery } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
 import { learningModules } from '../data/siteContent';
@@ -21,6 +21,7 @@ function LearningModuleChapter({
   index: number;
 }) {
   const theme = useTheme();
+  const showPreview = useMediaQuery('(min-width:900px) and (min-height:700px)');
   const module = learningModules[index];
   const { ref, progress } = useParallaxProgress<HTMLDivElement>();
   const reveal = getRevealProgress(progress, 0.1);
@@ -38,7 +39,7 @@ function LearningModuleChapter({
         alignItems: 'center',
         gridTemplateColumns: {
           xs: '1fr',
-          sm: 'minmax(0, 1.02fr) minmax(260px, 0.98fr)',
+          md: showPreview ? 'minmax(0, 1.02fr) minmax(260px, 0.98fr)' : '1fr',
         },
         gap: { xs: 3, sm: 4, md: 6 },
         borderTop: index === 0 ? 'none' : `1px solid ${alpha(theme.palette.divider, 0.2)}`,
@@ -46,7 +47,7 @@ function LearningModuleChapter({
     >
       <Box
         sx={{
-          order: { xs: 2, sm: isReversed ? 2 : 1 },
+          order: showPreview ? { xs: 2, sm: isReversed ? 2 : 1 } : 1,
           maxWidth: 620,
           opacity: 0.14 + reveal * 0.86,
           transform: `translate3d(0, ${(1 - reveal) * 56}px, 0)`,
@@ -79,27 +80,29 @@ function LearningModuleChapter({
         </Box>
       </Box>
 
-      <Box
-        sx={{
-          order: { xs: 1, sm: isReversed ? 1 : 2 },
-          position: 'relative',
-          alignSelf: 'center',
-          maxWidth: { xs: 420, sm: '100%' },
-          ml: { xs: 'auto', sm: 0 },
-          mr: { xs: 'auto', sm: 0 },
-          opacity: 0.22 + reveal * 0.78,
-          transform: `translate3d(0, ${(1 - reveal) * 36}px, 0)`,
-          transition: 'transform 180ms linear, opacity 180ms linear',
-        }}
-      >
-        <Box sx={{ position: 'relative' }}>
-          <ThreeModulePreview
-            accentColor={accentColor}
-            progress={progress}
-            variant={module.animationVariant}
-          />
+      {showPreview ? (
+        <Box
+          sx={{
+            order: { xs: 1, sm: isReversed ? 1 : 2 },
+            position: 'relative',
+            alignSelf: 'center',
+            maxWidth: { xs: 420, sm: '100%' },
+            ml: { xs: 'auto', sm: 0 },
+            mr: { xs: 'auto', sm: 0 },
+            opacity: 0.22 + reveal * 0.78,
+            transform: `translate3d(0, ${(1 - reveal) * 36}px, 0)`,
+            transition: 'transform 180ms linear, opacity 180ms linear',
+          }}
+        >
+          <Box sx={{ position: 'relative' }}>
+            <ThreeModulePreview
+              accentColor={accentColor}
+              progress={progress}
+              variant={module.animationVariant}
+            />
+          </Box>
         </Box>
-      </Box>
+      ) : null}
     </Box>
   );
 }
