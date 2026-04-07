@@ -940,6 +940,9 @@ export default function ThreeModulePreview({
     });
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.75));
     renderer.outputColorSpace = THREE.SRGBColorSpace;
+    renderer.domElement.style.display = 'block';
+    renderer.domElement.style.width = '100%';
+    renderer.domElement.style.height = '100%';
     container.appendChild(renderer.domElement);
 
     const ambientLight = new THREE.AmbientLight('#ffffff', 1.1);
