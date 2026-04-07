@@ -40,20 +40,20 @@ export interface LearningModule {
   difference: string;
   icon: SvgIconComponent;
   animationVariant:
-    | 'experiential'
-    | 'confidence'
-    | 'verification'
-    | 'attribution'
-    | 'conflict'
-    | 'architecture';
+  | 'experiential'
+  | 'confidence'
+  | 'verification'
+  | 'attribution'
+  | 'conflict'
+  | 'architecture';
   animationConcept: string;
   accent:
-    | 'primary'
-    | 'secondary'
-    | 'tertiary'
-    | 'primarySoft'
-    | 'secondarySoft'
-    | 'tertiarySoft';
+  | 'primary'
+  | 'secondary'
+  | 'tertiary'
+  | 'primarySoft'
+  | 'secondarySoft'
+  | 'tertiarySoft';
 }
 
 export interface CompatibilityItem {
@@ -150,7 +150,7 @@ export const learningModules: LearningModule[] = [
     title: 'Experiential Intelligence',
     eyebrow: 'Not just storage. Evolution.',
     description:
-      'Most AI systems remember specific conversations. Hyperstruck synthesizes patterns from thousands of runs to build a generalized intuition for your stack.',
+      'Most AI systems remember specific conversations. Hyperstruck Core synthesizes patterns from thousands of runs to build a generalized intuition for your stack.',
     difference: 'Others retrieve documents. We extract experience.',
     icon: PsychologyAltRoundedIcon,
     animationVariant: 'experiential',
@@ -161,7 +161,7 @@ export const learningModules: LearningModule[] = [
     title: 'Confidence That Matures',
     eyebrow: 'Knowledge that proves itself.',
     description:
-      'Every insight in Hyperstruck is assigned a dynamic confidence score based on historical performance and source reliability.',
+      'Every insight in Hyperstruck Core is assigned a dynamic confidence score based on historical performance and source reliability.',
     difference: 'Static embeddings vs. self-validating expertise.',
     icon: VerifiedRoundedIcon,
     animationVariant: 'confidence',
@@ -172,7 +172,7 @@ export const learningModules: LearningModule[] = [
     title: 'Trust Levels & Verification',
     eyebrow: 'Not all knowledge deserves equal weight.',
     description:
-      'Hyperstruck understands that insight requires validation. Our system partitions proposed knowledge from verified, production-ready intelligence.',
+      'Hyperstruck Core understands that insight requires validation. Our system partitions proposed knowledge from verified, production-ready intelligence.',
     difference: 'Flat retrieval vs. verified, tiered intelligence.',
     icon: RuleRoundedIcon,
     animationVariant: 'verification',
@@ -183,7 +183,7 @@ export const learningModules: LearningModule[] = [
     title: 'Attribution & Accountability',
     eyebrow: 'Close the loop. Know what works.',
     description:
-      'When Hyperstruck applies past learnings, it cites the exact historical execution path that justifies the current decision.',
+      'When Hyperstruck Core applies past learnings, it cites the exact historical execution path that justifies the current decision.',
     difference: 'Blind suggestions vs. attributable, measurable impact.',
     icon: HistoryEduRoundedIcon,
     animationVariant: 'attribution',
@@ -205,7 +205,7 @@ export const learningModules: LearningModule[] = [
     title: 'Memory Architecture',
     eyebrow: 'The right tool for the right thought.',
     description:
-      "Hyperstruck doesn't dump everything into a single bucket. We use specialized vector, graph, and relational memory structures for different cognitive tasks.",
+      "Hyperstruck Core doesn't dump everything into a single bucket. We use specialized vector, graph, and relational memory structures for different cognitive tasks.",
     difference: 'Monolithic memory vs. specialized cognition.',
     icon: SchemaRoundedIcon,
     animationVariant: 'architecture',
@@ -343,7 +343,7 @@ export const heroHighlights = [
 export const metrics = [
   {
     value: '1 API',
-    label: 'to plug Hyperstruck into existing workflows',
+    label: 'to plug Hyperstruck Core into existing workflows',
     icon: ApiRoundedIcon,
   },
   {
