@@ -1,0 +1,78 @@
+---
+title: Learnings API
+description: Store, search, retrieve, and reinforce operational knowledge so agents improve over time.
+---
+
+Use the Learnings API when you want useful experience to persist beyond a single run. It gives developers direct control over how lessons from operators, workflows, and repeated execution get stored, searched, and reinforced over time.
+
+<Callout type="idea" title="Best fit">
+  Use the Learnings API when you want useful experience to persist, get searched later, and improve future runs instead of disappearing after one task.
+</Callout>
+
+## The control point
+
+An API for programmatically managing operational learnings for an agent.
+
+## Why teams keep it close
+
+This is how teams turn one-off wins into durable system behavior. Instead of letting useful lessons disappear after a run, they can be stored, searched, and reinforced over time.
+
+## What it makes possible
+
+- capture what worked
+- search prior learnings before difficult tasks
+- reinforce useful patterns
+- create a compounding feedback loop around agent performance
+
+## Quick mental model
+
+<Cards>
+  <Card title="Store" description="Capture useful lessons from real execution." />
+  <Card title="Search and retrieve" description="Bring prior learnings back into difficult or recurring workflows." />
+  <Card title="Reinforce" description="Strengthen patterns that continue to prove useful over time." />
+</Cards>
+
+## Example: store a learning
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
+  -d '{
+    "content": "Always validate a date range before running large analytics exports.",
+    "learning_type": "pitfall",
+    "confidence": 0.7
+  }'
+```
+
+## Example: search learnings
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/search?q=analytics+export&limit=5"
+```
+
+## Example: get a learning
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>"
+```
+
+## Example: reinforce a learning
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>/reinforce" \
+  -d '{
+    "is_helpful": true
+  }'
+```
+
+## Related pages
+
+- See [Learning](/docs/learning) for the broader explanation of why this matters.
+- See [Agents API](/docs/agents-api) if you want Hyperstruck to drive reasoning for a goal, not just manage learnings directly.

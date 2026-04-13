@@ -1,0 +1,57 @@
+---
+title: Agents API
+description: Use Hyperstruck agent profiles to invoke hosted reasoning and task-level decision support through a simple API.
+---
+
+Use the Agents API when you want Hyperstruck to do more than complete a raw model call. It gives developers a clean way to select an agent profile and send in a goal that benefits from stronger reasoning, planning, and task structure.
+
+<Callout type="info" title="Best fit">
+  Use the Agents API when you want Hyperstruck to drive task-level reasoning, sequencing, and planning, not just complete a single prompt.
+</Callout>
+
+## The surface area
+
+An API surface for selecting agent profiles and sending goals into Hyperstruck.
+
+## Why teams reach for it
+
+It gives technical teams a lightweight integration path into Hyperstruck without needing to build the full orchestration and reasoning layer themselves.
+
+## What it unlocks
+
+- route work to the right agent profile
+- use Hyperstruck for planning and structured analysis
+- add reasoning capabilities without a heavy application wrapper
+
+## Quick mental model
+
+<Cards>
+  <Card title="Input" description="A goal plus the context needed to work through it well." />
+  <Card title="System role" description="Hyperstruck applies agent-level reasoning and task structure." />
+  <Card title="Output" description="A better-grounded approach to execution than a raw model call alone." />
+</Cards>
+
+## Example: list agents
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents?limit=50"
+```
+
+## Example: dispatch a goal
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/goals" \
+  -d '{
+    "goal": "Map out a migration plan with milestones and risks",
+    "context": "Current stack, constraints, and known blockers go here"
+  }'
+```
+
+## Related pages
+
+- See [Reasoning](/docs/reasoning) for the non-technical explanation of what this capability delivers.
+- See [Claude Skills](/docs/claude-skills) if you want to use the same capability from Claude Code or Cursor.

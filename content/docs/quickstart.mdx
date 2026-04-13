@@ -1,0 +1,113 @@
+---
+title: Quickstart
+description: A minimal end-to-end Hyperstruck flow using reasoning, learnings, and developer-tool integrations.
+---
+
+This page walks through the smallest useful Hyperstruck workflow: send a goal to an agent, capture a useful learning, and reuse the same capability from developer tooling.
+
+<Callout type="idea" title="What this shows">
+  The goal is not a full production integration. It is a minimal path to seeing reasoning and learning work together with as little setup as possible.
+</Callout>
+
+## At a glance
+
+<Cards>
+  <Card
+    title="1. Invoke reasoning"
+    href="/docs/agents-api"
+    description="Send a goal to a purpose-built agent profile."
+  />
+  <Card
+    title="2. Capture a learning"
+    href="/docs/learnings-api"
+    description="Store something useful so future runs can benefit."
+  />
+  <Card
+    title="3. Use it in tooling"
+    href="/docs/claude-skills"
+    description="Bring the same workflow into Claude Code or Cursor."
+  />
+</Cards>
+
+## Minimal flow
+
+<Steps>
+  <Step>
+
+### Pick an agent profile and dispatch a goal
+
+Use the Agents API when you want Hyperstruck to help with planning, sequencing, and decision quality.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/goals" \
+  -d '{
+    "goal": "Map out a migration plan with milestones and risks",
+    "context": "Current stack, constraints, and known blockers go here"
+  }'
+```
+
+  </Step>
+  <Step>
+
+### Store a useful lesson from the outcome
+
+When something proves useful, add it as a learning so future runs can benefit.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
+  -d '{
+    "content": "Always validate the migration dependency graph before scheduling milestones.",
+    "learning_type": "best_practice",
+    "confidence": 0.7
+  }'
+```
+
+  </Step>
+  <Step>
+
+### Reuse those capabilities from developer tooling
+
+Once the APIs are in place, you can expose the same reasoning and learning flows through Claude Code or Cursor skills.
+
+```text
+/hyper-reasoning Map out a migration plan with milestones and risks
+/hyper-learning search migration dependency graph
+/hyper-learning store
+```
+
+  </Step>
+</Steps>
+
+## How to think about this flow
+
+- [Reasoning](/docs/reasoning) improves decision quality during the run.
+- [Learning](/docs/learning) helps the system carry useful outcomes forward.
+- [Agents API](/docs/agents-api) is the simplest programmable entry point for hosted reasoning.
+- [Learnings API](/docs/learnings-api) is the programmable entry point for compounding operational knowledge.
+- [Claude Skills](/docs/claude-skills) makes the same capability easy to use where developers already work.
+
+## Suggested next pages
+
+<Cards>
+  <Card
+    title="Understand reasoning"
+    href="/docs/reasoning"
+    description="See how Hyperstruck improves task-level decision quality."
+  />
+  <Card
+    title="Understand learning"
+    href="/docs/learning"
+    description="See how Hyperstruck turns useful outcomes into reusable intelligence."
+  />
+  <Card
+    title="Go deeper on the APIs"
+    href="/docs/agents-api"
+    description="Start with the API surface if you are integrating directly."
+  />
+</Cards>
