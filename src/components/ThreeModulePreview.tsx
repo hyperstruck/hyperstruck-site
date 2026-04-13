@@ -1,4 +1,4 @@
-import { Box, Typography, useMediaQuery } from '@mui/material';
+import { Box, Stack, Typography, useMediaQuery } from '@mui/material';
 import { alpha } from '@mui/material/styles';
 import { useEffect, useRef } from 'react';
 import type { ReactNode } from 'react';
@@ -85,10 +85,12 @@ function createVariantScene(
   const rootGroup = new THREE.Group();
   scene.add(rootGroup);
   rootGroup.scale.setScalar(
-    variant === 'confidence' ? 1.36 : variant === 'architecture' ? 1.24 : 1.18,
+    variant === 'confidence' ? 1.36 : variant === 'architecture' ? 1.24 : variant === 'experiential' ? 1.04 : 1.18,
   );
   rootGroup.rotation.x =
-    variant === 'verification'
+    variant === 'experiential'
+      ? -0.08
+      : variant === 'verification'
       ? -0.42
       : variant === 'architecture'
         ? -0.34
@@ -97,7 +99,7 @@ function createVariantScene(
           : -0.18;
   rootGroup.rotation.y =
     variant === 'experiential'
-      ? -0.38
+      ? -0.1
       : variant === 'architecture'
         ? -0.28
         : variant === 'verification'
@@ -160,130 +162,160 @@ function createVariantScene(
   );
 
   if (variant === 'experiential') {
-    const cpu = new THREE.Mesh(
-      registerGeometry(new THREE.BoxGeometry(1.12, 1.12, 0.34)),
-      panelMaterial,
+    const graphLeft = -3;
+    const graphRight = 2.85;
+    const graphBottom = -1.92;
+    const graphTop = 1.4;
+    const baselineValue = 20;
+    const encounterValues = [25, 70, 80, 85, 90, 92];
+    const xPositions = Array.from({ length: encounterValues.length }, (_, index) =>
+      THREE.MathUtils.lerp(-2.68, 2.55, index / (encounterValues.length - 1)),
     );
-    cpu.position.z = 0.12;
-    rootGroup.add(cpu);
+    const projectY = (value: number): number =>
+      THREE.MathUtils.lerp(graphBottom, graphTop, value / 100);
+    const baselineY = projectY(baselineValue);
 
-    const cpuCore = new THREE.Mesh(
-      registerGeometry(new THREE.BoxGeometry(0.58, 0.58, 0.22)),
-      accentMaterial,
+    const axes = registerGeometry(
+      new THREE.BufferGeometry().setFromPoints([
+        new THREE.Vector3(graphLeft, graphBottom, 0),
+        new THREE.Vector3(graphLeft, graphTop, 0),
+        new THREE.Vector3(graphLeft, graphBottom, 0),
+        new THREE.Vector3(graphRight, graphBottom, 0),
+      ]),
     );
-    cpuCore.position.set(0, 0, 0.4);
-    rootGroup.add(cpuCore);
+    rootGroup.add(new THREE.LineSegments(axes, subtleLineMaterial));
 
-    const cpuPins = Array.from({ length: 12 }, (_, index) => {
-      const pin = new THREE.Mesh(
-        registerGeometry(new THREE.BoxGeometry(0.08, 0.16, 0.08)),
-        softMaterial,
+    [20, 40, 60, 80, 100].forEach((value) => {
+      const y = projectY(value);
+      const guide = createDashedLine(
+        registerGeometry,
+        registerMaterial,
+        [
+          new THREE.Vector3(graphLeft, y, -0.02),
+          new THREE.Vector3(graphRight, y, -0.02),
+        ],
+        value === baselineValue ? '#98a3b8' : '#cfd4ff',
+        value === baselineValue ? 0.42 : 0.12,
       );
-      const side = index < 3 ? 'top' : index < 6 ? 'right' : index < 9 ? 'bottom' : 'left';
-      const offset = ((index % 3) - 1) * 0.36;
+      rootGroup.add(guide);
 
-      if (side === 'top') {
-        pin.position.set(offset, 0.72, 0.04);
-      } else if (side === 'right') {
-        pin.position.set(0.72, offset, 0.04);
-      } else if (side === 'bottom') {
-        pin.position.set(offset, -0.72, 0.04);
-      } else {
-        pin.position.set(-0.72, offset, 0.04);
-      }
-
-      rootGroup.add(pin);
-      return pin;
-    });
-
-    const traceLines = [
-      [-0.96, 0.7, -0.24, 0.28],
-      [0.96, 0.7, 0.24, 0.28],
-      [-0.96, -0.7, -0.24, -0.28],
-      [0.96, -0.7, 0.24, -0.28],
-      [-0.86, 0, -0.34, 0],
-      [0.86, 0, 0.34, 0],
-    ].map(([x1, y1, x2, y2]) => {
-      const geometry = registerGeometry(
+      const tick = registerGeometry(
         new THREE.BufferGeometry().setFromPoints([
-          new THREE.Vector3(x1, y1, 0.02),
-          new THREE.Vector3(x2, y2, 0.28),
+          new THREE.Vector3(graphLeft, y, 0),
+          new THREE.Vector3(graphLeft + 0.12, y, 0),
         ]),
       );
-      const line = new THREE.Line(geometry, accentLineMaterial);
-      rootGroup.add(line);
-      return line;
+      rootGroup.add(new THREE.Line(tick, subtleLineMaterial));
     });
 
-    const ballColors = ['#4cd7f6', '#d0bcff', '#8083ff', '#acedff', '#e9ddff', '#5de0e6'];
-    const movingBalls = Array.from({ length: 12 }, (_, index) => {
-      const color = ballColors[index % ballColors.length];
-      const orb = createOrb(registerGeometry, registerMaterial, color, 0.12, 0.34);
+    xPositions.forEach((tickX) => {
+      const tick = registerGeometry(
+        new THREE.BufferGeometry().setFromPoints([
+          new THREE.Vector3(tickX, graphBottom, 0),
+          new THREE.Vector3(tickX, graphBottom + 0.12, 0),
+        ]),
+      );
+      rootGroup.add(new THREE.Line(tick, subtleLineMaterial));
+    });
+
+    const fillShape = new THREE.Shape();
+    fillShape.moveTo(xPositions[0], baselineY);
+    encounterValues.forEach((value, index) => {
+      fillShape.lineTo(xPositions[index], projectY(value));
+    });
+    fillShape.lineTo(xPositions[xPositions.length - 1], baselineY);
+    fillShape.lineTo(xPositions[0], baselineY);
+
+    const fillMaterial = registerMaterial(
+      new THREE.MeshBasicMaterial({
+        color: '#dbe7ff',
+        transparent: true,
+        opacity: 0.18,
+        side: THREE.DoubleSide,
+        depthWrite: false,
+      }),
+    );
+    const fill = new THREE.Mesh(registerGeometry(new THREE.ShapeGeometry(fillShape)), fillMaterial);
+    fill.position.z = -0.04;
+    rootGroup.add(fill);
+
+    const baseline = createDashedLine(
+      registerGeometry,
+      registerMaterial,
+      [
+        new THREE.Vector3(xPositions[0], baselineY, 0.06),
+        new THREE.Vector3(xPositions[xPositions.length - 1], baselineY, 0.06),
+      ],
+      '#98a3b8',
+      0.72,
+    );
+    rootGroup.add(baseline);
+
+    const linePoints = encounterValues.map(
+      (value, index) => new THREE.Vector3(xPositions[index], projectY(value), 0.12 + index * 0.04),
+    );
+    const line = new THREE.Line(
+      registerGeometry(new THREE.BufferGeometry().setFromPoints(linePoints)),
+      registerMaterial(
+        new THREE.LineBasicMaterial({
+          color: '#2f66e3',
+          transparent: true,
+          opacity: 0.96,
+        }),
+      ),
+    );
+    rootGroup.add(line);
+
+    const points = linePoints.map((position, index) => {
+      const orb = createOrb(
+        registerGeometry,
+        registerMaterial,
+        '#2f66e3',
+        index === linePoints.length - 1 ? 0.13 : 0.11,
+        index >= 4 ? 0.58 : 0.36,
+      );
+      orb.mesh.position.copy(position);
       rootGroup.add(orb.mesh);
       return orb;
     });
 
-    const targetDots = Array.from({ length: 12 }, (_, index) => {
-      const row = Math.floor(index / 4);
-      const column = index % 4;
-      const color = ballColors[index % ballColors.length];
-      const orb = createOrb(registerGeometry, registerMaterial, color, 0.1, 0.12);
-      orb.mesh.position.set(1.62 + column * 0.42, 0.48 - row * 0.42, 0);
-      orb.material.opacity = 0.2;
+    const baselineMarkers = xPositions.map((x) => {
+      const orb = createOrb(registerGeometry, registerMaterial, '#98a3b8', 0.05, 0.08);
+      orb.mesh.position.set(x, baselineY, 0.05);
+      orb.material.opacity = 0.22;
       rootGroup.add(orb.mesh);
       return orb;
     });
+
+    const sweep = createOrb(registerGeometry, registerMaterial, '#4cd7f6', 0.09, 0.42);
+    rootGroup.add(sweep.mesh);
 
     return {
       update: (elapsedSeconds: number) => {
-        cpu.rotation.y = Math.sin(elapsedSeconds * 0.8) * 0.08;
-        cpu.rotation.x = Math.cos(elapsedSeconds * 0.55) * 0.04;
-        cpuCore.rotation.z = Math.sin(elapsedSeconds * 0.9) * 0.08;
+        line.material.opacity = 0.88 + Math.sin(elapsedSeconds * 0.9) * 0.08;
+        fillMaterial.opacity = 0.14 + Math.sin(elapsedSeconds * 0.75) * 0.03;
 
-        cpuPins.forEach((pin, index) => {
-          pin.position.z = 0.04 + Math.max(0, Math.sin(elapsedSeconds * 1.6 + index * 0.5)) * 0.08;
-        });
-        traceLines.forEach((line, index) => {
-          const material = line.material as THREE.LineBasicMaterial;
-          material.opacity = 0.24 + Math.max(0, Math.sin(elapsedSeconds * 1.8 + index * 0.8)) * 0.4;
-        });
-
-        movingBalls.forEach((ball, index) => {
-          const cycle = (elapsedSeconds * 0.18 + index / movingBalls.length) % 1;
-          const row = Math.floor(index / 4);
-          const targetY = 0.48 - row * 0.42;
-          const sourceY = 0.94 - (index % 6) * 0.34;
-
-          if (cycle < 0.45) {
-            const t = cycle / 0.45;
-            ball.mesh.position.set(
-              -3.1 + t * 2.45,
-              sourceY + Math.sin(elapsedSeconds * 2.3 + index) * 0.12,
-              Math.sin(elapsedSeconds * 1.7 + index * 0.55) * 0.32,
-            );
-            ball.mesh.scale.setScalar(1);
-          } else if (cycle < 0.58) {
-            const t = (cycle - 0.45) / 0.13;
-            ball.mesh.position.set(
-              -0.2 + t * 0.4,
-              sourceY * (1 - t) * 0.18,
-              0.1 + Math.sin(elapsedSeconds * 2.2 + index) * 0.12,
-            );
-            ball.mesh.scale.setScalar(1 - t * 0.45);
-          } else {
-            const t = (cycle - 0.58) / 0.42;
-            ball.mesh.position.set(
-              0.55 + t * 2.35,
-              THREE.MathUtils.lerp(0, targetY, t),
-              0.18 + Math.cos(elapsedSeconds * 1.3 + index * 0.5) * 0.16,
-            );
-            ball.mesh.scale.setScalar(0.6 + t * 0.4);
-          }
+        points.forEach((point, index) => {
+          const pulse = Math.max(0, Math.sin(elapsedSeconds * 1.55 + index * 0.45));
+          point.material.emissiveIntensity =
+            (index >= 4 ? 0.46 : 0.28) + pulse * (index >= 4 ? 0.26 : 0.18);
+          point.mesh.scale.setScalar(index === points.length - 1 ? 1.1 + pulse * 0.1 : 1 + pulse * 0.08);
+          point.mesh.position.z = linePoints[index].z + Math.sin(elapsedSeconds * 1.15 + index) * 0.03;
         });
 
-        targetDots.forEach((dot, index) => {
-          dot.material.opacity = 0.12 + Math.max(0, Math.sin(elapsedSeconds * 2 + index * 0.45)) * 0.18;
+        baselineMarkers.forEach((marker, index) => {
+          marker.material.opacity = 0.18 + Math.max(0, Math.sin(elapsedSeconds * 1.4 + index * 0.3)) * 0.14;
         });
+
+        const sweepT = (elapsedSeconds * 0.12) % 1;
+        const scaledIndex = sweepT * (linePoints.length - 1);
+        const currentIndex = Math.floor(scaledIndex);
+        const nextIndex = Math.min(currentIndex + 1, linePoints.length - 1);
+        const localT = scaledIndex - currentIndex;
+        sweep.mesh.position.lerpVectors(linePoints[currentIndex], linePoints[nextIndex], localT);
+        sweep.mesh.position.z += 0.1;
+        sweep.material.opacity = 0.5 + Math.sin(elapsedSeconds * 2.1) * 0.16;
+        sweep.material.emissiveIntensity = 0.34 + Math.sin(elapsedSeconds * 1.8) * 0.12;
       },
       dispose: () => {
         scene.remove(rootGroup);
@@ -824,25 +856,147 @@ function renderOverlay(
 ): ReactNode {
   if (variant === 'experiential') {
     return (
-      <Box
-        sx={{
-          position: 'absolute',
-          top: 16,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          px: 1.5,
-          py: 0.6,
-          borderRadius: 1.5,
-          fontSize: '0.8rem',
-          fontWeight: 700,
-          letterSpacing: '0.04em',
-          color: 'text.primary',
-          backgroundColor: alpha('#0b0e14', 0.68),
-          border: `1px solid ${alpha(accentColor, 0.24)}`,
-          pointerEvents: 'none',
-        }}
-      >
-        HS Learning
+      <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
+        <Typography
+          variant="caption"
+          sx={{
+            position: 'absolute',
+            top: 14,
+            left: 34,
+            color: 'text.primary',
+            fontWeight: 700,
+            letterSpacing: '0.02em',
+          }}
+        >
+          Correct action taken (%)
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            position: 'absolute',
+            top: 34,
+            left: 34,
+            color: 'text.secondary',
+          }}
+        >
+          The more tasks completed, the better the agent gets
+        </Typography>
+        {[
+          { label: '100%', top: '21%' },
+          { label: '80%', top: '36%' },
+          { label: '60%', top: '51%' },
+          { label: '40%', top: '66%' },
+          { label: '20%', top: '81%' },
+        ].map((tick) => (
+          <Typography
+            key={tick.label}
+            variant="caption"
+            sx={{
+              position: 'absolute',
+              left: 10,
+              top: tick.top,
+              color: 'text.secondary',
+              transform: 'translateY(-50%)',
+              minWidth: 18,
+              textAlign: 'right',
+            }}
+          >
+            {tick.label}
+          </Typography>
+        ))}
+        {[
+          { label: '1st', left: '13%' },
+          { label: '2nd', left: '28%' },
+          { label: '3rd', left: '43%' },
+          { label: '4th', left: '58%' },
+          { label: '5th', left: '73%' },
+          { label: '6th', left: '88%' },
+        ].map((run, index) => (
+          <Typography
+            key={run.label}
+            variant="caption"
+            sx={{
+              position: 'absolute',
+              left: run.left,
+              bottom: 54,
+              color: 'text.secondary',
+              transform: 'translateX(-50%)',
+              textAlign: 'center',
+              lineHeight: 1.1,
+              whiteSpace: 'pre-line',
+            }}
+          >
+            {index === 0 ? '1st\n(new)' : run.label}
+          </Typography>
+        ))}
+        <Typography
+          variant="caption"
+          sx={{
+            position: 'absolute',
+            left: '50%',
+            bottom: 28,
+            color: 'text.secondary',
+            transform: 'translateX(-50%)',
+          }}
+        >
+          Encounter number
+        </Typography>
+        <Typography
+          variant="caption"
+          sx={{
+            position: 'absolute',
+            top: 56,
+            right: 28,
+            color: accentColor,
+            fontWeight: 700,
+            textAlign: 'center',
+            lineHeight: 1.2,
+          }}
+        >
+          Learned from
+          <br />
+          prior encounters
+        </Typography>
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 16,
+            bottom: 18,
+            px: 1.25,
+            py: 0.9,
+            borderRadius: 1.5,
+            backgroundColor: alpha('#0b0e14', 0.58),
+            border: `1px solid ${alpha(accentColor, 0.16)}`,
+          }}
+        >
+          <Stack spacing={0.7}>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Box
+                sx={{
+                  width: 18,
+                  height: 2,
+                  bgcolor: '#2f66e3',
+                  boxShadow: `0 0 8px ${alpha('#2f66e3', 0.45)}`,
+                }}
+              />
+              <Typography variant="caption" sx={{ color: 'text.primary' }}>
+                With learnings
+              </Typography>
+            </Stack>
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Box
+                sx={{
+                  width: 18,
+                  height: 0,
+                  borderTop: '2px dashed rgba(152, 163, 184, 0.9)',
+                }}
+              />
+              <Typography variant="caption" sx={{ color: 'text.secondary' }}>
+                Without learnings
+              </Typography>
+            </Stack>
+          </Stack>
+        </Box>
       </Box>
     );
   }

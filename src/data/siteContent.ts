@@ -85,128 +85,128 @@ export interface FeatureRow {
 
 export const architectureNodes: ArchitectureNode[] = [
   {
-    title: 'Node: MCP',
-    description: 'Fetching remote contexts...',
+    title: '85% vs 20%',
+    description: 'Correct action when a known problem returns.',
     placement: 'topLeft',
   },
   {
-    title: 'Node: APIs',
-    description: 'Any endpoint, any system.',
+    title: '84% vs 9%',
+    description: 'Silent failures avoided across benchmark tasks.',
     placement: 'topRight',
   },
   {
-    title: 'Node: Agent Skills',
-    description: 'Native workflows and execution.',
+    title: '92% vs 74%',
+    description: 'Overall task quality with access to prior learnings.',
     placement: 'bottomLeft',
   },
   {
-    title: 'Node: Sub Agents',
-    description: 'Distributed reasoning at speed.',
+    title: '83% vs 17%',
+    description: 'Correct ordering of operations in multi-step work.',
     placement: 'bottomRight',
   },
 ];
 
 export const valuePillars: ValuePillar[] = [
   {
-    title: 'Persistent Memory',
+    title: 'Learning',
     description:
-      'Long-term contextual awareness that evolves with every interaction, creating a truly personalized intelligence layer.',
-    icon: MemoryRoundedIcon,
+      'Hyperstruck turns execution into reusable operational intelligence so agents stop repeating the same mistakes and get better with experience.',
+    icon: PsychologyAltRoundedIcon,
     accent: 'primary',
   },
   {
-    title: 'Real Learning',
+    title: 'Reasoning',
     description:
-      'Dynamic adaptation to your specific business logic and communication style in real-time.',
-    icon: PsychologyAltRoundedIcon,
+      'It improves how agents sequence actions, handle tradeoffs, and choose the next step under real operating conditions.',
+    icon: RuleRoundedIcon,
     accent: 'secondary',
   },
   {
-    title: 'Domain Expertise',
+    title: 'Benchmarked Impact',
     description:
-      'Out-of-the-box mastery across specialized sectors including Fintech, Legal, and Deep Tech Engineering.',
-    icon: ArchitectureRoundedIcon,
+      'In benchmark runs across different domains, the same agent, same LLM, and same tools performed materially better when prior learnings were available.',
+    icon: InsightsRoundedIcon,
     accent: 'tertiary',
     featured: true,
   },
   {
-    title: 'Trust and Control',
+    title: 'Trust',
     description:
-      'Enterprise-grade security with granular visibility into every decision made by your AI workforce.',
+      'Learnings are strengthened, challenged, and reused with discipline so teams can trust what the system applies and why.',
     icon: SecurityRoundedIcon,
     accent: 'primary',
   },
   {
-    title: 'Quality Output',
+    title: 'Production Readiness',
     description:
-      'High-fidelity results that maintain brand voice and technical accuracy without hallucination.',
-    icon: BoltRoundedIcon,
+      'More than an LLM wrapper, Hyperstruck adds an intelligence layer before generation, during execution, and after completion so future decisions improve.',
+    icon: ApiRoundedIcon,
     accent: 'secondary',
   },
 ];
 
 export const learningModules: LearningModule[] = [
   {
-    title: 'Experiential Intelligence',
-    eyebrow: 'Not just storage. Evolution.',
+    title: 'Learning That Compounds',
+    eyebrow: 'Agents that get better with experience.',
     description:
-      'Most AI systems remember specific conversations. Hyperstruck Core synthesizes patterns from thousands of runs to build a generalized intuition for your stack.',
-    difference: 'Others retrieve documents. We extract experience.',
+      'Hyperstruck captures what proved useful in execution, reinforces signals that keep working, and carries those lessons into future runs.',
+    difference: 'Operational learning, not just retrieval.',
     icon: PsychologyAltRoundedIcon,
     animationVariant: 'experiential',
     animationConcept: 'Swarming memory particles that repeatedly converge into a stable path, showing raw executions becoming reusable intuition.',
     accent: 'primary',
   },
   {
-    title: 'Confidence That Matures',
-    eyebrow: 'Knowledge that proves itself.',
+    title: 'Better Judgment',
+    eyebrow: 'Reasoning grounded in prior outcomes.',
     description:
-      'Every insight in Hyperstruck Core is assigned a dynamic confidence score based on historical performance and source reliability.',
-    difference: 'Static embeddings vs. self-validating expertise.',
+      'The platform helps agents make structured decisions with better context, stronger sequencing, and fewer avoidable mistakes across complex work.',
+    difference: 'Better judgment, not just more output.',
     icon: VerifiedRoundedIcon,
     animationVariant: 'confidence',
     animationConcept: 'A fluctuating signal ring that sharpens and brightens as evidence accumulates, representing confidence hardening over time.',
     accent: 'secondary',
   },
   {
-    title: 'Trust Levels & Verification',
-    eyebrow: 'Not all knowledge deserves equal weight.',
+    title: 'Silent Failure Prevention',
+    eyebrow: 'Catch the miss before it compounds.',
     description:
-      'Hyperstruck Core understands that insight requires validation. Our system partitions proposed knowledge from verified, production-ready intelligence.',
-    difference: 'Flat retrieval vs. verified, tiered intelligence.',
+      'Hyperstruck is designed to surface the constraints, prerequisites, and checks that reduce silent failures before they turn into bad downstream decisions.',
+    difference: 'Prompt-only execution vs. disciplined decision quality.',
     icon: RuleRoundedIcon,
     animationVariant: 'verification',
     animationConcept: 'Layered gates that promote only certain data streams upward, visualizing proposed knowledge graduating into verified truth.',
     accent: 'tertiary',
   },
   {
-    title: 'Attribution & Accountability',
-    eyebrow: 'Close the loop. Know what works.',
+    title: 'Attributable Improvement',
+    eyebrow: 'Know what changed performance.',
     description:
-      'When Hyperstruck Core applies past learnings, it cites the exact historical execution path that justifies the current decision.',
-    difference: 'Blind suggestions vs. attributable, measurable impact.',
+      'Teams can see which learnings influenced execution and connect improved results to patterns that have already proven useful.',
+    difference: 'Opaque behavior vs. measurable improvement.',
     icon: HistoryEduRoundedIcon,
     animationVariant: 'attribution',
     animationConcept: 'A live execution trace that leaves luminous breadcrumbs from output back to its originating decision chain.',
     accent: 'primarySoft',
   },
   {
-    title: 'Conflict Detection',
-    eyebrow: 'Smart enough to spot contradictions.',
+    title: 'Conflict-Aware Learning',
+    eyebrow: 'Do not reinforce stale or contradictory guidance.',
     description:
-      'Real learning means updating beliefs. Core automatically identifies when new observations conflict with existing memory and triggers resolution logic.',
-    difference: 'Dumb storage vs. intelligent contradiction handling.',
+      'New evidence can challenge prior assumptions so agents do not blindly reuse old patterns when conditions have changed.',
+    difference: 'Flat memory vs. disciplined learning.',
     icon: TroubleshootRoundedIcon,
     animationVariant: 'conflict',
     animationConcept: 'Two competing waveforms intersect and trigger a resolving pulse, representing contradiction detection and reconciliation.',
     accent: 'secondarySoft',
   },
   {
-    title: 'Memory Architecture',
-    eyebrow: 'The right tool for the right thought.',
+    title: 'Production-Ready Integration',
+    eyebrow: 'Built for real systems, not demos.',
     description:
-      "Hyperstruck Core doesn't dump everything into a single bucket. We use specialized vector, graph, and relational memory structures for different cognitive tasks.",
-    difference: 'Monolithic memory vs. specialized cognition.',
+      'Use Hyperstruck through APIs, MCP, and developer workflows to add an intelligence layer that decides what matters before model calls, shapes execution during tasks, and captures what proved useful afterward.',
+    difference: 'More than an LLM wrapper. A decision-quality layer around execution.',
     icon: SchemaRoundedIcon,
     animationVariant: 'architecture',
     animationConcept: 'Distinct orbital structures exchanging light between graph, vector, and tabular regions to suggest specialized memory systems working together.',
@@ -240,7 +240,7 @@ export const pricingTiers: PricingTier[] = [
     label: 'Core Promise',
     description: 'Build domain-expert agents',
     price: '$299 / month',
-    subtext: '+ $0.0000383 / sec compute',
+    subtext: '+ $0.00005745 / sec of compute',
     icon: BoltRoundedIcon,
     featureList: [
       { label: 'Up to 30 agents', icon: SmartToyRoundedIcon },
@@ -335,25 +335,36 @@ export const featureRows: FeatureRow[] = [
 ];
 
 export const heroHighlights = [
-  'Persistent memory',
-  'Domain-specialist adaptation',
-  'Secure orchestration',
+  'Benchmarked across domains',
+  'Same agent, same LLM, same tools',
+  'Only difference: prior learnings',
+  'Measurable decision gains',
 ] as const;
 
 export const metrics = [
   {
-    value: '1 API',
-    label: 'to plug Hyperstruck Core into existing workflows',
-    icon: ApiRoundedIcon,
+    value: '85% vs 20%',
+    label: 'Correct action taken on known problem types',
+    icon: PsychologyAltRoundedIcon,
   },
   {
-    value: '10k+',
-    label: 'learnings available on the Pro tier',
+    value: '84% vs 9%',
+    label: 'Avoidance of silent failures',
+    icon: TroubleshootRoundedIcon,
+  },
+  {
+    value: '92% vs 74%',
+    label: 'Overall task quality',
+    icon: VerifiedRoundedIcon,
+  },
+  {
+    value: '83% vs 17%',
+    label: 'Correct ordering of operations',
+    icon: RuleRoundedIcon,
+  },
+  {
+    value: '83% vs 13%',
+    label: 'Effective strategy adoption',
     icon: InsightsRoundedIcon,
-  },
-  {
-    value: '∞',
-    label: 'applications supported across pricing plans',
-    icon: AutoAwesomeRoundedIcon,
   },
 ] as const;

@@ -1,5 +1,4 @@
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
-import HubRoundedIcon from '@mui/icons-material/HubRounded';
 import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import {
   Box,
@@ -16,16 +15,9 @@ import { Link as RouterLink } from 'react-router-dom';
 import CoreValuePillarsSection from '../components/CoreValuePillarsSection';
 import LearningModulesSection from '../components/LearningModulesSection';
 import {
-  architectureNodes,
   heroHighlights,
+  metrics,
 } from '../data/siteContent';
-
-const nodePlacementMap = {
-  topLeft: { top: 20, left: 0, transform: 'translateX(40px)' },
-  topRight: { top: 20, right: 0, transform: 'translateX(-40px)' },
-  bottomLeft: { bottom: 20, left: 0, transform: 'translateX(16px)' },
-  bottomRight: { bottom: 20, right: 0, transform: 'translateX(-16px)' },
-} as const;
 
 export default function HomePage() {
   const theme = useTheme();
@@ -43,7 +35,7 @@ export default function HomePage() {
         >
           <Stack spacing={4}>
             <Chip
-              label="The Cognitive Layer"
+              label="Benchmark-Proven Intelligence Layer"
               sx={{
                 width: 'fit-content',
                 px: 1,
@@ -64,26 +56,29 @@ export default function HomePage() {
                 lineHeight: 0.94,
               }}
             >
-              <Box component="span" sx={{ color: 'primary.main' }}>
-                Plug-and-play
-              </Box>
+              Same model.
               <br />
-              intelligence.
+              Same tools.
+              <br />
+              <Box component="span" sx={{ color: 'primary.main' }}>
+                Better judgment.
+              </Box>
             </Typography>
 
             <Typography
               color="text.secondary"
               sx={{ maxWidth: 680, fontSize: { xs: '1.05rem', md: '1.25rem' }, lineHeight: 1.7 }}
             >
-              Hyperstruck Core turns generic agents into domain specialists with unparalleled
-              learning, higher-quality execution, and production-ready orchestration across the
-              systems teams already trust.
+              Hyperstruck gives agents a compounding intelligence layer that improves execution
+              quality over time, not just output generation in the moment. When agents can use
+              accumulated learnings, they take better actions, avoid repeated mistakes, and apply
+              proven strategies from prior work.
             </Typography>
 
             <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
               <Button
                 component={RouterLink}
-                to="/pricing"
+                to="/signup"
                 variant="contained"
                 endIcon={<ArrowForwardRoundedIcon />}
                 sx={{
@@ -93,7 +88,7 @@ export default function HomePage() {
                   boxShadow: theme.custom.shadows.glow,
                 }}
               >
-                Explore pricing
+                Request API access
               </Button>
               <Button
                 component={RouterLink}
@@ -105,7 +100,7 @@ export default function HomePage() {
                   color: 'text.primary',
                 }}
               >
-                Request sandbox access
+                Talk to an engineer
               </Button>
             </Stack>
 
@@ -119,119 +114,192 @@ export default function HomePage() {
                 />
               ))}
             </Stack>
+
+            <Typography
+              color="text.secondary"
+              sx={{ maxWidth: 720, fontSize: '0.95rem', lineHeight: 1.75 }}
+            >
+              These results came from benchmark runs across different domains using the same agent,
+              same LLM, same tools, and the same tasks. The only difference was whether the agent
+              had access to learnings from prior executions.
+            </Typography>
           </Stack>
 
           <Box
             sx={{
               position: 'relative',
-              minHeight: { xs: 520, md: 620 },
-              overflow: 'hidden',
-              borderRadius: 3,
-              background:
-                'radial-gradient(circle at 50% 50%, rgba(99, 102, 241, 0.1) 0%, rgba(2, 4, 8, 0) 40%)',
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, minmax(0, 1fr))' },
+              gap: 2.25,
+              alignSelf: 'center',
+              alignItems: 'start',
+              alignContent: 'center',
+              justifySelf: 'center',
+              width: '100%',
+              maxWidth: 560,
             }}
           >
-            <Box
-              sx={{
-                position: 'absolute',
-                inset: 0,
-                background:
-                  'radial-gradient(circle at 0% 0%, rgba(99, 102, 241, 0.08) 0%, transparent 40%), radial-gradient(circle at 100% 100%, rgba(99, 102, 241, 0.05) 0%, transparent 40%)',
-                pointerEvents: 'none',
-              }}
-            />
+            {metrics.map((metric, index) => {
+              const Icon = metric.icon;
+              const isFeatured = index === 0;
+              const isLast = index === metrics.length - 1;
+              const [withLearnings, baseline] = metric.value.split(' vs ');
 
-            <Card
-              sx={{
-                position: 'absolute',
-                zIndex: 2,
-                top: '50%',
-                left: '50%',
-                width: { xs: 192, md: 220 },
-                height: { xs: 192, md: 220 },
-                transform: 'translate(-50%, -50%)',
-                display: 'flex',
-                flexDirection: 'column',
-                alignItems: 'center',
-                justifyContent: 'center',
-                textAlign: 'center',
-                p: 3,
-                backgroundColor: alpha(theme.palette.background.paper, 0.88),
-                borderColor: alpha(theme.palette.primary.main, 0.35),
-                boxShadow: '0px 0px 50px rgba(99,102,241,0.15)',
-              }}
-            >
-              <Box
-                sx={{
-                  position: 'absolute',
-                  inset: 0,
-                  borderRadius: 'inherit',
-                  backgroundColor: alpha(theme.palette.primary.main, 0.05),
-                  filter: 'blur(24px)',
-                }}
-              />
-              <HubRoundedIcon sx={{ position: 'relative', zIndex: 1, color: 'primary.main', fontSize: 44, mb: 1.5 }} />
-              <Typography variant="overline" color="primary.main" sx={{ position: 'relative', zIndex: 1 }}>
-                Central hub
-              </Typography>
-              <Typography variant="h4" sx={{ position: 'relative', zIndex: 1 }}>
-                Intelligence Layer
-              </Typography>
-            </Card>
-
-            {architectureNodes.map((node) => (
-              <Card
-                key={node.title}
-                sx={{
-                  position: 'absolute',
-                  zIndex: 2,
-                  width: node.placement.includes('bottom') ? { xs: 160, md: 184 } : { xs: 148, md: 168 },
-                  p: 2.25,
-                  backgroundColor: alpha(theme.palette.background.paper, 0.66),
-                  ...nodePlacementMap[node.placement],
-                }}
-              >
-                <Typography variant="overline" color="secondary.main" sx={{ fontSize: '0.58rem' }}>
-                  {node.title}
-                </Typography>
-                <Box
+              return (
+                <Card
+                  key={`${metric.value}-${metric.label}`}
                   sx={{
-                    mt: 1.25,
-                    minHeight: 48,
+                    position: 'relative',
+                    overflow: 'hidden',
+                    p: { xs: 1.7, md: 1.9 },
+                    gridColumn: isLast ? { xs: 'auto', sm: '1 / -1' } : undefined,
                     display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    px: 1,
-                    borderRadius: 1,
-                    backgroundColor: alpha(theme.palette.background.default, 0.6),
+                    flexDirection: 'column',
+                    background: isFeatured
+                      ? `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.2)} 0%, ${alpha(theme.palette.background.paper, 0.9)} 100%)`
+                      : `linear-gradient(180deg, ${alpha(theme.palette.background.paper, 0.82)} 0%, ${alpha(theme.palette.background.paper, 0.62)} 100%)`,
+                    borderColor: alpha(
+                      isFeatured ? theme.palette.primary.main : theme.palette.divider,
+                      isFeatured ? 0.34 : 0.36,
+                    ),
+                    boxShadow: isFeatured ? '0px 0px 50px rgba(99,102,241,0.12)' : undefined,
+                    backdropFilter: 'blur(10px)',
                   }}
                 >
-                  <Typography
-                    color="text.secondary"
-                    sx={{ textAlign: 'center', fontSize: '0.72rem', fontStyle: 'italic', lineHeight: 1.4 }}
+                  <Box
+                    sx={{
+                      position: 'absolute',
+                      inset: 'auto -12% -24% auto',
+                      width: 160,
+                      height: 160,
+                      borderRadius: '50%',
+                      background: `radial-gradient(circle, ${alpha(theme.palette.primary.main, isFeatured ? 0.22 : 0.12)} 0%, transparent 72%)`,
+                      filter: 'blur(18px)',
+                      pointerEvents: 'none',
+                    }}
+                  />
+                  <Stack
+                    spacing={0.95}
+                    sx={{ position: 'relative', zIndex: 1 }}
                   >
-                    {node.description}
-                  </Typography>
-                </Box>
-              </Card>
-            ))}
+                    <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1}>
+                      <Typography
+                        sx={{
+                          lineHeight: 1.2,
+                          fontSize: { xs: '0.94rem', md: isFeatured ? '1.02rem' : '0.97rem' },
+                          fontWeight: 600,
+                          maxWidth: isLast ? 420 : undefined,
+                          color: 'secondary.main',
+                        }}
+                      >
+                        {metric.label}
+                      </Typography>
+                      <Box
+                        sx={{
+                          width: 34,
+                          height: 34,
+                          borderRadius: 2,
+                          display: 'grid',
+                          placeItems: 'center',
+                          backgroundColor: alpha(theme.palette.primary.main, 0.14),
+                          color: 'primary.main',
+                          flexShrink: 0,
+                        }}
+                      >
+                        <Icon fontSize="small" />
+                      </Box>
+                    </Stack>
 
-            <svg
-              viewBox="0 0 400 400"
-              style={{
-                position: 'absolute',
-                inset: 0,
-                width: '100%',
-                height: '100%',
-                opacity: 0.2,
-                zIndex: 1,
-              }}
-            >
-              <path d="M100 100 L200 200" stroke="#6366F1" strokeDasharray="4 4" strokeWidth="1" />
-              <path d="M300 100 L200 200" stroke="#6366F1" strokeDasharray="4 4" strokeWidth="1" />
-              <path d="M100 300 L200 200" stroke="#6366F1" strokeDasharray="4 4" strokeWidth="1" />
-              <path d="M300 300 L200 200" stroke="#6366F1" strokeDasharray="4 4" strokeWidth="1" />
-            </svg>
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      alignItems="stretch"
+                    >
+                      <Box
+                        sx={{
+                          flex: 1,
+                          px: 0.85,
+                          py: 0.72,
+                          borderRadius: 2,
+                          backgroundColor: alpha(theme.palette.primary.main, 0.12),
+                          border: `1px solid ${alpha(theme.palette.primary.main, 0.22)}`,
+                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'text.secondary', lineHeight: 1, fontSize: '0.72rem' }}
+                        >
+                          With learnings
+                        </Typography>
+                        <Typography
+                          sx={{
+                            mt: 0.04,
+                            fontSize: { xs: '1.45rem', md: isFeatured ? '1.85rem' : '1.7rem' },
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            whiteSpace: 'nowrap',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
+                          {withLearnings}
+                        </Typography>
+                      </Box>
+
+                      <Box
+                        sx={{
+                          alignSelf: 'center',
+                          color: 'text.secondary',
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          letterSpacing: '0.08em',
+                          textTransform: 'uppercase',
+                        }}
+                      >
+                        vs
+                      </Box>
+
+                      <Box
+                        sx={{
+                          flex: 1,
+                          px: 0.85,
+                          py: 0.72,
+                          borderRadius: 2,
+                          backgroundColor: alpha(theme.palette.background.default, 0.44),
+                          border: `1px solid ${alpha(theme.palette.divider, 0.28)}`,
+                          textAlign: 'center',
+                          display: 'flex',
+                          flexDirection: 'column',
+                          justifyContent: 'center',
+                        }}
+                      >
+                        <Typography
+                          variant="caption"
+                          sx={{ color: 'text.secondary', lineHeight: 1, fontSize: '0.72rem' }}
+                        >
+                          Without
+                        </Typography>
+                        <Typography
+                          sx={{
+                            mt: 0.04,
+                            fontSize: { xs: '1.45rem', md: isFeatured ? '1.85rem' : '1.7rem' },
+                            fontWeight: 700,
+                            lineHeight: 1,
+                            whiteSpace: 'nowrap',
+                            fontVariantNumeric: 'tabular-nums',
+                          }}
+                        >
+                          {baseline}
+                        </Typography>
+                      </Box>
+                    </Stack>
+                  </Stack>
+                </Card>
+              );
+            })}
           </Box>
         </Box>
 
@@ -251,15 +319,16 @@ export default function HomePage() {
           }}
         >
           <Typography variant="h2" sx={{ fontSize: { xs: '2.25rem', md: '4rem' }, mb: 3 }}>
-            Ready to unify your intelligence stack?
+            Ready to build agents that improve with experience?
           </Typography>
           <Typography color="text.secondary" sx={{ maxWidth: 760, mx: 'auto', mb: 4, lineHeight: 1.75 }}>
-            Start building with the most sophisticated cognitive orchestration layer ever
-            engineered. No credit card required for sandbox access.
+            Hyperstruck is built for teams that want more than raw model output. If you need
+            better judgment, stronger operational learning, and measurable improvement over time,
+            request access and we will help you get started.
           </Typography>
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} justifyContent="center">
-            <Button component={RouterLink} to="/pricing" variant="contained" size="large">
-              Get started free
+            <Button component={RouterLink} to="/signup" variant="contained" size="large">
+              Request API access
             </Button>
             <Button component={RouterLink} to="/signup" variant="outlined" size="large">
               Talk to an engineer
