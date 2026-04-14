@@ -1,6 +1,6 @@
 import { Box, Stack, Typography, useMediaQuery } from '@mui/material';
 import { alpha } from '@mui/material/styles';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { ReactNode } from 'react';
 import * as THREE from 'three';
 
@@ -15,6 +15,63 @@ interface ThreeModulePreviewProps {
 interface DisposableScene {
   dispose: () => void;
   update: (elapsedSeconds: number) => void;
+}
+
+interface OverlaySize {
+  width: number;
+  height: number;
+}
+
+interface OverlayPosition {
+  left: string;
+  top: string;
+}
+
+function getExperientialChartLayout(): {
+  baselineValue: number;
+  graphBottom: number;
+  graphLeft: number;
+  graphRight: number;
+  graphTop: number;
+  projectY: (value: number) => number;
+  xPositions: number[];
+} {
+  const graphLeft = -3;
+  const graphRight = 2.85;
+  const graphBottom = -1.92;
+  const graphTop = 1.4;
+  const baselineValue = 20;
+  const xPositions = Array.from({ length: 6 }, (_, index) =>
+    THREE.MathUtils.lerp(-2.68, 2.55, index / 5),
+  );
+  const projectY = (value: number): number =>
+    THREE.MathUtils.lerp(graphBottom, graphTop, value / 100);
+
+  return {
+    baselineValue,
+    graphBottom,
+    graphLeft,
+    graphRight,
+    graphTop,
+    projectY,
+    xPositions,
+  };
+}
+
+function projectScenePoint(point: THREE.Vector3, size: OverlaySize): OverlayPosition {
+  const camera = new THREE.PerspectiveCamera(34, size.width / size.height, 0.1, 100);
+  camera.position.set(0, 0.25, 8.2);
+  camera.updateProjectionMatrix();
+  camera.updateMatrixWorld();
+
+  const projectedPoint = point.clone().project(camera);
+  const left = THREE.MathUtils.clamp(((projectedPoint.x + 1) / 2) * 100, 0, 100);
+  const top = THREE.MathUtils.clamp(((-projectedPoint.y + 1) / 2) * 100, 0, 100);
+
+  return {
+    left: `${left}%`,
+    top: `${top}%`,
+  };
 }
 
 function createMaterial(
@@ -162,17 +219,9 @@ function createVariantScene(
   );
 
   if (variant === 'experiential') {
-    const graphLeft = -3;
-    const graphRight = 2.85;
-    const graphBottom = -1.92;
-    const graphTop = 1.4;
-    const baselineValue = 20;
+    const { baselineValue, graphBottom, graphLeft, graphRight, graphTop, projectY, xPositions } =
+      getExperientialChartLayout();
     const encounterValues = [25, 70, 80, 85, 90, 92];
-    const xPositions = Array.from({ length: encounterValues.length }, (_, index) =>
-      THREE.MathUtils.lerp(-2.68, 2.55, index / (encounterValues.length - 1)),
-    );
-    const projectY = (value: number): number =>
-      THREE.MathUtils.lerp(graphBottom, graphTop, value / 100);
     const baselineY = projectY(baselineValue);
 
     const axes = registerGeometry(
@@ -853,8 +902,60 @@ function createVariantScene(
 function renderOverlay(
   variant: LearningModule['animationVariant'],
   accentColor: string,
+  overlaySize: OverlaySize | null,
 ): ReactNode {
   if (variant === 'experiential') {
+    const fallbackYTicks = [
+      { label: '100%', left: '24%', top: '21%' },
+      { label: '80%', left: '24%', top: '36%' },
+      { label: '60%', left: '24%', top: '51%' },
+      { label: '40%', left: '24%', top: '66%' },
+      { label: '20%', left: '24%', top: '81%' },
+    ];
+    const fallbackXTicks = [
+      { label: '1st\n(new)', left: '22%', top: '82%' },
+      { label: '2nd', left: '34%', top: '81.5%' },
+      { label: '3rd', left: '46%', top: '81%' },
+      { label: '4th', left: '58%', top: '80.5%' },
+      { label: '5th', left: '70%', top: '80%' },
+      { label: '6th', left: '82%', top: '79.5%' },
+    ];
+    const experientialChart = getExperientialChartLayout();
+    const yTicks = overlaySize
+      ? [100, 80, 60, 40, 20].map((value) => ({
+          label: `${value}%`,
+          ...projectScenePoint(
+            new THREE.Vector3(
+              experientialChart.graphLeft,
+              experientialChart.projectY(value),
+              0,
+            ),
+            overlaySize,
+          ),
+        }))
+      : fallbackYTicks;
+    const xTicks = overlaySize
+      ? experientialChart.xPositions.map((xPosition, index) => ({
+          label: index === 0 ? '1st\n(new)' : `${index + 1}${index === 1 ? 'nd' : index === 2 ? 'rd' : 'th'}`,
+          ...projectScenePoint(
+            new THREE.Vector3(xPosition, experientialChart.graphBottom, 0),
+            overlaySize,
+          ),
+        }))
+      : fallbackXTicks;
+    const xAxisLabelPosition = overlaySize
+      ? projectScenePoint(
+          new THREE.Vector3(
+            (experientialChart.xPositions[0] +
+              experientialChart.xPositions[experientialChart.xPositions.length - 1]) /
+              2,
+            experientialChart.graphBottom,
+            0,
+          ),
+          overlaySize,
+        )
+      : { left: '52%', top: '81%' };
+
     return (
       <Box sx={{ position: 'absolute', inset: 0, pointerEvents: 'none' }}>
         <Typography
@@ -881,44 +982,31 @@ function renderOverlay(
         >
           The more tasks completed, the better the agent gets
         </Typography>
-        {[
-          { label: '100%', top: '21%' },
-          { label: '80%', top: '36%' },
-          { label: '60%', top: '51%' },
-          { label: '40%', top: '66%' },
-          { label: '20%', top: '81%' },
-        ].map((tick) => (
+        {yTicks.map((tick) => (
           <Typography
             key={tick.label}
             variant="caption"
             sx={{
               position: 'absolute',
-              left: 10,
+              left: `calc(${tick.left} - 10px)`,
               top: tick.top,
               color: 'text.secondary',
-              transform: 'translateY(-50%)',
-              minWidth: 18,
+              transform: 'translate(-100%, -50%)',
+              minWidth: 28,
               textAlign: 'right',
             }}
           >
             {tick.label}
           </Typography>
         ))}
-        {[
-          { label: '1st', left: '13%' },
-          { label: '2nd', left: '28%' },
-          { label: '3rd', left: '43%' },
-          { label: '4th', left: '58%' },
-          { label: '5th', left: '73%' },
-          { label: '6th', left: '88%' },
-        ].map((run, index) => (
+        {xTicks.map((run) => (
           <Typography
             key={run.label}
             variant="caption"
             sx={{
               position: 'absolute',
               left: run.left,
-              bottom: 54,
+              top: `calc(${run.top} + 12px)`,
               color: 'text.secondary',
               transform: 'translateX(-50%)',
               textAlign: 'center',
@@ -926,15 +1014,15 @@ function renderOverlay(
               whiteSpace: 'pre-line',
             }}
           >
-            {index === 0 ? '1st\n(new)' : run.label}
+            {run.label}
           </Typography>
         ))}
         <Typography
           variant="caption"
           sx={{
             position: 'absolute',
-            left: '50%',
-            bottom: 28,
+            left: xAxisLabelPosition.left,
+            top: `calc(${xAxisLabelPosition.top} + 24px)`,
             color: 'text.secondary',
             transform: 'translateX(-50%)',
           }}
@@ -1077,9 +1165,12 @@ export default function ThreeModulePreview({
 }: ThreeModulePreviewProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const showAnimation = useMediaQuery('(min-width:600px)');
+  const [overlaySize, setOverlaySize] = useState<OverlaySize | null>(null);
+  const previewContentInset = variant === 'experiential' ? '0 0 20px 0' : 0;
 
   useEffect(() => {
     if (!showAnimation) {
+      setOverlaySize(null);
       return undefined;
     }
 
@@ -1126,6 +1217,11 @@ export default function ThreeModulePreview({
       camera.updateProjectionMatrix();
 
       renderer.setSize(width, height, false);
+      setOverlaySize((currentSize) =>
+        currentSize?.width === width && currentSize?.height === height
+          ? currentSize
+          : { width, height },
+      );
     };
 
     const resizeObserver = new ResizeObserver(resizeRenderer);
@@ -1157,7 +1253,7 @@ export default function ThreeModulePreview({
     <Box
       sx={{
         position: 'relative',
-        minHeight: { xs: 220, sm: 260, md: 320 },
+        minHeight: { xs: 256, sm: 308, md: 372 },
         borderRadius: 4,
         overflow: 'hidden',
         background: `linear-gradient(180deg, ${alpha('#101419', 0.92)} 0%, ${alpha(accentColor, 0.08)} 100%)`,
@@ -1179,8 +1275,14 @@ export default function ThreeModulePreview({
           pointerEvents: 'none',
         }}
       />
-      {showAnimation ? <Box ref={containerRef} sx={{ position: 'absolute', inset: 0 }} /> : null}
-      {showAnimation ? renderOverlay(variant, accentColor) : null}
+      {showAnimation ? (
+        <Box ref={containerRef} sx={{ position: 'absolute', inset: previewContentInset }} />
+      ) : null}
+      {showAnimation ? (
+        <Box sx={{ position: 'absolute', inset: previewContentInset }}>
+          {renderOverlay(variant, accentColor, overlaySize)}
+        </Box>
+      ) : null}
     </Box>
   );
 }
