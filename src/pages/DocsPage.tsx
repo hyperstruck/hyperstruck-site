@@ -57,6 +57,11 @@ const docsTree: Root = {
       children: [
         {
           type: 'page',
+          name: 'Credentials API',
+          url: '/docs/credentials-api',
+        },
+        {
+          type: 'page',
           name: 'Agents API',
           url: '/docs/agents-api',
         },

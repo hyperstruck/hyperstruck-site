@@ -1,45 +1,62 @@
 ---
 title: Learnings API
-description: Manually inject, search, retrieve, and reinforce operational learnings when you want direct control over what the system carries forward.
+description: Manually store, search, retrieve, and reinforce learnings when you want direct control over what the system carries forward.
 ---
 
-Hyperstruck automatically extracts learnings from reasoning runs when useful patterns emerge. The Learnings API is the manual control surface for teams that want to inject lessons directly, curate what matters, reinforce good patterns, and tune what the system should carry forward.
+import { TypeTable } from 'fumadocs-ui/components/type-table';
 
-<Callout type="idea" title="Best fit">
-  Use the Learnings API when you want direct editorial control over learnings, not because it is the only way Hyperstruck improves over time.
+Hyperstruck can already extract learnings automatically from reasoning runs. The Learnings API is the lighter manual control surface for teams that want to inject, curate, search, and reinforce specific lessons.
+
+<Callout type="info" title="Start small">
+  Start with the minimum required fields. Full API reference lives in the OpenAPI docs.
 </Callout>
 
-## The control point
+## Store a learning
 
-An API for manually managing operational learnings for an agent.
-
-## Why teams keep it close
-
-This is how teams turn one-off wins into durable system behavior. Instead of letting useful lessons disappear after a run, they can be stored, searched, and reinforced over time.
-
-## What it makes possible
-
-- capture what worked
-- search prior learnings before difficult tasks
-- reinforce useful patterns
-- create a compounding feedback loop around agent performance
-
-## Best used for
-
-- post-mortems and incident lessons
-- operator-curated best practices
-- imported domain-specific lessons
-- explicit reinforcement and trust tuning
-
-## Quick mental model
-
-<Cards>
-  <Card title="Store" description="Capture useful lessons from real execution." />
-  <Card title="Search and retrieve" description="Bring prior learnings back into difficult or recurring workflows." />
-  <Card title="Reinforce" description="Strengthen patterns that continue to prove useful over time." />
-</Cards>
-
-## Example: store a learning
+<TypeTable
+  type={{
+    content: {
+      description: 'The learning text to store.',
+      type: 'string',
+      required: true,
+    },
+    learning_type: {
+      description: 'The type of learning being stored.',
+      type: '"tool_usage" | "approach" | "pitfall" | "prerequisite" | "coordination_pattern" | "agent_capability" | "conflict_insight" | "debate_outcome"',
+      required: true,
+    },
+    confidence: {
+      description: 'Confidence score for the learning.',
+      type: 'number',
+      default: '0.5',
+      required: false,
+    },
+    source_goal: {
+      description: 'Goal text the learning came from.',
+      type: 'string',
+      default: '""',
+      required: false,
+    },
+    applicable_goals: {
+      description: 'Goals this learning is especially relevant to.',
+      type: 'string[]',
+      default: '[]',
+      required: false,
+    },
+    applicable_tools: {
+      description: 'Tools this learning is especially relevant to.',
+      type: 'string[]',
+      default: '[]',
+      required: false,
+    },
+    privacy: {
+      description: 'Privacy setting for the learning.',
+      type: '"shareable"',
+      default: '"shareable"',
+      required: false,
+    },
+  }}
+/>
 
 ```bash
 curl -X POST \
@@ -47,31 +64,85 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
   -d '{
-    "content": "Always validate a date range before running large analytics exports.",
-    "learning_type": "pitfall",
-    "confidence": 0.7
+    "content": "Always validate the migration dependency graph before scheduling milestones.",
+    "learning_type": "pitfall"
   }'
 ```
 
-This endpoint returns `202 Accepted`. Background processing handles indexing and validation, so you may need to wait briefly before searching for the new learning.
+This endpoint returns `202 Accepted` and stores the learning asynchronously. Background processing handles validation and indexing, so it may take a moment before the learning appears in search results.
 
-For many teams, this endpoint is optional at first because reasoning runs can already extract learnings automatically. Use it when you want direct editorial control.
+Valid `learning_type` values:
 
-## Example: search learnings
+- `tool_usage`
+- `approach`
+- `pitfall`
+- `prerequisite`
+- `coordination_pattern`
+- `agent_capability`
+- `conflict_insight`
+- `debate_outcome`
+
+## Search learnings
+
+The only required query param is `q`.
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
-  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/search?q=analytics+export&limit=5"
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/search?q=migration+dependency+graph"
 ```
 
-## Example: get a learning
+<TypeTable
+  type={{
+    q: {
+      description: 'Search text.',
+      type: 'string',
+      required: true,
+    },
+    limit: {
+      description: 'Maximum number of results to return.',
+      type: 'integer',
+      default: '10',
+      required: false,
+    },
+    min_confidence: {
+      description: 'Filter out results below this confidence.',
+      type: 'number',
+      required: false,
+    },
+    learning_type: {
+      description: 'Filter results to one learning type.',
+      type: 'string',
+      required: false,
+    },
+    scope: {
+      description: 'Search scope.',
+      type: '"agent"',
+      default: '"agent"',
+      required: false,
+    },
+  }}
+/>
+
+## Get a learning
+
+No body or query params are required.
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>"
 ```
 
-## Example: reinforce a learning
+## Reinforce a learning
+
+<TypeTable
+  type={{
+    is_helpful: {
+      description: 'Whether the retrieved learning was helpful.',
+      type: 'boolean',
+      required: true,
+    },
+  }}
+/>
 
 ```bash
 curl -X POST \
@@ -83,7 +154,14 @@ curl -X POST \
   }'
 ```
 
+## When to use manual learning
+
+- Use automatic learning first for low-friction compounding improvement.
+- Use manual learning when you want direct editorial control over a lesson.
+- Use reinforcement when you want to strengthen or down-rank a retrieved learning based on whether it helped.
+
 ## Related pages
 
-- See [Learning](/docs/learning) for the broader explanation of automatic learning and manual control.
-- See [Agents API](/docs/agents-api) if you want Hyperstruck to drive reasoning for a goal, not just manage learnings directly.
+- [Quickstart](/docs/quickstart) for the fastest end-to-end flow
+- [Learning](/docs/learning) for the conceptual model
+- [Agents API](/docs/agents-api) for reasoning runs that can produce automatic learnings

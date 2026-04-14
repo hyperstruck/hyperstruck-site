@@ -85,7 +85,7 @@ export default function AppLayout() {
                 letterSpacing: '-0.04em',
               }}
             >
-              Core by Hyperstruck
+              Hyperstruck
             </Link>
 
             {isDesktop ? (
