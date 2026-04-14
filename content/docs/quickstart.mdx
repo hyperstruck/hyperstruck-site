@@ -1,29 +1,38 @@
 ---
 title: Quickstart
-description: A minimal end-to-end Hyperstruck flow using reasoning, learnings, and developer-tool integrations.
+description: A minimal end-to-end Hyperstruck flow from a fresh API key to reasoning, optional manual learnings, and developer-tool integrations.
 ---
 
-This page walks through the smallest useful Hyperstruck workflow: send a goal to an agent, capture a useful learning, and reuse the same capability from developer tooling.
+This page walks through the smallest useful Hyperstruck workflow for a brand-new user: create an agent, run a goal, optionally add a manual learning, and reuse the same capability from developer tooling.
 
 <Callout type="idea" title="What this shows">
-  The goal is not a full production integration. It is a minimal path to seeing reasoning and learning work together with as little setup as possible.
+  The goal is not a full production integration. It is a working first path for someone who has an API key, no existing agent, and no prior learnings.
+</Callout>
+
+<Callout type="info" title="Automatic and manual learning">
+  Reasoning runs can automatically extract useful learnings from execution. The manual learning step below is optional and is best used for explicit tuning, curation, imported lessons, or operator-injected guidance.
 </Callout>
 
 ## At a glance
 
 <Cards>
   <Card
-    title="1. Invoke reasoning"
+    title="1. Create an agent"
     href="/docs/agents-api"
-    description="Send a goal to a purpose-built agent profile."
+    description="Start with a reasoning-capable agent you can reuse across runs."
   />
   <Card
-    title="2. Capture a learning"
+    title="2. Run a goal"
+    href="/docs/agents-api"
+    description="Dispatch a task and get back a run handle."
+  />
+  <Card
+    title="3. Optionally add a manual learning"
     href="/docs/learnings-api"
-    description="Store something useful so future runs can benefit."
+    description="Inject or curate a lesson when you want direct control."
   />
   <Card
-    title="3. Use it in tooling"
+    title="4. Use it in tooling"
     href="/docs/claude-skills"
     description="Bring the same workflow into Claude Code or Cursor."
   />
@@ -34,9 +43,34 @@ This page walks through the smallest useful Hyperstruck workflow: send a goal to
 <Steps>
   <Step>
 
-### Pick an agent profile and dispatch a goal
+### Create an agent
 
-Use the Agents API when you want Hyperstruck to help with planning, sequencing, and decision quality.
+Create an agent first so you have an `AGENT_ID` to use in later runs.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents" \
+  -d '{
+    "name": "Operations Assistant",
+    "model_provider": "anthropic",
+    "model_name": "claude-sonnet-4-5",
+    "reasoning_profile": "balanced",
+    "memory_profile": "default",
+    "knowledge_scope": "agent",
+    "core_config": {
+      "instructions": "You are a helpful operations assistant."
+    }
+  }'
+```
+
+  </Step>
+  <Step>
+
+### Dispatch a goal
+
+Use the returned `AGENT_ID` to start a reasoning run.
 
 ```bash
 curl -X POST \
@@ -49,12 +83,14 @@ curl -X POST \
   }'
 ```
 
+Hyperstruck can automatically extract useful learnings from what happens during the run when meaningful patterns emerge.
+
   </Step>
   <Step>
 
-### Store a useful lesson from the outcome
+### Optionally store a manual learning
 
-When something proves useful, add it as a learning so future runs can benefit.
+Use the Learnings API when you want direct editorial control over what the system should carry forward.
 
 ```bash
 curl -X POST \
@@ -71,9 +107,9 @@ curl -X POST \
   </Step>
   <Step>
 
-### Reuse those capabilities from developer tooling
+### Reuse the same capabilities from developer tooling
 
-Once the APIs are in place, you can expose the same reasoning and learning flows through Claude Code or Cursor skills.
+Once the APIs are in place, you can expose the same reasoning and manual learning controls through Claude Code or Cursor skills.
 
 ```text
 /hyper-reasoning Map out a migration plan with milestones and risks
@@ -87,10 +123,10 @@ Once the APIs are in place, you can expose the same reasoning and learning flows
 ## How to think about this flow
 
 - [Reasoning](/docs/reasoning) improves decision quality during the run.
-- [Learning](/docs/learning) helps the system carry useful outcomes forward.
-- [Agents API](/docs/agents-api) is the simplest programmable entry point for hosted reasoning.
-- [Learnings API](/docs/learnings-api) is the programmable entry point for compounding operational knowledge.
-- [Claude Skills](/docs/claude-skills) makes the same capability easy to use where developers already work.
+- [Learning](/docs/learning) improves future decisions by carrying useful lessons forward.
+- [Agents API](/docs/agents-api) is the orchestration surface for creating agents, dispatching goals, and monitoring runs.
+- [Learnings API](/docs/learnings-api) is the manual control surface for injecting, curating, retrieving, and reinforcing learnings.
+- [Claude Skills](/docs/claude-skills) makes the same APIs easy to use where developers already work.
 
 ## Suggested next pages
 

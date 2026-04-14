@@ -1,17 +1,17 @@
 ---
 title: Learnings API
-description: Store, search, retrieve, and reinforce operational knowledge so agents improve over time.
+description: Manually inject, search, retrieve, and reinforce operational learnings when you want direct control over what the system carries forward.
 ---
 
-Use the Learnings API when you want useful experience to persist beyond a single run. It gives developers direct control over how lessons from operators, workflows, and repeated execution get stored, searched, and reinforced over time.
+Hyperstruck automatically extracts learnings from reasoning runs when useful patterns emerge. The Learnings API is the manual control surface for teams that want to inject lessons directly, curate what matters, reinforce good patterns, and tune what the system should carry forward.
 
 <Callout type="idea" title="Best fit">
-  Use the Learnings API when you want useful experience to persist, get searched later, and improve future runs instead of disappearing after one task.
+  Use the Learnings API when you want direct editorial control over learnings, not because it is the only way Hyperstruck improves over time.
 </Callout>
 
 ## The control point
 
-An API for programmatically managing operational learnings for an agent.
+An API for manually managing operational learnings for an agent.
 
 ## Why teams keep it close
 
@@ -23,6 +23,13 @@ This is how teams turn one-off wins into durable system behavior. Instead of let
 - search prior learnings before difficult tasks
 - reinforce useful patterns
 - create a compounding feedback loop around agent performance
+
+## Best used for
+
+- post-mortems and incident lessons
+- operator-curated best practices
+- imported domain-specific lessons
+- explicit reinforcement and trust tuning
 
 ## Quick mental model
 
@@ -45,6 +52,10 @@ curl -X POST \
     "confidence": 0.7
   }'
 ```
+
+This endpoint returns `202 Accepted`. Background processing handles indexing and validation, so you may need to wait briefly before searching for the new learning.
+
+For many teams, this endpoint is optional at first because reasoning runs can already extract learnings automatically. Use it when you want direct editorial control.
 
 ## Example: search learnings
 
@@ -74,5 +85,5 @@ curl -X POST \
 
 ## Related pages
 
-- See [Learning](/docs/learning) for the broader explanation of why this matters.
+- See [Learning](/docs/learning) for the broader explanation of automatic learning and manual control.
 - See [Agents API](/docs/agents-api) if you want Hyperstruck to drive reasoning for a goal, not just manage learnings directly.

@@ -22,6 +22,11 @@ export function getDocsLayoutOptions(): BaseLayoutProps {
         text: 'Request access',
         url: '/signup',
       },
+      {
+        type: 'button',
+        text: 'OpenAPI Spec (coming soon)',
+        url: 'https://api.core.hyperstruck.com/openapi.json',
+      }
     ],
     searchToggle: {
       enabled: true,

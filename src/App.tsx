@@ -38,6 +38,7 @@ const docsSearch = {
       ['Quickstart', '/docs/quickstart'],
       ['Reasoning', '/docs/reasoning'],
       ['Learning', '/docs/learning'],
+      ['Usage API', '/docs/usage-api'],
     ],
     source: '/docs-search.json',
   },

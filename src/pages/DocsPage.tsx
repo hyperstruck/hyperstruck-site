@@ -65,6 +65,11 @@ const docsTree: Root = {
           name: 'Learnings API',
           url: '/docs/learnings-api',
         },
+        {
+          type: 'page',
+          name: 'Usage API',
+          url: '/docs/usage-api',
+        },
       ],
     },
     {
