@@ -1,51 +1,46 @@
 ---
 title: Quickstart
-description: A minimal end-to-end Hyperstruck flow from a fresh API key to reasoning, optional manual learnings, and developer-tool integrations.
+description: The lowest-friction path from a fresh API key to a working Hyperstruck agent run.
 ---
 
-This page walks through the smallest useful Hyperstruck workflow for a brand-new user: create an agent, run a goal, optionally add a manual learning, and reuse the same capability from developer tooling.
+This is the fastest first-success path: upload a provider credential, create an agent, dispatch a goal, and optionally store a manual learning.
 
-<Callout type="idea" title="What this shows">
-  The goal is not a full production integration. It is a working first path for someone who has an API key, no existing agent, and no prior learnings.
+<Callout type="warning" title="An API key alone is not enough">
+  A fresh Hyperstruck API key does not let an agent run by itself. The agent also needs a matching active provider credential for its `model_provider`. For most teams, a `tenant_default` credential is the fastest setup path. See [Credentials API](/docs/credentials-api).
 </Callout>
 
-<Callout type="info" title="Automatic and manual learning">
-  Reasoning runs can automatically extract useful learnings from execution. The manual learning step below is optional and is best used for explicit tuning, curation, imported lessons, or operator-injected guidance.
+<Callout type="info" title="Keep the first call small">
+  Start with the minimum required fields. Full API reference lives in the OpenAPI docs. If you omit optional fields here, Hyperstruck uses sane defaults.
 </Callout>
-
-## At a glance
-
-<Cards>
-  <Card
-    title="1. Create an agent"
-    href="/docs/agents-api"
-    description="Start with a reasoning-capable agent you can reuse across runs."
-  />
-  <Card
-    title="2. Run a goal"
-    href="/docs/agents-api"
-    description="Dispatch a task and get back a run handle."
-  />
-  <Card
-    title="3. Optionally add a manual learning"
-    href="/docs/learnings-api"
-    description="Inject or curate a lesson when you want direct control."
-  />
-  <Card
-    title="4. Use it in tooling"
-    href="/docs/claude-skills"
-    description="Bring the same workflow into Claude Code or Cursor."
-  />
-</Cards>
 
 ## Minimal flow
 
 <Steps>
   <Step>
 
-### Create an agent
+### 1. Upload a tenant-default provider credential
 
-Create an agent first so you have an `AGENT_ID` to use in later runs.
+Use a tenant default first so any agent with the same `model_provider` can run without extra credential setup.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/credentials/providers" \
+  -d '{
+    "provider": "anthropic",
+    "display_name": "Default Anthropic Key",
+    "binding_type": "tenant_default",
+    "secret": "<ANTHROPIC_API_KEY>"
+  }'
+```
+
+  </Step>
+  <Step>
+
+### 2. Create an agent
+
+Create an agent with only the required fields.
 
 ```bash
 curl -X POST \
@@ -53,14 +48,11 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents" \
   -d '{
-    "name": "Operations Assistant",
+    "name": "Sales Execution Assistant",
     "model_provider": "anthropic",
     "model_name": "claude-sonnet-4-5",
-    "reasoning_profile": "balanced",
-    "memory_profile": "default",
-    "knowledge_scope": "agent",
     "core_config": {
-      "instructions": "You are a helpful operations assistant."
+      "instructions": "You are a helpful sales execution assistant."
     }
   }'
 ```
@@ -68,9 +60,9 @@ curl -X POST \
   </Step>
   <Step>
 
-### Dispatch a goal
+### 3. Dispatch a goal
 
-Use the returned `AGENT_ID` to start a reasoning run.
+Use the returned `AGENT_ID` to start a run.
 
 ```bash
 curl -X POST \
@@ -78,19 +70,16 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/goals" \
   -d '{
-    "goal": "Map out a migration plan with milestones and risks",
-    "context": "Current stack, constraints, and known blockers go here"
+    "goal": "Create a follow-up sales execution plan for a call with client XYZ"
   }'
 ```
-
-Hyperstruck can automatically extract useful learnings from what happens during the run when meaningful patterns emerge.
 
   </Step>
   <Step>
 
-### Optionally store a manual learning
+### 4. Optionally store a manual learning
 
-Use the Learnings API when you want direct editorial control over what the system should carry forward.
+Reasoning runs can already extract learnings automatically. Use manual storage when you want direct editorial control.
 
 ```bash
 curl -X POST \
@@ -98,52 +87,49 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
   -d '{
-    "content": "Always validate the migration dependency graph before scheduling milestones.",
-    "learning_type": "best_practice",
-    "confidence": 0.7
+    "content": "At client XYZ, directors and below are usually influencers, not final decision-makers, so map the buying committee before assigning next steps.",
+    "learning_type": "pitfall"
   }'
 ```
 
   </Step>
   <Step>
 
-### Reuse the same capabilities from developer tooling
+### 5. Reuse the same capabilities from developer tooling
 
-Once the APIs are in place, you can expose the same reasoning and manual learning controls through Claude Code or Cursor skills.
+Once the API flow works, you can expose the same capabilities in developer tooling.
 
 ```text
-/hyper-reasoning Map out a migration plan with milestones and risks
-/hyper-learning search migration dependency graph
+/hyper-reasoning Create a follow-up sales execution plan for a call with client XYZ
+/hyper-learning search client XYZ decision makers
 /hyper-learning store
 ```
 
   </Step>
 </Steps>
 
-## How to think about this flow
+## Common next knobs
 
-- [Reasoning](/docs/reasoning) improves decision quality during the run.
-- [Learning](/docs/learning) improves future decisions by carrying useful lessons forward.
-- [Agents API](/docs/agents-api) is the orchestration surface for creating agents, dispatching goals, and monitoring runs.
-- [Learnings API](/docs/learnings-api) is the manual control surface for injecting, curating, retrieving, and reinforcing learnings.
-- [Claude Skills](/docs/claude-skills) makes the same APIs easy to use where developers already work.
+- Agent creation defaults: `status="active"`, `reasoning_profile="balanced"`, `memory_profile="default"`, `knowledge_scope="agent"`
+- Goal dispatch optional fields: `context`, `session_id`, `worker_profile`, `metadata`
+- Manual learning optional fields: `confidence`, `source_goal`, `applicable_goals`, `applicable_tools`, `privacy`
 
-## Suggested next pages
+## Why credentials come first
+
+Credential resolution is provider-based:
+
+1. Hyperstruck looks at the agent's `model_provider`.
+2. A matching active `agent_override` credential for that agent wins first.
+3. If none exists, Hyperstruck falls back to the matching active `tenant_default`.
+4. If neither exists, agent runs cannot start and manual learning store requests for that agent fail.
+
+Use [Credentials API](/docs/credentials-api) for the full credential setup and resolution rules.
+
+## Related pages
 
 <Cards>
-  <Card
-    title="Understand reasoning"
-    href="/docs/reasoning"
-    description="See how Hyperstruck improves task-level decision quality."
-  />
-  <Card
-    title="Understand learning"
-    href="/docs/learning"
-    description="See how Hyperstruck turns useful outcomes into reusable intelligence."
-  />
-  <Card
-    title="Go deeper on the APIs"
-    href="/docs/agents-api"
-    description="Start with the API surface if you are integrating directly."
-  />
+  <Card title="Credentials API" href="/docs/credentials-api" description="Upload tenant defaults and agent overrides." />
+  <Card title="Agents API" href="/docs/agents-api" description="Create agents, dispatch goals, and inspect runs." />
+  <Card title="Learnings API" href="/docs/learnings-api" description="Store, search, retrieve, and reinforce learnings." />
+  <Card title="Claude Skills" href="/docs/claude-skills" description="Bring the same workflow into developer tooling." />
 </Cards>

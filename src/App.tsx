@@ -36,6 +36,9 @@ const docsSearch = {
     links: [
       ['Docs home', '/docs'],
       ['Quickstart', '/docs/quickstart'],
+      ['Credentials API', '/docs/credentials-api'],
+      ['Agents API', '/docs/agents-api'],
+      ['Learnings API', '/docs/learnings-api'],
       ['Reasoning', '/docs/reasoning'],
       ['Learning', '/docs/learning'],
       ['Usage API', '/docs/usage-api'],

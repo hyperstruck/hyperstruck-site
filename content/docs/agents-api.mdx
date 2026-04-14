@@ -1,51 +1,77 @@
 ---
 title: Agents API
-description: Create or select agents, dispatch goals, monitor runs, resume suspended work, and inspect session history through the reasoning orchestration surface.
+description: Create agents, dispatch goals, monitor runs, resume suspended work, and inspect session history.
 ---
 
-Use the Agents API when you want Hyperstruck to do more than complete a raw model call. It is the orchestration surface for reasoning runs and covers agent selection or creation, goal dispatch, run monitoring, resume flows, and session inspection.
+import { TypeTable } from 'fumadocs-ui/components/type-table';
 
-<Callout type="info" title="Best fit">
-  Use the Agents API when you want Hyperstruck to drive task-level reasoning, sequencing, and planning, not just complete a single prompt.
+Use the Agents API when you want Hyperstruck to run task-level reasoning for an agent.
+
+<Callout type="info" title="Start with the minimum required fields">
+  Keep the first request copy/paste-friendly. Full API reference lives in the OpenAPI docs. If you omit optional fields here, Hyperstruck uses sane defaults.
 </Callout>
 
-## What this page covers
-
-This page covers the core reasoning lifecycle:
-
-1. create or select an agent
-2. dispatch a goal
-3. monitor the run
-4. resume if the run is suspended for review
-5. inspect session messages and session runs if needed
-
-## Why teams reach for it
-
-It gives technical teams a lightweight integration path into Hyperstruck without building the full orchestration and reasoning layer themselves.
-
-- route work to the right agent profile
-- use Hyperstruck for planning and structured analysis
-- add reasoning capabilities without a heavy application wrapper
-- monitor long-running work through run handles and session history
+<Callout type="warning" title="Runs need a matching provider credential">
+  Agent runs require a matching active provider credential for the agent's `model_provider`. For most teams, a `tenant_default` credential is the fastest setup path. See [Credentials API](/docs/credentials-api).
+</Callout>
 
 ## Core lifecycle
 
-<Cards>
-  <Card title="Create or select" description="Start with an existing agent or create one for the workflow you want to support." />
-  <Card title="Dispatch" description="Send a goal and receive a run handle for the work Hyperstruck starts." />
-  <Card title="Inspect and resume" description="Monitor progress, continue suspended work, and inspect session history if needed." />
-</Cards>
+### List agents
 
-## Create or select an agent
-
-### List available agents
+No query params are required.
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
-  "https://api.core.hyperstruck.com/agents?limit=50"
+  "https://api.core.hyperstruck.com/agents"
 ```
 
+<TypeTable
+  type={{
+    include_llm_credential: {
+      description: 'Include resolved LLM credential details in the response.',
+      type: 'boolean',
+      required: false,
+    },
+    limit: {
+      description: 'Limit the number of agents returned.',
+      type: 'integer',
+      required: false,
+    },
+    cursor: {
+      description: 'Cursor for pagination.',
+      type: 'string',
+      required: false,
+    },
+  }}
+/>
+
 ### Create an agent
+
+<TypeTable
+  type={{
+    name: {
+      description: 'Human-readable name for the agent.',
+      type: 'string',
+      required: true,
+    },
+    model_provider: {
+      description: 'Provider Hyperstruck should resolve credentials for.',
+      type: 'string',
+      required: true,
+    },
+    model_name: {
+      description: 'Provider model name for the agent.',
+      type: 'string',
+      required: true,
+    },
+    'core_config.instructions': {
+      description: 'Base instructions for the agent.',
+      type: 'string',
+      required: true,
+    },
+  }}
+/>
 
 ```bash
 curl -X POST \
@@ -53,21 +79,49 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents" \
   -d '{
-    "name": "Migration Planner",
+    "name": "Operations Assistant",
     "model_provider": "anthropic",
     "model_name": "claude-sonnet-4-5",
-    "reasoning_profile": "balanced",
-    "memory_profile": "default",
-    "knowledge_scope": "agent",
     "core_config": {
-      "instructions": "You are a careful migration planning assistant."
+      "instructions": "You are a helpful operations assistant."
     }
   }'
 ```
 
-## Dispatch a goal
+<TypeTable
+  type={{
+    status: {
+      description: 'Agent lifecycle status.',
+      type: '"active"',
+      default: '"active"',
+      required: false,
+    },
+    reasoning_profile: {
+      description: 'Reasoning preset for the agent.',
+      type: '"balanced"',
+      default: '"balanced"',
+      required: false,
+    },
+    memory_profile: {
+      description: 'Memory preset for the agent.',
+      type: '"default"',
+      default: '"default"',
+      required: false,
+    },
+    knowledge_scope: {
+      description: 'Knowledge scope used by the agent.',
+      type: '"agent"',
+      default: '"agent"',
+      required: false,
+    },
+  }}
+/>
 
-`POST /agents/{agent_id}/goals` returns a run handle. Use that run handle to monitor long-running work and to resume the run if human review is required.
+Other `core_config` fields are optional.
+
+### Dispatch a goal
+
+`POST /agents/{agent_id}/goals` returns a run handle. The only required body field is `goal`.
 
 ```bash
 curl -X POST \
@@ -75,23 +129,92 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/goals" \
   -d '{
-    "goal": "Map out a migration plan with milestones and risks",
-    "context": "Current stack, constraints, and known blockers go here"
+    "goal": "Map out a migration plan with milestones and risks"
   }'
 ```
 
-## Poll run status
+<TypeTable
+  type={{
+    goal: {
+      description: 'The task for the agent to complete.',
+      type: 'string',
+      required: true,
+    },
+    context: {
+      description: 'Extra context to help the agent with the goal.',
+      type: 'string',
+      required: false,
+    },
+    session_id: {
+      description: 'Reuse an existing session instead of creating a new one.',
+      type: 'string',
+      required: false,
+    },
+    worker_profile: {
+      description: 'Worker preset for the run.',
+      type: '"default"',
+      default: '"default"',
+      required: false,
+    },
+    metadata: {
+      description: 'Arbitrary metadata attached to the run.',
+      type: 'object',
+      required: false,
+    },
+  }}
+/>
 
-Use the returned `RUN_ID` to inspect progress, output, and suspension state.
+### Poll run status
+
+No body or query params are required.
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
   "https://api.core.hyperstruck.com/runs/<RUN_ID>"
 ```
 
-## Resume a suspended run
+### Resume a suspended run
 
-If a run pauses for review, continue it through the resume endpoint.
+<TypeTable
+  type={{
+    suspension_id: {
+      description: 'The suspension being resolved.',
+      type: 'string',
+      required: true,
+    },
+    decision_type: {
+      description: 'Decision to apply to the suspension.',
+      type: 'string',
+      required: true,
+    },
+    data: {
+      description: 'Structured decision payload for the resume action.',
+      type: 'object',
+      required: false,
+    },
+    decided_by: {
+      description: 'Identifier for who made the decision.',
+      type: 'string',
+      required: false,
+    },
+    reason: {
+      description: 'Reason for the decision.',
+      type: 'string',
+      required: false,
+    },
+    worker_profile: {
+      description: 'Worker preset for the resumed run.',
+      type: '"default"',
+      default: '"default"',
+      required: false,
+    },
+    metadata: {
+      description: 'Arbitrary metadata attached to the resume action.',
+      type: 'object',
+      required: false,
+    },
+  }}
+/>
 
 ```bash
 curl -X POST \
@@ -100,31 +223,61 @@ curl -X POST \
   "https://api.core.hyperstruck.com/runs/<RUN_ID>/resume" \
   -d '{
     "suspension_id": "<SUSPENSION_ID>",
-    "decision_type": "approve",
-    "decided_by": "user"
+    "decision_type": "approve"
   }'
 ```
 
-## Inspect session messages
+### Inspect session messages
 
-Use session history when you want to inspect what happened during the run at the message level.
-
-```bash
-curl -H "Authorization: Bearer <API_KEY>" \
-  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/messages?limit=50"
-```
-
-## Inspect session runs
-
-Use session runs when you want a higher-level view of work completed in the same session.
+No query params are required.
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
-  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/runs?limit=20"
+  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/messages"
 ```
+
+<TypeTable
+  type={{
+    limit: {
+      description: 'Limit the number of messages returned.',
+      type: 'integer',
+      required: false,
+    },
+    cursor: {
+      description: 'Cursor for pagination.',
+      type: 'string',
+      required: false,
+    },
+  }}
+/>
+
+### Inspect session runs
+
+No query params are required.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/runs"
+```
+
+<TypeTable
+  type={{
+    limit: {
+      description: 'Limit the number of runs returned.',
+      type: 'integer',
+      required: false,
+    },
+    cursor: {
+      description: 'Cursor for pagination.',
+      type: 'string',
+      required: false,
+    },
+  }}
+/>
 
 ## Related pages
 
-- See [Quickstart](/docs/quickstart) for a valid first path from a fresh API key.
-- See [Reasoning](/docs/reasoning) for the non-technical explanation of what this capability delivers.
-- See [Claude Skills](/docs/claude-skills) if you want to use the same capability from Claude Code or Cursor.
+- [Quickstart](/docs/quickstart) for the fastest first-success flow
+- [Credentials API](/docs/credentials-api) for tenant defaults and agent overrides
+- [Reasoning](/docs/reasoning) for the conceptual overview
+- [Claude Skills](/docs/claude-skills) for using the same capability in developer tooling
