@@ -1,0 +1,89 @@
+---
+title: Learnings API
+description: Manually inject, search, retrieve, and reinforce operational learnings when you want direct control over what the system carries forward.
+---
+
+Hyperstruck automatically extracts learnings from reasoning runs when useful patterns emerge. The Learnings API is the manual control surface for teams that want to inject lessons directly, curate what matters, reinforce good patterns, and tune what the system should carry forward.
+
+<Callout type="idea" title="Best fit">
+  Use the Learnings API when you want direct editorial control over learnings, not because it is the only way Hyperstruck improves over time.
+</Callout>
+
+## The control point
+
+An API for manually managing operational learnings for an agent.
+
+## Why teams keep it close
+
+This is how teams turn one-off wins into durable system behavior. Instead of letting useful lessons disappear after a run, they can be stored, searched, and reinforced over time.
+
+## What it makes possible
+
+- capture what worked
+- search prior learnings before difficult tasks
+- reinforce useful patterns
+- create a compounding feedback loop around agent performance
+
+## Best used for
+
+- post-mortems and incident lessons
+- operator-curated best practices
+- imported domain-specific lessons
+- explicit reinforcement and trust tuning
+
+## Quick mental model
+
+<Cards>
+  <Card title="Store" description="Capture useful lessons from real execution." />
+  <Card title="Search and retrieve" description="Bring prior learnings back into difficult or recurring workflows." />
+  <Card title="Reinforce" description="Strengthen patterns that continue to prove useful over time." />
+</Cards>
+
+## Example: store a learning
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
+  -d '{
+    "content": "Always validate a date range before running large analytics exports.",
+    "learning_type": "pitfall",
+    "confidence": 0.7
+  }'
+```
+
+This endpoint returns `202 Accepted`. Background processing handles indexing and validation, so you may need to wait briefly before searching for the new learning.
+
+For many teams, this endpoint is optional at first because reasoning runs can already extract learnings automatically. Use it when you want direct editorial control.
+
+## Example: search learnings
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/search?q=analytics+export&limit=5"
+```
+
+## Example: get a learning
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>"
+```
+
+## Example: reinforce a learning
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>/reinforce" \
+  -d '{
+    "is_helpful": true
+  }'
+```
+
+## Related pages
+
+- See [Learning](/docs/learning) for the broader explanation of automatic learning and manual control.
+- See [Agents API](/docs/agents-api) if you want Hyperstruck to drive reasoning for a goal, not just manage learnings directly.

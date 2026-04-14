@@ -128,8 +128,9 @@ export default function LearningModulesSection() {
 
       <Box sx={{ display: 'flex', justifyContent: 'center' }}>
         <SectionHeading
-          title="Learning Intelligence"
-          description="Beyond simple retrieval. We've built an architectural memory that grows more capable with every cycle of execution."
+          eyebrow="Why Hyperstruck Performs Differently"
+          title="More than generation. Better judgment."
+          description="Most AI systems generate answers. Hyperstruck improves judgment before, during, and after model calls so execution quality compounds over time."
           align="center"
           maxWidth={760}
         />

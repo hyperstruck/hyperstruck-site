@@ -1,0 +1,130 @@
+---
+title: Agents API
+description: Create or select agents, dispatch goals, monitor runs, resume suspended work, and inspect session history through the reasoning orchestration surface.
+---
+
+Use the Agents API when you want Hyperstruck to do more than complete a raw model call. It is the orchestration surface for reasoning runs and covers agent selection or creation, goal dispatch, run monitoring, resume flows, and session inspection.
+
+<Callout type="info" title="Best fit">
+  Use the Agents API when you want Hyperstruck to drive task-level reasoning, sequencing, and planning, not just complete a single prompt.
+</Callout>
+
+## What this page covers
+
+This page covers the core reasoning lifecycle:
+
+1. create or select an agent
+2. dispatch a goal
+3. monitor the run
+4. resume if the run is suspended for review
+5. inspect session messages and session runs if needed
+
+## Why teams reach for it
+
+It gives technical teams a lightweight integration path into Hyperstruck without building the full orchestration and reasoning layer themselves.
+
+- route work to the right agent profile
+- use Hyperstruck for planning and structured analysis
+- add reasoning capabilities without a heavy application wrapper
+- monitor long-running work through run handles and session history
+
+## Core lifecycle
+
+<Cards>
+  <Card title="Create or select" description="Start with an existing agent or create one for the workflow you want to support." />
+  <Card title="Dispatch" description="Send a goal and receive a run handle for the work Hyperstruck starts." />
+  <Card title="Inspect and resume" description="Monitor progress, continue suspended work, and inspect session history if needed." />
+</Cards>
+
+## Create or select an agent
+
+### List available agents
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents?limit=50"
+```
+
+### Create an agent
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents" \
+  -d '{
+    "name": "Migration Planner",
+    "model_provider": "anthropic",
+    "model_name": "claude-sonnet-4-5",
+    "reasoning_profile": "balanced",
+    "memory_profile": "default",
+    "knowledge_scope": "agent",
+    "core_config": {
+      "instructions": "You are a careful migration planning assistant."
+    }
+  }'
+```
+
+## Dispatch a goal
+
+`POST /agents/{agent_id}/goals` returns a run handle. Use that run handle to monitor long-running work and to resume the run if human review is required.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/goals" \
+  -d '{
+    "goal": "Map out a migration plan with milestones and risks",
+    "context": "Current stack, constraints, and known blockers go here"
+  }'
+```
+
+## Poll run status
+
+Use the returned `RUN_ID` to inspect progress, output, and suspension state.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/runs/<RUN_ID>"
+```
+
+## Resume a suspended run
+
+If a run pauses for review, continue it through the resume endpoint.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/runs/<RUN_ID>/resume" \
+  -d '{
+    "suspension_id": "<SUSPENSION_ID>",
+    "decision_type": "approve",
+    "decided_by": "user"
+  }'
+```
+
+## Inspect session messages
+
+Use session history when you want to inspect what happened during the run at the message level.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/messages?limit=50"
+```
+
+## Inspect session runs
+
+Use session runs when you want a higher-level view of work completed in the same session.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/sessions/<SESSION_ID>/runs?limit=20"
+```
+
+## Related pages
+
+- See [Quickstart](/docs/quickstart) for a valid first path from a fresh API key.
+- See [Reasoning](/docs/reasoning) for the non-technical explanation of what this capability delivers.
+- See [Claude Skills](/docs/claude-skills) if you want to use the same capability from Claude Code or Cursor.

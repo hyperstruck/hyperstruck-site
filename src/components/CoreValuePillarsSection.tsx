@@ -103,7 +103,7 @@ function PillarCard({
   );
 }
 
-function DomainExpertiseVisual() {
+function BenchmarkImpactVisual() {
   const theme = useTheme();
 
   return (
@@ -147,7 +147,7 @@ function DomainExpertiseVisual() {
           alignItems: 'center',
         }}
       >
-        {['Fintech', 'Legal', 'Deep Tech'].map((label, index) => (
+        {['Known problems', 'Silent failures', 'Task quality'].map((label, index) => (
           <Box
             key={label}
             sx={{
@@ -198,7 +198,7 @@ function DomainExpertiseVisual() {
 export default function CoreValuePillarsSection() {
   const theme = useTheme();
   const { ref, progress } = useParallaxProgress<HTMLDivElement>();
-  const [persistentMemory, realLearning, domainExpertise, trustAndControl, qualityOutput] =
+  const [learning, reasoning, benchmarkedImpact, trust, productionReadiness] =
     valuePillars;
   const compatibilityReveal = getRevealProgress(progress, 0.28);
 
@@ -220,7 +220,12 @@ export default function CoreValuePillarsSection() {
 
       <Box sx={{ mb: 6 }}>
         <Typography variant="h2" sx={{ fontSize: { xs: '2.2rem', md: '3.2rem' }, mb: 2 }}>
-          Core Value Pillars
+          A compounding intelligence layer
+        </Typography>
+        <Typography color="text.secondary" sx={{ maxWidth: 760, lineHeight: 1.75, mb: 2.5 }}>
+          Hyperstruck improves decision quality now through reasoning, improves decision quality
+          later through learning, and makes both usable in production through trust and
+          integration.
         </Typography>
         <Box sx={{ width: 48, height: 4, borderRadius: 999, backgroundColor: 'primary.main' }} />
       </Box>
@@ -233,22 +238,22 @@ export default function CoreValuePillarsSection() {
         }}
       >
         <Stack spacing={3}>
-          <PillarCard {...persistentMemory} progress={progress} delay={0.02} minHeight={240} />
-          <PillarCard {...realLearning} progress={progress} delay={0.12} minHeight={210} muted />
+          <PillarCard {...learning} progress={progress} delay={0.02} minHeight={240} />
+          <PillarCard {...reasoning} progress={progress} delay={0.12} minHeight={210} muted />
         </Stack>
 
         <PillarCard
-          {...domainExpertise}
+          {...benchmarkedImpact}
           progress={progress}
           delay={0.08}
           minHeight={{ xs: 280, md: 494 }}
           featured
-          visual={<DomainExpertiseVisual />}
+          visual={<BenchmarkImpactVisual />}
         />
 
         <Stack spacing={3}>
-          <PillarCard {...trustAndControl} progress={progress} delay={0.16} minHeight={210} muted />
-          <PillarCard {...qualityOutput} progress={progress} delay={0.24} minHeight={240} />
+          <PillarCard {...trust} progress={progress} delay={0.16} minHeight={210} muted />
+          <PillarCard {...productionReadiness} progress={progress} delay={0.24} minHeight={240} />
         </Stack>
 
         <Card
@@ -273,10 +278,11 @@ export default function CoreValuePillarsSection() {
           >
             <Box>
               <Typography variant="h3" sx={{ mb: 2 }}>
-                Drop-in Compatibility
+                Fits existing systems
               </Typography>
               <Typography color="text.secondary" sx={{ fontSize: { xs: '1rem', md: '1.05rem' }, lineHeight: 1.75, maxWidth: 620 }}>
-                Integrate via a single API call or native SDK, MCP, Claude Code and Cursor Skills as needed.
+                Use Hyperstruck through APIs, MCP, and developer workflows like Claude Code and
+                Cursor so agents can benefit from prior learnings without rebuilding your stack.
               </Typography>
             </Box>
 

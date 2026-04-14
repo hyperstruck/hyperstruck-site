@@ -4,9 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc --noEmit && vite build",
-    "preview": "vite preview"
+    "dev": "npm run docs:generate && npm run docs:search && vite",
+    "build": "npm run docs:generate && npm run docs:search && tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "docs:generate": "fumadocs-mdx",
+    "docs:search": "tsx scripts/generate-docs-search.ts",
+    "postinstall": "npm run docs:generate && npm run docs:search"
   },
   "repository": {
     "type": "git",
@@ -28,9 +31,15 @@
     "@mui/icons-material": "^7.3.9",
     "@mui/material": "^7.3.9",
     "@supabase/supabase-js": "^2.57.4",
+    "@tailwindcss/vite": "^4.2.2",
+    "@types/mdx": "^2.0.13",
+    "fumadocs-core": "^16.7.14",
+    "fumadocs-mdx": "^14.2.13",
+    "fumadocs-ui": "^16.7.14",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.13.2",
+    "tailwindcss": "^4.2.2",
     "three": "^0.183.2"
   },
   "devDependencies": {
@@ -38,6 +47,7 @@
     "@types/react-dom": "^19.2.3",
     "@types/three": "^0.183.1",
     "@vitejs/plugin-react": "^6.0.1",
+    "tsx": "^4.21.0",
     "typescript": "^6.0.2",
     "vite": "^8.0.3"
   }

@@ -1,0 +1,209 @@
+---
+title: Usage API
+description: Visibility and reporting endpoints for tenant usage, estimated cost, learning activity, and run history.
+---
+
+The Usage API gives teams visibility into compute usage, estimated cost, learning activity, and run history. It is the reporting surface for understanding how your tenant is using Hyperstruck. Subscription and plan state affect access and entitlements, but subscription management itself is not currently exposed as a public API.
+
+<Callout type="warning" title="What this page does and does not cover">
+  This page documents usage reporting and cost-style visibility. Checkout, invoices, payment methods, customer portal, and subscription self-service are not exposed as public API endpoints in this version.
+</Callout>
+
+## What the Usage API covers
+
+This surface is for:
+
+- tenant usage summary
+- tenant run history
+
+Use it when you want reporting visibility into:
+
+- aggregate run activity
+- estimated ledger-style cost totals
+- learning-operation counts
+- individual run records for drill-down analysis
+
+## Own-tenant reporting endpoints
+
+### `GET /usage/summary`
+
+Returns aggregate usage summary for the calling tenant.
+
+- Required scope: `usage:read`
+- Important query params: `window`, `as_of`
+- Behavior: aggregates run usage from completed and in-window runs, includes learning-operation counts, and defaults to `last_7_days` if no window is provided
+
+#### Example: own-tenant usage summary
+
+```bash
+curl -sS "https://api.core.hyperstruck.com/usage/summary?window=last_7_days" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+#### Example: summary response excerpt
+
+```json
+{
+  "tenant_id": "9f235d26-66d6-4099-a6e5-d959d0c9b1d1",
+  "window": "last_7_days",
+  "period_start": "2026-04-06T00:00:00Z",
+  "period_end_exclusive": "2026-04-13T12:34:56Z",
+  "agent_runs": {
+    "run_count": 42,
+    "runs_with_compute_count": 38,
+    "total_compute_seconds": "1523.45",
+    "total_compute_hours": "0.42",
+    "total_estimated_cost_usd": "3.81",
+    "average_compute_seconds": "40.09",
+    "unique_session_count": 12
+  },
+  "learnings": {
+    "total_learning_operations": 7
+  }
+}
+```
+
+### `GET /usage/runs`
+
+Returns a cursor-paginated list of runs for the calling tenant.
+
+- Required scope: `usage:read`
+- Important query params: `window`, `limit`, `cursor`, `as_of`
+- Behavior: returns individual run records, ordered newest-first, and cursor-paginated
+
+#### Example: own-tenant run list
+
+```bash
+curl -sS "https://api.core.hyperstruck.com/usage/runs?window=last_7_days&limit=20" \
+  -H "Authorization: Bearer <API_KEY>"
+```
+
+#### Example: run-list response excerpt
+
+```json
+{
+  "items": [
+    {
+      "id": "a1b2c3d4-...",
+      "agent_id": "e5f6a7b8-...",
+      "session_id": "c9d0e1f2-...",
+      "parent_run_id": null,
+      "run_type": "goal",
+      "status": "completed",
+      "goal": "Analyze customer feedback",
+      "worker_profile": "default",
+      "started_at": "2026-04-12T10:00:00Z",
+      "ended_at": "2026-04-12T10:01:30Z",
+      "compute_seconds": "90.00",
+      "estimated_compute_cost_usd": "0.23",
+      "error": null,
+      "metadata": {},
+      "created_at": "2026-04-12T09:59:58Z"
+    }
+  ],
+  "next_cursor": "eyJjcmVhdGVkX2F0Ijoi..."
+}
+```
+
+## Supported reporting windows
+
+The Usage API currently supports preset reporting windows only:
+
+- `last_7_days`
+- `last_30_days`
+- `calendar_quarter`
+- `calendar_year`
+
+Important notes:
+
+- all reporting windows are UTC-based
+- custom `start` / `end` ranges are not supported in this version
+
+If you need custom date-range reporting, that is not part of the public API in this version.
+
+## Understanding response fields
+
+### Usage summary
+
+The summary response is the aggregate reporting view for a preset time window. It combines run-level usage, estimated cost-style totals, and learning-operation counts.
+
+Important top-level fields:
+
+- `tenant_id`
+- `window`
+- `period_start`
+- `period_end_exclusive`
+- `agent_runs`
+- `learnings`
+
+### `agent_runs`
+
+- `run_count`: number of runs created in the selected window
+- `runs_with_compute_count`: number of runs in the window that recorded compute usage
+- `total_compute_seconds`: aggregate compute duration for those runs
+- `total_compute_hours`: the same total expressed in hours
+- `total_estimated_cost_usd`: an estimated ledger-style cost value used for reporting and usage visibility, not an invoice or billing artifact
+- `average_compute_seconds`: average compute duration across counted runs
+- `unique_session_count`: number of distinct sessions contributing to the selected window
+
+### `learnings`
+
+- `total_learning_operations`: learning operations recorded in the same reporting period
+
+### Run history
+
+The run-list response is the drill-down view for the same reporting surface. It is:
+
+- a paginated list of individual runs
+- scoped to the selected reporting window
+- returned newest-first
+- continued through `next_cursor`
+
+Useful run-list fields to inspect:
+
+- `id`
+- `agent_id`
+- `session_id`
+- `run_type`
+- `status`
+- `goal`
+- `started_at`
+- `ended_at`
+- `compute_seconds`
+- `estimated_compute_cost_usd`
+- `created_at`
+
+This is often the best view when you want to trace activity spikes, inspect usage patterns, or understand which runs contributed to a reporting total.
+
+## Scopes and access
+
+### Scopes
+
+- `usage:read` for own-tenant reporting
+
+### Plan and subscription context
+
+Plan and subscription state influence access and entitlements across Hyperstruck, but the Usage API itself is a reporting surface. It is not a subscription-management API.
+
+That means:
+
+- subscription or entitlement state can affect whether usage requests are allowed
+- adjacent APIs may behave differently based on plan access
+- this page should not be treated as a checkout, invoicing, or plan-management reference
+
+## Common responses and errors
+
+- `200 OK`: request succeeded
+- `400 Bad Request`: invalid cursor on run-list endpoints
+- `403 Forbidden`: missing `usage:read`
+- `500 Internal Server Error`: unexpected server error
+
+If a run-list request returns `400`, retry without the cursor and request the first page again. If a request returns `403`, verify that the API key has the correct reporting scope.
+
+## Related pages
+
+- [Quickstart](/docs/quickstart) shows how teams get started before they need reporting visibility.
+- [Agents API](/docs/agents-api) explains how runs are created.
+- [Learnings API](/docs/learnings-api) explains the manual learning surface whose operations may appear in usage aggregates.
+- [Pricing](/pricing) explains plan packaging, while Usage API explains reporting visibility.
+- [Request access](/signup) is the right next step if you need API access enabled.

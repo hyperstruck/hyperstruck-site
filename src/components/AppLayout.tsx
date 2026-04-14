@@ -22,6 +22,7 @@ import { contactEmail } from '../theme/tokens';
 
 const navItems = [
   { label: 'Home', to: '/' },
+  { label: 'Docs', to: '/docs' },
   { label: 'Pricing', to: '/pricing' },
   { label: 'Sign up', to: '/signup' },
 ] as const;
@@ -50,6 +51,7 @@ export default function AppLayout() {
 
   const footerLinks = useMemo(
     () => [
+      { label: 'Docs', to: '/docs' },
       { label: 'Pricing', to: '/pricing' },
     ],
     [],
@@ -185,7 +187,8 @@ export default function AppLayout() {
               Hyperstruck
             </Typography>
             <Typography color="text.secondary" sx={{ maxWidth: 420 }}>
-              Engineering the next era of intelligence with data in motion and decisions at speed.
+              The intelligence layer for agents that make better decisions and improve with
+              experience.
             </Typography>
           </Box>
 
@@ -213,9 +216,11 @@ export default function AppLayout() {
               Contact
             </Typography>
             <Stack spacing={1.25} sx={{ mt: 1 }}>
-              <Typography color="text.secondary">Ready to explore a custom deployment?</Typography>
+              <Typography color="text.secondary">
+                Ready to benchmark judgment in your workflow?
+              </Typography>
               <Link component={RouterLink} to="/signup" underline="hover">
-                Join the waitlist
+                Request API access
               </Link>
             </Stack>
           </Box>
