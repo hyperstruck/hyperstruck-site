@@ -55,6 +55,11 @@ curl -H "Authorization: Bearer <API_KEY>" \
       type: 'string',
       required: true,
     },
+    description: {
+      description: "A short string describing the agent's purpose or area of expertise in more detail.",
+      type: 'string',
+      required: false,
+    },
     model_provider: {
       description: 'Provider Hyperstruck should resolve credentials for.',
       type: 'string',
@@ -73,6 +78,8 @@ curl -H "Authorization: Bearer <API_KEY>" \
   }}
 />
 
+`description` is useful when you want a clearer summary of the agent's role.
+
 ```bash
 curl -X POST \
   -H "Authorization: Bearer <API_KEY>" \
@@ -80,6 +87,7 @@ curl -X POST \
   "https://api.core.hyperstruck.com/agents" \
   -d '{
     "name": "Operations Assistant",
+    "description": "Helps coordinate internal operations workflows and follow-up tasks.",
     "model_provider": "anthropic",
     "model_name": "claude-sonnet-4-5",
     "core_config": {
@@ -90,6 +98,11 @@ curl -X POST \
 
 <TypeTable
   type={{
+    description: {
+      description: "A short string describing the agent's purpose or area of expertise in more detail.",
+      type: 'string',
+      required: false,
+    },
     status: {
       description: 'Agent lifecycle status.',
       type: '"active"',

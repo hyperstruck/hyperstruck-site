@@ -40,7 +40,7 @@ curl -X POST \
 
 ### 2. Create an agent
 
-Create an agent with only the required fields.
+Create an agent with the required fields plus an optional `description`. `description` is a short string describing the agent's purpose or area of expertise in more detail.
 
 ```bash
 curl -X POST \
@@ -49,6 +49,7 @@ curl -X POST \
   "https://api.core.hyperstruck.com/agents" \
   -d '{
     "name": "Sales Execution Assistant",
+    "description": "Helps sales reps plan follow-ups, next steps, and account strategy.",
     "model_provider": "anthropic",
     "model_name": "claude-sonnet-4-5",
     "core_config": {
