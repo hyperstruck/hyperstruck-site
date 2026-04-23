@@ -13,6 +13,7 @@ import {
 
 import AppLayout from './components/AppLayout';
 import StaticSearchDialog from './components/docs/StaticSearchDialog';
+import BlogPageRoute from './pages/BlogPage';
 import HomePage from './pages/HomePage';
 import DocsPageRoute from './pages/DocsPage';
 import PricingPage from './pages/PricingPage';
@@ -47,10 +48,22 @@ const docsSearch = {
   },
 } as ComponentProps<typeof RootProvider>['search'];
 
+const blogSearch = {
+  enabled: true,
+  SearchDialog: StaticSearchDialog,
+  options: {
+    links: [['Blog home', '/blog']],
+    source: '/blog-search.json',
+  },
+} as ComponentProps<typeof RootProvider>['search'];
+
 function RootRouteLayout() {
+  const { pathname } = useLocation();
+  const search = pathname.startsWith('/blog') ? blogSearch : docsSearch;
+
   return (
     <RootProvider
-      search={docsSearch}
+      search={search}
       theme={{
         attribute: 'class',
         defaultTheme: 'dark',
@@ -72,6 +85,7 @@ const router = createBrowserRouter(
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/signup" element={<SignupPage />} />
       </Route>
+      <Route path="/blog/*" element={<BlogPageRoute />} />
       <Route path="/docs/*" element={<DocsPageRoute />} />
     </Route>,
   ),
