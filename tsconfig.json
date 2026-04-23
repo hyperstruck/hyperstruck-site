@@ -19,6 +19,6 @@
     "noEmit": true,
     "jsx": "react-jsx"
   },
-  "include": ["src", "source.config.ts", ".source/**/*.ts", "content/**/*.mdx"],
+  "include": ["src", "source.config.ts", ".source/**/*.ts", "content/**/*.md", "content/**/*.mdx"],
   "references": []
 }

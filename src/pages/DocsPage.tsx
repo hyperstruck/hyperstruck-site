@@ -15,6 +15,7 @@ import {
 } from 'fumadocs-ui/layouts/docs/page';
 
 import { useMDXComponents } from '../components/docs/mdx';
+import { resolveContentEntry } from '../lib/contentFiles';
 import { getDocsLayoutOptions } from '../lib/docsLayout';
 import DocsNotFoundPage from './DocsNotFoundPage';
 
@@ -166,37 +167,12 @@ function DocsPageFallback() {
   );
 }
 
-function resolveDocEntry(pathname: string): string | null {
-  const availableEntries = Object.keys(browserCollections.docs.raw).map((entry) =>
-    entry.startsWith('./') ? entry.slice(2) : entry,
-  );
-  const normalizedPath = pathname.replace(/^\/docs\/?/, '').replace(/\/+$/, '');
-  const candidates =
-    normalizedPath.length === 0
-      ? ['index.mdx', 'index.md']
-      : [
-          `${normalizedPath}.mdx`,
-          `${normalizedPath}.md`,
-          `${normalizedPath}/index.mdx`,
-          `${normalizedPath}/index.md`,
-        ];
-
-  for (const candidate of candidates) {
-    const match = availableEntries.find(
-      (entry) => entry === candidate || entry.endsWith(`/${candidate}`),
-    );
-
-    if (match) {
-      return match;
-    }
-  }
-
-  return null;
-}
-
 export default function DocsPageRoute() {
   const { pathname } = useLocation();
-  const path = useMemo(() => resolveDocEntry(pathname), [pathname]);
+  const path = useMemo(
+    () => resolveContentEntry(pathname, '/docs', browserCollections.docs.raw),
+    [pathname],
+  );
 
   return (
     <DocsLayout {...getDocsLayoutOptions()} tree={docsTree}>

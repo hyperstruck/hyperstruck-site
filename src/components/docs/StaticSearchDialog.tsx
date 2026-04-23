@@ -86,6 +86,10 @@ export default function StaticSearchDialog({
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
+    setEntries(null);
+  }, [source]);
+
+  useEffect(() => {
     if (!open || entries !== null) {
       return;
     }

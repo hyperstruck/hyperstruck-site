@@ -1,13 +1,17 @@
-import { mkdir, writeFile } from 'node:fs/promises';
-import { readdir, readFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const workspaceRoot = path.resolve(__dirname, '..');
-const docsDirectory = path.join(workspaceRoot, 'content', 'docs');
-const outputPath = path.join(workspaceRoot, 'public', 'docs-search.json');
+
+interface ContentIndexConfig {
+  label: string;
+  baseUrl: string;
+  contentDirectory: string;
+  outputPath: string;
+}
 
 interface SearchIndex {
   title: string;
@@ -17,6 +21,21 @@ interface SearchIndex {
   url: string;
   keywords?: string;
 }
+
+const collections: ContentIndexConfig[] = [
+  {
+    label: 'Docs',
+    baseUrl: '/docs',
+    contentDirectory: path.join(workspaceRoot, 'content', 'docs'),
+    outputPath: path.join(workspaceRoot, 'public', 'docs-search.json'),
+  },
+  {
+    label: 'Blog',
+    baseUrl: '/blog',
+    contentDirectory: path.join(workspaceRoot, 'content', 'blog'),
+    outputPath: path.join(workspaceRoot, 'public', 'blog-search.json'),
+  },
+];
 
 function parseFrontmatter(source: string): {
   data: Record<string, string>;
@@ -69,15 +88,27 @@ function toPlainText(source: string): string {
     .trim();
 }
 
-function toUrl(filePath: string): string {
-  const relativePath = path.relative(docsDirectory, filePath);
+function humanizeSegment(value: string): string {
+  return value
+    .split(/[-_]/)
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
+function toUrl(filePath: string, config: ContentIndexConfig): string {
+  const relativePath = path.relative(config.contentDirectory, filePath);
   const withoutExtension = relativePath.replace(/\.mdx?$/, '');
 
   if (withoutExtension === 'index') {
-    return '/docs';
+    return config.baseUrl;
   }
 
-  return `/docs/${withoutExtension.replace(/\\/g, '/')}`;
+  if (withoutExtension.endsWith('/index')) {
+    return `${config.baseUrl}/${withoutExtension.slice(0, -'/index'.length).replace(/\\/g, '/')}`;
+  }
+
+  return `${config.baseUrl}/${withoutExtension.replace(/\\/g, '/')}`;
 }
 
 function toTitle(filePath: string, frontmatterTitle?: string): string {
@@ -90,6 +121,19 @@ function toTitle(filePath: string, frontmatterTitle?: string): string {
     .split(/[-_]/)
     .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
     .join(' ');
+}
+
+function toBreadcrumbs(filePath: string, title: string, config: ContentIndexConfig): string[] {
+  const relativePath = path.relative(config.contentDirectory, filePath).replace(/\\/g, '/');
+  const segments = relativePath.replace(/\.mdx?$/, '').split('/').filter(Boolean);
+
+  if (segments.at(-1) === 'index') {
+    segments.pop();
+  } else {
+    segments.pop();
+  }
+
+  return [config.label, ...segments.map(humanizeSegment), title];
 }
 
 async function collectDocFiles(directory: string): Promise<string[]> {
@@ -113,8 +157,8 @@ async function collectDocFiles(directory: string): Promise<string[]> {
   return files.flat();
 }
 
-async function buildIndexes(): Promise<SearchIndex[]> {
-  const files = await collectDocFiles(docsDirectory);
+async function buildIndexes(config: ContentIndexConfig): Promise<SearchIndex[]> {
+  const files = await collectDocFiles(config.contentDirectory);
 
   return Promise.all(
     files.map(async (filePath) => {
@@ -126,9 +170,9 @@ async function buildIndexes(): Promise<SearchIndex[]> {
       return {
         title,
         description,
-        breadcrumbs: ['Docs', title],
+        breadcrumbs: toBreadcrumbs(filePath, title, config),
         content: toPlainText(body),
-        url: toUrl(filePath),
+        url: toUrl(filePath, config),
         keywords: [title, description].filter(Boolean).join(' '),
       } satisfies SearchIndex;
     }),
@@ -136,14 +180,18 @@ async function buildIndexes(): Promise<SearchIndex[]> {
 }
 
 async function main(): Promise<void> {
-  const indexes = await buildIndexes();
-  const body = JSON.stringify(indexes);
+  await Promise.all(
+    collections.map(async (config) => {
+      const indexes = await buildIndexes(config);
+      const body = JSON.stringify(indexes);
 
-  await mkdir(path.dirname(outputPath), { recursive: true });
-  await writeFile(outputPath, body, 'utf8');
+      await mkdir(path.dirname(config.outputPath), { recursive: true });
+      await writeFile(config.outputPath, body, 'utf8');
+    }),
+  );
 }
 
 main().catch((error: unknown) => {
-  console.error('Failed to generate static docs search index.', error);
+  console.error('Failed to generate static content search indexes.', error);
   process.exitCode = 1;
 });
