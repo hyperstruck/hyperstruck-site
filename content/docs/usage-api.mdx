@@ -1,11 +1,11 @@
 ---
 title: Usage API
-description: Inspect your tenant's usage summary and recent runs, with advanced admin endpoints for cross-tenant reporting.
+description: Inspect your tenant's usage summary, cost rollups, and recent runs, with admin endpoints for cross-tenant reporting.
 ---
 
 import { TypeTable } from 'fumadocs-ui/components/type-table';
 
-Use the Usage API to see aggregate usage and recent run history for your own tenant.
+Use the Usage API to see aggregate run usage, estimated cost rollups, learning operation counts, and recent run history for your own tenant.
 
 <Callout type="info" title="Lead with the default tenant view">
   Start with the no-query-params version first. Add filters only when you need them.
@@ -39,6 +39,63 @@ curl -H "Authorization: Bearer <API_KEY>" \
 />
 
 Required scope: `usage:read`
+
+The summary response includes:
+
+<TypeTable
+  type={{
+    tenant_id: {
+      description: 'Tenant being reported.',
+      type: 'string',
+      required: true,
+    },
+    window: {
+      description: 'Preset reporting window used for the response.',
+      type: '"last_7_days" | "last_30_days" | "calendar_quarter" | "calendar_year"',
+      required: true,
+    },
+    period_start: {
+      description: 'Inclusive UTC start boundary.',
+      type: 'string',
+      required: true,
+    },
+    period_end_exclusive: {
+      description: 'Exclusive UTC end boundary.',
+      type: 'string',
+      required: true,
+    },
+    'agent_runs.run_count': {
+      description: 'All runs created in the window.',
+      type: 'integer',
+      required: true,
+    },
+    'agent_runs.total_compute_seconds': {
+      description: 'Sum of compute seconds for runs in the window.',
+      type: 'decimal',
+      required: true,
+    },
+    'agent_runs.total_estimated_compute_cost_usd': {
+      description: 'Estimated compute cost rollup.',
+      type: 'decimal',
+      required: true,
+    },
+    'agent_runs.total_estimated_llm_cost_usd': {
+      description: 'Estimated LLM cost rollup.',
+      type: 'decimal',
+      required: true,
+    },
+    'agent_runs.total_estimated_cost_usd': {
+      description: 'Estimated total cost rollup.',
+      type: 'decimal',
+      required: true,
+    },
+    'learnings.total_learning_operations': {
+      description: 'Learning operation count for UTC dates overlapping the window.',
+      type: 'integer',
+      required: true,
+    },
+  }}
+/>
 
 ### `GET /usage/runs`
 
@@ -78,9 +135,11 @@ curl -H "Authorization: Bearer <API_KEY>" \
 
 Required scope: `usage:read`
 
+Run list items are billing-safe projections. They include IDs, status, worker profile, timestamps, compute seconds, and estimated cost fields. They intentionally omit `goal`, `metadata`, and `error`.
+
 ## Common next knobs
 
-- Use `window` to switch from the default `last_7_days` view.
+- Use `window` to switch from the default `last_7_days` view. Valid values are `last_7_days`, `last_30_days`, `calendar_quarter`, and `calendar_year`.
 - Use `limit` and `cursor` when paging through run history.
 - Use `as_of` when you want a report anchored to a specific point in time.
 
@@ -108,4 +167,5 @@ These admin endpoints require `usage:admin:read`.
 
 - [Quickstart](/docs/quickstart) for the first agent flow
 - [Agents API](/docs/agents-api) for the endpoints that create runs
+- [Plans API](/docs/plans-api) for directly inspecting prior workflow matches
 - [Learnings API](/docs/learnings-api) for manual learning operations that may appear in usage reporting

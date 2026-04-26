@@ -51,7 +51,7 @@ Hyperstruck can already extract learnings automatically from reasoning runs. The
     },
     privacy: {
       description: 'Privacy setting for the learning.',
-      type: '"shareable"',
+      type: '"shareable" | "agent_specific" | "sensitive"',
       default: '"shareable"',
       required: false,
     },
@@ -70,6 +70,8 @@ curl -X POST \
 ```
 
 This endpoint returns `202 Accepted` and stores the learning asynchronously. Background processing handles validation and indexing, so it may take a moment before the learning appears in search results.
+
+Required scope: `agents:write`
 
 Valid `learning_type` values:
 
@@ -116,12 +118,16 @@ curl -H "Authorization: Bearer <API_KEY>" \
     },
     scope: {
       description: 'Search scope.',
-      type: '"agent"',
+      type: '"agent" | "org"',
       default: '"agent"',
       required: false,
     },
   }}
 />
+
+`org` scope searches shared learnings across agents and is available on eligible plans.
+
+Required scope: `agents:read`
 
 ## Get a learning
 
@@ -131,6 +137,8 @@ No body or query params are required.
 curl -H "Authorization: Bearer <API_KEY>" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings/<LEARNING_ID>"
 ```
+
+Required scope: `agents:read`
 
 ## Reinforce a learning
 
@@ -154,6 +162,8 @@ curl -X POST \
   }'
 ```
 
+Required scope: `agents:write`
+
 ## When to use manual learning
 
 - Use automatic learning first for low-friction compounding improvement.
@@ -165,3 +175,4 @@ curl -X POST \
 - [Quickstart](/docs/quickstart) for the fastest end-to-end flow
 - [Learning](/docs/learning) for the conceptual model
 - [Agents API](/docs/agents-api) for reasoning runs that can produce automatic learnings
+- [Plans API](/docs/plans-api) for searching prior workflows and their candidate learnings
