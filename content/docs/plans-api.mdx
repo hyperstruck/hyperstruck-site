@@ -7,7 +7,7 @@ import { TypeTable } from 'fumadocs-ui/components/type-table';
 
 Plans are stored reasoning workflows from prior agent runs. Hyperstruck agents already search their known workflows during normal reasoning, so most users do not need to call the Plans API directly.
 
-Use this API when you want to query that memory surface yourself: for example, to see whether an agent has handled a workflow like the one you are about to send, inspect similar prior goals, or compare relevant history across a small set of agents.
+Use this API when you want to query that memory surface yourself: for example, to see whether an agent has handled a sales follow-up workflow like the one you are about to send, inspect similar prior account goals, or compare relevant history across a small set of agents.
 
 <Callout type="info" title="Usually automatic">
   Start with normal agent runs first. Agents already look for relevant known workflows while planning, so direct plan search is mainly for inspection, debugging, routing, and custom UI surfaces.
@@ -19,7 +19,7 @@ Use this API when you want to query that memory surface yourself: for example, t
 
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
-  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/plans/similar?q=migration+dependency+planning&limit=10"
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/plans/similar?q=client+XYZ+sales+follow-up+plan&limit=10"
 ```
 
 <TypeTable
@@ -51,7 +51,7 @@ curl -X POST \
   "https://api.core.hyperstruck.com/plans/similar" \
   -d '{
     "agent_ids": ["<AGENT_ID>", "<SECOND_AGENT_ID>"],
-    "q": "find workflows for scoping a migration with milestones and risks",
+    "q": "find workflows for planning a sales follow-up with next steps and buying committee risks",
     "limit": 10
   }'
 ```
@@ -92,7 +92,7 @@ Each result includes the matched plan metadata, a `similarity_score`, and any ca
       "plan": {
         "plan_id": "plan-123",
         "agent_id": "00000000-0000-0000-0000-000000000000",
-        "goal": "Investigate migration dependency risks",
+        "goal": "Create a follow-up sales execution plan for a call with client XYZ",
         "is_success": true,
         "executed_at": "2026-04-12T10:11:12Z",
         "num_steps": 0
@@ -101,7 +101,7 @@ Each result includes the matched plan metadata, a `similarity_score`, and any ca
       "candidate_learnings": [
         {
           "learning_id": "learning-1",
-          "content": "Validate the dependency graph before assigning migration milestones.",
+          "content": "At client XYZ, directors and below are usually influencers, not final decision-makers, so map the buying committee before assigning next steps.",
           "score": 0.71,
           "trust_level": "agent_verified"
         }
@@ -116,8 +116,8 @@ Each result includes the matched plan metadata, a `similarity_score`, and any ca
 ## When to query plans directly
 
 - Use direct plan search when building an internal "what has this agent seen before?" view.
-- Use it before dispatching a high-stakes workflow if you want to inspect similar prior goals and outcomes yourself.
-- Use multi-agent search to route a workflow to the agent with the most relevant history.
+- Use it before dispatching a high-stakes sales workflow if you want to inspect similar prior account goals and outcomes yourself.
+- Use multi-agent search to route an account workflow to the agent with the most relevant sales history.
 - Use it while debugging memory behavior, especially when an agent seems to miss or over-weight prior workflow context.
 
 You usually should not query plans just to make an agent smarter before a run. Send the goal to the agent; Hyperstruck already searches relevant known workflows during planning.
