@@ -11,8 +11,8 @@ Use the Agents API when you want Hyperstruck to run task-level reasoning for an 
   Keep the first request copy/paste-friendly. Full API reference lives in the OpenAPI docs. If you omit optional fields here, Hyperstruck uses sane defaults.
 </Callout>
 
-<Callout type="warning" title="Runs need a matching provider credential">
-  Agent runs require a matching active provider credential for the agent's `model_provider`. For most teams, a `tenant_default` credential is the fastest setup path. See [Credentials API](/docs/credentials-api).
+<Callout type="info" title="Platform model defaults are available">
+  You can create and run an agent without uploading provider credentials. By default, Hyperstruck intelligently uses the best-suited model with a platform-provided credential.
 </Callout>
 
 ## Core lifecycle
@@ -31,11 +31,13 @@ curl -H "Authorization: Bearer <API_KEY>" \
     include_llm_credential: {
       description: 'Include resolved LLM credential details in the response.',
       type: 'boolean',
+      default: 'false',
       required: false,
     },
     limit: {
       description: 'Limit the number of agents returned.',
       type: 'integer',
+      default: '20',
       required: false,
     },
     cursor: {
@@ -45,6 +47,8 @@ curl -H "Authorization: Bearer <API_KEY>" \
     },
   }}
 />
+
+Required scope: `agents:read`
 
 ### Create an agent
 
@@ -61,14 +65,14 @@ curl -H "Authorization: Bearer <API_KEY>" \
       required: false,
     },
     model_provider: {
-      description: 'Provider Hyperstruck should resolve credentials for.',
+      description: 'Optional provider override. If omitted, Hyperstruck chooses an appropriate default.',
       type: 'string',
-      required: true,
+      required: false,
     },
     model_name: {
-      description: 'Provider model name for the agent.',
+      description: 'Optional model override. If omitted, Hyperstruck chooses an appropriate default.',
       type: 'string',
-      required: true,
+      required: false,
     },
     'core_config.instructions': {
       description: 'Base instructions for the agent.',
@@ -88,8 +92,6 @@ curl -X POST \
   -d '{
     "name": "Operations Assistant",
     "description": "Helps coordinate internal operations workflows and follow-up tasks.",
-    "model_provider": "anthropic",
-    "model_name": "claude-sonnet-4-5",
     "core_config": {
       "instructions": "You are a helpful operations assistant."
     }
@@ -111,8 +113,8 @@ curl -X POST \
     },
     reasoning_profile: {
       description: 'Reasoning preset for the agent.',
-      type: '"balanced"',
-      default: '"balanced"',
+      type: '"full" | "balanced" | "fast"',
+      default: '"full"',
       required: false,
     },
     memory_profile: {
@@ -132,9 +134,64 @@ curl -X POST \
 
 Other `core_config` fields are optional.
 
+Required scope: `agents:write`
+
+### Get an agent
+
+`GET /agents/{agent_id}` returns the stored agent configuration. By default it includes an `llm_credential` summary for the effective runtime credential without exposing secrets.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>"
+```
+
+<TypeTable
+  type={{
+    include_llm_credential: {
+      description: 'Include effective non-secret LLM credential metadata.',
+      type: 'boolean',
+      default: 'true',
+      required: false,
+    },
+  }}
+/>
+
+`llm_credential.source` can be `customer_agent_override`, `customer_tenant_default`, or `platform_default`.
+
+Required scope: `agents:read`
+
+### Update an agent
+
+`PATCH /agents/{agent_id}` accepts a partial update. Include at least one field.
+
+```bash
+curl -X PATCH \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>" \
+  -d '{
+    "reasoning_profile": "balanced",
+    "core_config": {
+      "instructions": "You are a helpful operations assistant. Prefer concise plans."
+    }
+  }'
+```
+
+Required scope: `agents:write`
+
+### Delete an agent
+
+```bash
+curl -X DELETE \
+  -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>"
+```
+
+Required scope: `agents:write`
+
 ### Dispatch a goal
 
-`POST /agents/{agent_id}/goals` returns a run handle. The only required body field is `goal`.
+`POST /agents/{agent_id}/goals` returns `202 Accepted` with a run handle. The only required body field is `goal`.
 
 ```bash
 curl -X POST \
@@ -177,6 +234,8 @@ curl -X POST \
   }}
 />
 
+Required scope: `agents:write`
+
 ### Poll run status
 
 No body or query params are required.
@@ -185,6 +244,8 @@ No body or query params are required.
 curl -H "Authorization: Bearer <API_KEY>" \
   "https://api.core.hyperstruck.com/runs/<RUN_ID>"
 ```
+
+Required scope: `agents:read`
 
 ### Resume a suspended run
 
@@ -240,6 +301,8 @@ curl -X POST \
   }'
 ```
 
+Required scope: `agents:write`
+
 ### Inspect session messages
 
 No query params are required.
@@ -254,6 +317,7 @@ curl -H "Authorization: Bearer <API_KEY>" \
     limit: {
       description: 'Limit the number of messages returned.',
       type: 'integer',
+      default: '20',
       required: false,
     },
     cursor: {
@@ -263,6 +327,8 @@ curl -H "Authorization: Bearer <API_KEY>" \
     },
   }}
 />
+
+Required scope: `agents:read`
 
 ### Inspect session runs
 
@@ -278,6 +344,7 @@ curl -H "Authorization: Bearer <API_KEY>" \
     limit: {
       description: 'Limit the number of runs returned.',
       type: 'integer',
+      default: '20',
       required: false,
     },
     cursor: {
@@ -288,9 +355,12 @@ curl -H "Authorization: Bearer <API_KEY>" \
   }}
 />
 
+Required scope: `agents:read`
+
 ## Related pages
 
 - [Quickstart](/docs/quickstart) for the fastest first-success flow
-- [Credentials API](/docs/credentials-api) for tenant defaults and agent overrides
+- [Credentials API](/docs/credentials-api) for optional tenant defaults and agent overrides
+- [Plans API](/docs/plans-api) for directly searching prior workflows when you need inspection or routing
 - [Reasoning](/docs/reasoning) for the conceptual overview
 - [Claude Skills](/docs/claude-skills) for using the same capability in developer tooling

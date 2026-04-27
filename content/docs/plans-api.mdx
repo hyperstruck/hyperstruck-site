@@ -1,0 +1,129 @@
+---
+title: Plans API
+description: Search the workflows an agent has seen before when you need direct visibility into prior reasoning plans.
+---
+
+import { TypeTable } from 'fumadocs-ui/components/type-table';
+
+Plans are stored reasoning workflows from prior agent runs. Hyperstruck agents already search their known workflows during normal reasoning, so most users do not need to call the Plans API directly.
+
+Use this API when you want to query that memory surface yourself: for example, to see whether an agent has handled a sales follow-up workflow like the one you are about to send, inspect similar prior account goals, or compare relevant history across a small set of agents.
+
+<Callout type="info" title="Usually automatic">
+  Start with normal agent runs first. Agents already look for relevant known workflows while planning, so direct plan search is mainly for inspection, debugging, routing, and custom UI surfaces.
+</Callout>
+
+## Search one agent
+
+`GET /agents/{agent_id}/plans/similar` searches one agent's prior plans using a natural-language query.
+
+```bash
+curl -H "Authorization: Bearer <API_KEY>" \
+  "https://api.core.hyperstruck.com/agents/<AGENT_ID>/plans/similar?q=client+XYZ+sales+follow-up+plan&limit=10"
+```
+
+<TypeTable
+  type={{
+    q: {
+      description: 'Natural-language search text used to retrieve similar plans.',
+      type: 'string',
+      required: true,
+    },
+    limit: {
+      description: 'Optional maximum number of results. Results are capped at 10 per agent.',
+      type: 'integer',
+      default: '10',
+      required: false,
+    },
+  }}
+/>
+
+Required scope: `agents:read`
+
+## Search multiple agents
+
+`POST /plans/similar` searches across an explicit set of tenant-owned agents and merges the most similar results.
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer <API_KEY>" \
+  -H "Content-Type: application/json" \
+  "https://api.core.hyperstruck.com/plans/similar" \
+  -d '{
+    "agent_ids": ["<AGENT_ID>", "<SECOND_AGENT_ID>"],
+    "q": "find workflows for planning a sales follow-up with next steps and buying committee risks",
+    "limit": 10
+  }'
+```
+
+<TypeTable
+  type={{
+    agent_ids: {
+      description: 'Explicit set of tenant-owned agents to search across.',
+      type: 'string[]',
+      required: true,
+    },
+    q: {
+      description: 'Natural-language plan similarity query.',
+      type: 'string',
+      required: true,
+    },
+    limit: {
+      description: 'Maximum number of merged results to return.',
+      type: 'integer',
+      default: '10',
+      required: false,
+    },
+  }}
+/>
+
+Every `agent_id` must be accessible to your tenant. The endpoint searches agents in parallel, caps each agent at 10 candidate plans, sorts matches by similarity, and may return `partial_failures` if one agent's retrieval path fails while other results are still available.
+
+Required scope: `agents:read`
+
+## Response shape
+
+Each result includes the matched plan metadata, a `similarity_score`, and any candidate learnings surfaced alongside that plan.
+
+```json
+{
+  "items": [
+    {
+      "plan": {
+        "plan_id": "plan-123",
+        "agent_id": "00000000-0000-0000-0000-000000000000",
+        "goal": "Create a follow-up sales execution plan for a call with client XYZ",
+        "is_success": true,
+        "executed_at": "2026-04-12T10:11:12Z",
+        "num_steps": 0
+      },
+      "similarity_score": 0.83,
+      "candidate_learnings": [
+        {
+          "learning_id": "learning-1",
+          "content": "At client XYZ, directors and below are usually influencers, not final decision-makers, so map the buying committee before assigning next steps.",
+          "score": 0.71,
+          "trust_level": "agent_verified"
+        }
+      ]
+    }
+  ],
+  "retrieved_at": "2026-04-21T08:00:00Z",
+  "partial_failures": []
+}
+```
+
+## When to query plans directly
+
+- Use direct plan search when building an internal "what has this agent seen before?" view.
+- Use it before dispatching a high-stakes sales workflow if you want to inspect similar prior account goals and outcomes yourself.
+- Use multi-agent search to route an account workflow to the agent with the most relevant sales history.
+- Use it while debugging memory behavior, especially when an agent seems to miss or over-weight prior workflow context.
+
+You usually should not query plans just to make an agent smarter before a run. Send the goal to the agent; Hyperstruck already searches relevant known workflows during planning.
+
+## Related pages
+
+- [Agents API](/docs/agents-api) for dispatching goals that automatically use relevant known workflows
+- [Learnings API](/docs/learnings-api) for directly managing reusable lessons
+- [Reasoning](/docs/reasoning) for the conceptual model behind plan-aware execution

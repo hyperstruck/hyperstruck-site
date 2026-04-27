@@ -3,10 +3,10 @@ title: Quickstart
 description: The lowest-friction path from a fresh API key to a working Hyperstruck agent run.
 ---
 
-This is the fastest first-success path: upload a provider credential, create an agent, dispatch a goal, and optionally store a manual learning.
+This is the fastest first-success path: create an agent, dispatch a goal, and optionally store a manual learning.
 
-<Callout type="warning" title="An API key alone is not enough">
-  A fresh Hyperstruck API key does not let an agent run by itself. The agent also needs a matching active provider credential for its `model_provider`. For most teams, a `tenant_default` credential is the fastest setup path. See [Credentials API](/docs/credentials-api).
+<Callout type="info" title="Provider credentials are optional">
+  Hyperstruck can run agents with a platform-provided model credential. Upload your own provider credential only when you need a tenant default or agent-specific override.
 </Callout>
 
 <Callout type="info" title="Keep the first call small">
@@ -18,29 +18,9 @@ This is the fastest first-success path: upload a provider credential, create an 
 <Steps>
   <Step>
 
-### 1. Upload a tenant-default provider credential
+### 1. Create an agent
 
-Use a tenant default first so any agent with the same `model_provider` can run without extra credential setup.
-
-```bash
-curl -X POST \
-  -H "Authorization: Bearer <API_KEY>" \
-  -H "Content-Type: application/json" \
-  "https://api.core.hyperstruck.com/credentials/providers" \
-  -d '{
-    "provider": "anthropic",
-    "display_name": "Default Anthropic Key",
-    "binding_type": "tenant_default",
-    "secret": "<ANTHROPIC_API_KEY>"
-  }'
-```
-
-  </Step>
-  <Step>
-
-### 2. Create an agent
-
-Create an agent with the required fields plus an optional `description`. `description` is a short string describing the agent's purpose or area of expertise in more detail.
+Create an agent with a `name` and `core_config.instructions`. If you omit provider and model fields, Hyperstruck intelligently uses the best-suited model by default.
 
 ```bash
 curl -X POST \
@@ -50,8 +30,6 @@ curl -X POST \
   -d '{
     "name": "Sales Execution Assistant",
     "description": "Helps sales reps plan follow-ups, next steps, and account strategy.",
-    "model_provider": "anthropic",
-    "model_name": "claude-sonnet-4-5",
     "core_config": {
       "instructions": "You are a helpful sales execution assistant."
     }
@@ -61,7 +39,7 @@ curl -X POST \
   </Step>
   <Step>
 
-### 3. Dispatch a goal
+### 2. Dispatch a goal
 
 Use the returned `AGENT_ID` to start a run.
 
@@ -78,7 +56,7 @@ curl -X POST \
   </Step>
   <Step>
 
-### 4. Optionally store a manual learning
+### 3. Optionally store a manual learning
 
 Reasoning runs can already extract learnings automatically. Use manual storage when you want direct editorial control.
 
@@ -96,7 +74,7 @@ curl -X POST \
   </Step>
   <Step>
 
-### 5. Reuse the same capabilities from developer tooling
+### 4. Reuse the same capabilities from developer tooling
 
 Once the API flow works, you can expose the same capabilities in developer tooling.
 
@@ -111,25 +89,26 @@ Once the API flow works, you can expose the same capabilities in developer tooli
 
 ## Common next knobs
 
-- Agent creation defaults: `status="active"`, `reasoning_profile="balanced"`, `memory_profile="default"`, `knowledge_scope="agent"`
+- Agent creation defaults: `status="active"`, automatic model selection, `reasoning_profile="full"`, `memory_profile="default"`, `knowledge_scope="agent"`
 - Goal dispatch optional fields: `context`, `session_id`, `worker_profile`, `metadata`
 - Manual learning optional fields: `confidence`, `source_goal`, `applicable_goals`, `applicable_tools`, `privacy`
 
-## Why credentials come first
+## When to upload credentials
 
-Credential resolution is provider-based:
+You usually do not need provider credentials for the first run because Hyperstruck provides a platform default. Upload credentials only when you want model billing, provider selection, or endpoint control under your own account.
 
-1. Hyperstruck looks at the agent's `model_provider`.
-2. A matching active `agent_override` credential for that agent wins first.
-3. If none exists, Hyperstruck falls back to the matching active `tenant_default`.
-4. If neither exists, agent runs cannot start and manual learning store requests for that agent fail.
+Credential resolution is:
 
-Use [Credentials API](/docs/credentials-api) for the full credential setup and resolution rules.
+1. A matching active `agent_override` credential for the agent wins first.
+2. If none exists, Hyperstruck uses a matching active `tenant_default`.
+3. If neither exists, Hyperstruck uses the platform default credential and intelligently selects the best-suited model.
+
+Use [Credentials API](/docs/credentials-api) when you want to bring your own provider account.
 
 ## Related pages
 
 <Cards>
-  <Card title="Credentials API" href="/docs/credentials-api" description="Upload tenant defaults and agent overrides." />
+  <Card title="Credentials API" href="/docs/credentials-api" description="Optionally bring your own tenant defaults and agent overrides." />
   <Card title="Agents API" href="/docs/agents-api" description="Create agents, dispatch goals, and inspect runs." />
   <Card title="Learnings API" href="/docs/learnings-api" description="Store, search, retrieve, and reinforce learnings." />
   <Card title="Claude Skills" href="/docs/claude-skills" description="Bring the same workflow into developer tooling." />
