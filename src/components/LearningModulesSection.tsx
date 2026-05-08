@@ -1,4 +1,4 @@
-import { Box, Typography, useMediaQuery } from '@mui/material';
+import { Box, Card, Typography, useMediaQuery } from '@mui/material';
 import { alpha, useTheme } from '@mui/material/styles';
 
 import { learningModules } from '../data/siteContent';
@@ -14,6 +14,59 @@ const accentColorMap = {
   secondarySoft: '#acedff',
   tertiarySoft: '#e9ddff',
 } as const;
+
+function ProductDemoVideo() {
+  const theme = useTheme();
+
+  return (
+    <Card
+      sx={{
+        position: 'relative',
+        overflow: 'hidden',
+        mt: { xs: 5, md: 7 },
+        mx: 'auto',
+        maxWidth: 1120,
+        p: { xs: 1, sm: 1.25 },
+        background: `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.14)} 0%, ${alpha(
+          theme.palette.background.paper,
+          0.82,
+        )} 100%)`,
+        borderColor: alpha(theme.palette.primary.main, 0.26),
+        boxShadow: '0px 0px 60px rgba(99,102,241,0.14)',
+      }}
+    >
+      <Box
+        sx={{
+          position: 'absolute',
+          inset: '-30% -20% auto auto',
+          width: { xs: 220, md: 360 },
+          height: { xs: 220, md: 360 },
+          borderRadius: '50%',
+          background: `radial-gradient(circle, ${alpha(theme.palette.secondary.main, 0.18)} 0%, transparent 72%)`,
+          filter: 'blur(26px)',
+          pointerEvents: 'none',
+        }}
+      />
+      <Box
+        component="iframe"
+        title="Hyperstruck product demo"
+        src="https://www.youtube-nocookie.com/embed/Bh1vJBJJNCE"
+        loading="lazy"
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        allowFullScreen
+        sx={{
+          position: 'relative',
+          display: 'block',
+          width: '100%',
+          aspectRatio: '16 / 9',
+          border: 0,
+          borderRadius: 2,
+          backgroundColor: 'common.black',
+        }}
+      />
+    </Card>
+  );
+}
 
 function LearningModuleChapter({
   index,
@@ -135,6 +188,8 @@ export default function LearningModulesSection() {
           maxWidth={760}
         />
       </Box>
+
+      <ProductDemoVideo />
 
       <Box
         sx={{
