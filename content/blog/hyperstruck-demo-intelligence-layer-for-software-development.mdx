@@ -14,49 +14,47 @@ That institutional knowledge is what makes your team your team. And none of it e
 
 ## The Treadmill
 
-Every morning, your agents start from zero. It doesn't know what your team learned last sprint. It doesn't know why you stopped doing synchronous deletes above 10,000 records. It doesn't know that your compliance team requires audit trails on every destructive operation.
+Every morning, your agents start from zero. They don't know what your team learned last sprint. They don't know why you stopped doing synchronous deletes above 10,000 records. They don't know that your compliance team requires audit trails on every destructive operation.
 
 So the ritual begins: explain the problem, get an answer, notice it missed critical context, prompt again, correct the model, paste in more files, prompt again, ask for edge cases, prompt again, ask for tests, prompt again.
 
 Tomorrow, start over.
 
-The output might be fine. But nothing compounds. Every task starts cold. Every lesson evaporates. You're spending more tokens, more review cycles, and more senior engineer time re-stating the same context you stated last week.
-
-For junior developers, this is actively dangerous. Agents produce confident, polished answers that look production-ready but silently miss the constraints that only come from experience. Scale limits. Failure modes. Security boundaries. Operational reality. Without those guardrails surfacing automatically, junior engineers ship code that works in demos and breaks under load.
+For junior developers, this is actively dangerous. Agents produce confident, polished answers that look production-ready but silently miss the constraints that only come from experience. Scale limits. Failure modes. Security boundaries. Without those guardrails surfacing automatically, junior engineers ship code that works in demos and breaks under load.
 
 <Callout type="warn" title="The real cost">
   Agents can write code. What they can't do is remember why your team stopped writing it that way.
 </Callout>
 
-## See the Difference
+## The Demo
 
-The demo above uses a deliberately ordinary task: implement backend logic for deleting a folder from a mobile app.
+The video above shows a real run on a deliberately ordinary task: implement backend logic for deleting a folder from a mobile app.
 
-On the surface, simple. In reality, a minefield.
+Anyone who's shipped agents on LangGraph, OpenAI Agents SDK, or CrewAI has seen this exact output. Delete the folder, delete the files, return success. Same answer on day one as day three hundred.
 
-A standard coding agent handles the obvious path: delete the folder, delete the files, return success. That's the answer you get from every agent on the market today.
+The second pass is different. Before generating code, Hyperstruck retrieves learnings from previous engineering tasks and applies them to the current plan. In this case, something like:
 
-Now watch what happens when the system has actually learned from prior engineering work. Hyperstruck's second pass applies what it has picked up from previous tasks: estimate the blast radius before executing, bound large deletes or move them to background jobs, write audit records, verify ownership, check permissions, and generate tests that cover threshold behaviour and failure paths.
+> **Pitfall retrieved:** "Unbounded bulk deletes on large tables cause extended locks and timeouts. During a previous cleanup task, a DELETE without a row limit locked the table for 12 minutes. Estimate row count first and batch if above threshold."
 
-Nobody prompted for that. The system learned it.
+That's a real lesson from a real prior task, surfaced because the system recognised the current work involves a destructive bulk operation. Not because someone prompted for it.
+
+The result: the second-pass implementation includes a preflight row count estimate, bounded batch deletion above a threshold, background job handoff for large folders, ownership verification, audit trail logging, and test coverage for failure paths.
+
+None of that was in the prompt. All of it came from accumulated experience.
+
+This isn't a markdown file that grows until it's noise, or a vector store you dump everything into and hope the model figures it out. The hard part was never storing lessons. It's knowing which one matters right now, for this task, at this stage of the work.
 
 <Callout type="success" title="What to watch for">
-  This demo isn't about folder deletion. It's about agents that learn how your organization thinks and apply that knowledge before you have to ask.
+  Pay attention to the gap between the first pass and the second. The first is what you get from any agent today. The second is what you get when the agent has actually learned from prior work.
 </Callout>
 
-## This Is Technology, Not a Wrapper
+## What It Won't Do
 
-Most AI products on the market are thin layers on top of a language model API. A prompt goes in, a response comes out, nothing persists. That's a wrapper.
+Even on day one, the reasoning engine produces better output than a standard agent. The quality floor is higher before any learnings exist. But the real compounding starts after a few tasks, when the system has context from your actual work to draw on.
 
-Hyperstruck is an intelligence layer. It sits between your agents and the work they do, adding capabilities that don't exist in the models themselves:
+It doesn't help with trivial tasks. If you already know the answer, you don't need a reasoning pass. Straightforward formatting changes, copy edits, and small UI fixes are better handled directly.
 
-<Cards>
-  <Card title="Hyper Reasoning" description="Structured thinking before action. Surface hidden tradeoffs, identify risks, compare approaches, and produce a deliberate plan instead of a fast guess." />
-  <Card title="Hyper Learning" description="Durable lessons from real work. Patterns, pitfalls, production constraints, and team conventions that persist across sessions and get retrieved when they matter." />
-  <Card title="Compounding intelligence" description="Every task makes the next one better. The system doesn't just remember. It applies the right lesson at the right moment, so your agents get smarter the longer you use them." />
-</Cards>
-
-That's a fundamentally different kind of product.
+And it doesn't replace your engineers. It encodes their judgment so it doesn't have to live exclusively in their heads. The goal is to make "what the senior engineer would have caught" available to every agent, on every task.
 
 ## Where This Goes
 
@@ -64,6 +62,6 @@ The first wave of AI made it easier to generate. The next wave has to make it ea
 
 Today, the best teams run on informal institutional memory. The senior engineer who has seen every failure mode. The product manager who remembers what customers actually need. The reliability engineer who knows what breaks at scale. It works until someone is on holiday, switches teams, or leaves.
 
-Hyperstruck gives that organizational memory a system. One that works across your entire software development lifecycle, from product planning through design, implementation, testing, security, operations, and support. And the same architecture works beyond software: anywhere people and agents need to reason, act, learn, and get better over time.
+Hyperstruck gives that institutional memory a system. Software development is where we're starting. The same architecture works anywhere people and agents need to reason, act, learn, and get better over time.
 
 This isn't AI that responds. It's AI that compounds.
