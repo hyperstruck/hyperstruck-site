@@ -18,6 +18,7 @@ import HomePage from './pages/HomePage';
 import DocsPageRoute from './pages/DocsPage';
 import PricingPage from './pages/PricingPage';
 import SignupPage from './pages/SignupPage';
+import { BLOG_HOME_URL } from './lib/blogLayout';
 import appTheme from './theme/appTheme';
 
 function ScrollToTop() {
@@ -53,7 +54,7 @@ const blogSearch = {
   enabled: true,
   SearchDialog: StaticSearchDialog,
   options: {
-    links: [['Blog home', '/blog']],
+    links: [['Blog home', BLOG_HOME_URL]],
     source: '/blog-search.json',
   },
 } as ComponentProps<typeof RootProvider>['search'];

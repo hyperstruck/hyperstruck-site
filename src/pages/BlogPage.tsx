@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 
 import browserCollections from 'collections/browser';
 import type { Root } from 'fumadocs-core/page-tree';
@@ -12,7 +12,7 @@ import {
 } from 'fumadocs-ui/layouts/docs/page';
 
 import { useMDXComponents } from '../components/docs/mdx';
-import { getBlogLayoutOptions } from '../lib/blogLayout';
+import { BLOG_HOME_URL, getBlogLayoutOptions } from '../lib/blogLayout';
 import { buildContentTree, resolveContentEntry } from '../lib/contentFiles';
 import BlogNotFoundPage from './BlogNotFoundPage';
 
@@ -144,6 +144,7 @@ function useBlogTree(): Root {
 export default function BlogPageRoute() {
   const { pathname } = useLocation();
   const tree = useBlogTree();
+  const isBlogRoot = pathname.replace(/\/+$/, '') === '/blog';
   const path = useMemo(
     () => resolveContentEntry(pathname, '/blog', browserCollections.blog.raw),
     [pathname],
@@ -151,7 +152,13 @@ export default function BlogPageRoute() {
 
   return (
     <DocsLayout {...getBlogLayoutOptions()} tree={tree}>
-      {path ? clientLoader.useContent(path) ?? <BlogPageFallback /> : <BlogNotFoundPage />}
+      {isBlogRoot ? (
+        <Navigate to={BLOG_HOME_URL} replace />
+      ) : path ? (
+        clientLoader.useContent(path) ?? <BlogPageFallback />
+      ) : (
+        <BlogNotFoundPage />
+      )}
     </DocsLayout>
   );
 }

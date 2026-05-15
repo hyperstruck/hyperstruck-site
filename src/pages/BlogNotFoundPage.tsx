@@ -3,6 +3,8 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import { DocsBody, DocsDescription, DocsPage, DocsTitle } from 'fumadocs-ui/layouts/docs/page';
 
+import { BLOG_HOME_URL } from '../lib/blogLayout';
+
 export default function BlogNotFoundPage() {
   useEffect(() => {
     document.title = 'Blog Not Found | Hyperstruck Blog';
@@ -24,7 +26,7 @@ export default function BlogNotFoundPage() {
       <DocsBody>
         <p>Head back to the blog index to browse published posts, or return to the main site.</p>
         <p>
-          <RouterLink to="/blog">Go to blog home</RouterLink>
+          <RouterLink to={BLOG_HOME_URL}>Go to blog home</RouterLink>
           {'  '}
           <RouterLink to="/">Back to hyperstruck.com</RouterLink>
         </p>
