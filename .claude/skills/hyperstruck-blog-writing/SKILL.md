@@ -1,4 +1,9 @@
-# Blog Writing Guide
+---
+name: hyperstruck-blog-writing
+description: Guides Hyperstruck blog writing, editing, and publishing review. Use when drafting, revising, or reviewing Hyperstruck blog posts, launch posts, product narratives, or content under content/blog.
+---
+
+# Hyperstruck Blog Writing
 
 Rules for writing Hyperstruck blog posts that sound like us, convert readers, and don't read like AI output.
 
