@@ -22,7 +22,7 @@ Hyperstruck can already extract learnings automatically from reasoning runs. The
     },
     learning_type: {
       description: 'The type of learning being stored.',
-      type: '"tool_usage" | "approach" | "pitfall" | "prerequisite" | "coordination_pattern" | "agent_capability" | "conflict_insight" | "debate_outcome"',
+      type: '"tool_usage" | "approach" | "pitfall" | "prerequisite" | "coordination_pattern" | "agent_capability" | "conflict_insight" | "debate_outcome" | "tool_behaviour" | "outcome_pattern" | "coverage"',
       required: true,
     },
     confidence: {
@@ -55,6 +55,28 @@ Hyperstruck can already extract learnings automatically from reasoning runs. The
       default: '"shareable"',
       required: false,
     },
+    instances: {
+      description: 'Optional structured evidence examples for this learning.',
+      type: 'InstanceEvidenceInput[]',
+      default: '[]',
+      required: false,
+    },
+    'instances[].entity_values': {
+      description: 'Non-empty map of input entity names to string values.',
+      type: 'Record<string, string>',
+      required: true,
+    },
+    'instances[].outcome': {
+      description: 'Non-empty map of outcome names to string values.',
+      type: 'Record<string, string>',
+      required: true,
+    },
+    'instances[].source_context': {
+      description: 'Optional source label for this evidence instance.',
+      type: 'string',
+      default: '"api"',
+      required: false,
+    },
   }}
 />
 
@@ -64,12 +86,30 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
   -d '{
-    "content": "Always validate the migration dependency graph before scheduling milestones.",
-    "learning_type": "pitfall"
+    "content": "qualify_lead returns cold for cybersecurity companies",
+    "learning_type": "outcome_pattern",
+    "applicable_tools": ["qualify_lead"],
+    "instances": [
+      {
+        "entity_values": {
+          "company": "CrowdShield",
+          "industry": "cybersecurity"
+        },
+        "outcome": {
+          "tier": "cold",
+          "score": "0.12"
+        },
+        "source_context": "api"
+      }
+    ]
   }'
 ```
 
 This endpoint returns `202 Accepted` and stores the learning asynchronously. Background processing handles validation and indexing, so it may take a moment before the learning appears in search results.
+
+`instances` is optional and backward-compatible. Use it for concrete input-to-outcome examples, tool behavior observations, test cases, compacted external-run evidence, and other structured evidence. Do not store raw logs, secrets, PII, or internal hostnames.
+
+Each evidence instance must include non-empty `entity_values` and `outcome` maps with string keys and string values. If `source_context` is omitted, the platform API defaults it to `api`. API-sourced evidence is content-addressed with `InstanceEvidence.make_id(None, entity_values=..., outcome=...)`, so duplicate entity/outcome examples collapse into one instance.
 
 Required scope: `agents:write`
 
@@ -83,6 +123,9 @@ Valid `learning_type` values:
 - `agent_capability`
 - `conflict_insight`
 - `debate_outcome`
+- `tool_behaviour`
+- `outcome_pattern`
+- `coverage`
 
 ## Search learnings
 
@@ -129,6 +172,37 @@ curl -H "Authorization: Bearer <API_KEY>" \
 
 Required scope: `agents:read`
 
+Search responses may include compact returned evidence on each learning:
+
+```json
+{
+  "items": [
+    {
+      "learning_id": "learning-1",
+      "content": "qualify_lead returns cold for cybersecurity companies",
+      "learning_type": "outcome_pattern",
+      "confidence": 0.74,
+      "score": 0.88,
+      "instances": [
+        {
+          "id": "instance-1",
+          "entity_values": {
+            "company": "CrowdShield",
+            "industry": "cybersecurity"
+          },
+          "outcome": {
+            "tier": "cold",
+            "score": "0.12"
+          },
+          "source_context": "api",
+          "created_at": "2026-05-17T02:01:00Z"
+        }
+      ]
+    }
+  ]
+}
+```
+
 ## Get a learning
 
 No body or query params are required.
@@ -139,6 +213,32 @@ curl -H "Authorization: Bearer <API_KEY>" \
 ```
 
 Required scope: `agents:read`
+
+Read responses may include the full evidence instances currently attached to the learning:
+
+```json
+{
+  "learning_id": "learning-1",
+  "content": "qualify_lead returns cold for cybersecurity companies",
+  "learning_type": "outcome_pattern",
+  "applicable_tools": ["qualify_lead"],
+  "instances": [
+    {
+      "id": "instance-1",
+      "entity_values": {
+        "company": "CrowdShield",
+        "industry": "cybersecurity"
+      },
+      "outcome": {
+        "tier": "cold",
+        "score": "0.12"
+      },
+      "source_context": "api",
+      "created_at": "2026-05-17T02:01:00Z"
+    }
+  ]
+}
+```
 
 ## Reinforce a learning
 

@@ -85,6 +85,8 @@ Required scope: `agents:read`
 
 Each result includes the matched plan metadata, a `similarity_score`, and any candidate learnings surfaced alongside that plan.
 
+`candidate_learnings` stay compact in plan-search responses. If a candidate learning has instance evidence and you need to inspect it, fetch the full learning with `GET /agents/{agent_id}/learnings/{learning_id}`.
+
 ```json
 {
   "items": [

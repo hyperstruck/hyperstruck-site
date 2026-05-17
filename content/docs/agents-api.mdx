@@ -240,6 +240,8 @@ Required scope: `agents:write`
 
 No body or query params are required.
 
+Completed runs can produce or inspire evidence-backed learnings, but `RunResponse` does not return learning `instances`. Use the [Learnings API](/docs/learnings-api) to inspect stored instance evidence.
+
 ```bash
 curl -H "Authorization: Bearer <API_KEY>" \
   "https://api.core.hyperstruck.com/runs/<RUN_ID>"
