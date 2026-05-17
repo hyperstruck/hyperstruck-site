@@ -1,5 +1,7 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
+import { BLOG_HOME_URL } from './blogLayout';
+
 export function getDocsLayoutOptions(): BaseLayoutProps {
   return {
     nav: {
@@ -11,6 +13,11 @@ export function getDocsLayoutOptions(): BaseLayoutProps {
         type: 'main',
         text: 'Home',
         url: '/',
+      },
+      {
+        type: 'main',
+        text: 'Blog',
+        url: BLOG_HOME_URL,
       },
       {
         type: 'main',

@@ -58,7 +58,7 @@ curl -X POST \
 
 ### 3. Optionally store a manual learning
 
-Reasoning runs can already extract learnings automatically. Use manual storage when you want direct editorial control.
+Reasoning runs can already extract learnings automatically. Use manual storage when you want direct editorial control, including structured entity/outcome evidence for a concrete observation.
 
 ```bash
 curl -X POST \
@@ -66,10 +66,25 @@ curl -X POST \
   -H "Content-Type: application/json" \
   "https://api.core.hyperstruck.com/agents/<AGENT_ID>/learnings" \
   -d '{
-    "content": "At client XYZ, directors and below are usually influencers, not final decision-makers, so map the buying committee before assigning next steps.",
-    "learning_type": "pitfall"
+    "content": "qualify_lead returns cold for cybersecurity companies",
+    "learning_type": "outcome_pattern",
+    "applicable_tools": ["qualify_lead"],
+    "instances": [
+      {
+        "entity_values": {
+          "company": "CrowdShield",
+          "industry": "cybersecurity"
+        },
+        "outcome": {
+          "tier": "cold",
+          "score": "0.12"
+        }
+      }
+    ]
   }'
 ```
+
+See [Learnings API](/docs/learnings-api) for the full instance evidence shape and storage rules.
 
   </Step>
   <Step>
@@ -91,7 +106,7 @@ Once the API flow works, you can expose the same capabilities in developer tooli
 
 - Agent creation defaults: `status="active"`, automatic model selection, `reasoning_profile="full"`, `memory_profile="default"`, `knowledge_scope="agent"`
 - Goal dispatch optional fields: `context`, `session_id`, `worker_profile`, `metadata`
-- Manual learning optional fields: `confidence`, `source_goal`, `applicable_goals`, `applicable_tools`, `privacy`
+- Manual learning optional fields: `confidence`, `source_goal`, `applicable_goals`, `applicable_tools`, `privacy`, `instances`
 
 ## When to upload credentials
 

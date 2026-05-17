@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Navigate, useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 
 import browserCollections from 'collections/browser';
 import type { Root } from 'fumadocs-core/page-tree';
@@ -12,7 +12,7 @@ import {
 } from 'fumadocs-ui/layouts/docs/page';
 
 import { useMDXComponents } from '../components/docs/mdx';
-import { BLOG_HOME_URL, getBlogLayoutOptions } from '../lib/blogLayout';
+import { getBlogLayoutOptions } from '../lib/blogLayout';
 import { buildContentTree, resolveContentEntry } from '../lib/contentFiles';
 import BlogNotFoundPage from './BlogNotFoundPage';
 
@@ -85,6 +85,23 @@ const clientLoader = browserCollections.blog.createClientLoader({
   },
 });
 
+function getBlogRootEntry(): string | null {
+  const availableEntries = Object.keys(browserCollections.blog.raw).map((entry) =>
+    entry.startsWith('./') ? entry.slice(2) : entry,
+  );
+  const indexEntry = availableEntries.find((entry) => entry === 'index.mdx' || entry === 'index.md');
+
+  if (indexEntry) {
+    return indexEntry;
+  }
+
+  return (
+    availableEntries
+      .filter((entry) => entry.endsWith('.mdx') || entry.endsWith('.md'))
+      .sort((left, right) => left.localeCompare(right))[0] ?? null
+  );
+}
+
 function BlogPageFallback() {
   useEffect(() => {
     document.title = 'Hyperstruck Blog';
@@ -146,15 +163,16 @@ export default function BlogPageRoute() {
   const tree = useBlogTree();
   const isBlogRoot = pathname.replace(/\/+$/, '') === '/blog';
   const path = useMemo(
-    () => resolveContentEntry(pathname, '/blog', browserCollections.blog.raw),
-    [pathname],
+    () =>
+      isBlogRoot
+        ? getBlogRootEntry()
+        : resolveContentEntry(pathname, '/blog', browserCollections.blog.raw),
+    [isBlogRoot, pathname],
   );
 
   return (
     <DocsLayout {...getBlogLayoutOptions()} tree={tree}>
-      {isBlogRoot ? (
-        <Navigate to={BLOG_HOME_URL} replace />
-      ) : path ? (
+      {path ? (
         clientLoader.useContent(path) ?? <BlogPageFallback />
       ) : (
         <BlogNotFoundPage />

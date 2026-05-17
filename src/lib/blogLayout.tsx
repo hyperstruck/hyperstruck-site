@@ -1,6 +1,6 @@
 import type { BaseLayoutProps } from 'fumadocs-ui/layouts/shared';
 
-export const BLOG_HOME_URL = '/blog/hyperstruck-demo-intelligence-layer-for-agentic-work';
+export const BLOG_HOME_URL = '/blog';
 
 export function getBlogLayoutOptions(): BaseLayoutProps {
   return {

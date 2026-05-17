@@ -18,11 +18,13 @@ import { alpha, useTheme } from '@mui/material/styles';
 import { useMemo, useState } from 'react';
 import { NavLink, Outlet, Link as RouterLink } from 'react-router-dom';
 
+import { BLOG_HOME_URL } from '../lib/blogLayout';
 import { contactEmail } from '../theme/tokens';
 
 const navItems = [
   { label: 'Home', to: '/' },
   { label: 'Docs', to: '/docs' },
+  { label: 'Blog', to: BLOG_HOME_URL },
   { label: 'Pricing', to: '/pricing' },
   { label: 'Sign up', to: '/signup' },
 ] as const;
@@ -52,6 +54,7 @@ export default function AppLayout() {
   const footerLinks = useMemo(
     () => [
       { label: 'Docs', to: '/docs' },
+      { label: 'Blog', to: BLOG_HOME_URL },
       { label: 'Pricing', to: '/pricing' },
     ],
     [],
