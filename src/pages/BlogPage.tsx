@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useState } from 'react';
+import { type ReactNode, createElement, useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 
 import browserCollections from 'collections/browser';
-import type { Root } from 'fumadocs-core/page-tree';
+import type { Node, Root } from 'fumadocs-core/page-tree';
 import { DocsLayout } from 'fumadocs-ui/layouts/docs';
 import {
   DocsBody,
@@ -13,12 +13,13 @@ import {
 
 import { useMDXComponents } from '../components/docs/mdx';
 import { getBlogLayoutOptions } from '../lib/blogLayout';
-import { buildContentTree, resolveContentEntry } from '../lib/contentFiles';
+import { buildContentTree, formatDate, resolveContentEntry } from '../lib/contentFiles';
 import BlogNotFoundPage from './BlogNotFoundPage';
 
 interface BlogFrontmatter {
   title?: string;
   description?: string;
+  date?: string;
 }
 
 interface BlogMetaProps {
@@ -76,6 +77,11 @@ const clientLoader = browserCollections.blog.createClientLoader({
         >
           <DocsTitle>{frontmatter.title}</DocsTitle>
           <DocsDescription>{frontmatter.description}</DocsDescription>
+          {frontmatter.date && (
+            <div className="mb-6 text-sm text-[var(--color-fd-muted-foreground)]">
+              {formatDate(frontmatter.date)}
+            </div>
+          )}
           <DocsBody>
             <Mdx components={useMDXComponents()} />
           </DocsBody>
@@ -118,6 +124,37 @@ function BlogPageFallback() {
   );
 }
 
+function sidebarNameWithDate(name: ReactNode, description: ReactNode): ReactNode {
+  if (!description) {
+    return name;
+  }
+
+  return createElement(
+    'span',
+    { className: 'flex flex-col gap-0.5' },
+    createElement('span', null, name),
+    createElement(
+      'span',
+      { className: 'text-[11px] text-[var(--color-fd-muted-foreground)] font-normal' },
+      description,
+    ),
+  );
+}
+
+function addDatesToTree(nodes: Node[]): Node[] {
+  return nodes.map((node) => {
+    if (node.type === 'page' && node.description) {
+      return { ...node, name: sidebarNameWithDate(node.name, node.description) };
+    }
+
+    if (node.type === 'folder') {
+      return { ...node, children: addDatesToTree(node.children) };
+    }
+
+    return node;
+  });
+}
+
 function useBlogTree(): Root {
   const [tree, setTree] = useState<Root>({
     name: 'Hyperstruck Blog',
@@ -139,13 +176,16 @@ function useBlogTree(): Root {
         return;
       }
 
-      setTree(
-        buildContentTree(Object.fromEntries(entries), {
-          baseUrl: '/blog',
-          contentRoot: 'content/blog',
-          rootName: 'Hyperstruck Blog',
-        }),
-      );
+      const baseTree = buildContentTree(Object.fromEntries(entries), {
+        baseUrl: '/blog',
+        contentRoot: 'content/blog',
+        rootName: 'Hyperstruck Blog',
+      });
+
+      setTree({
+        ...baseTree,
+        children: addDatesToTree(baseTree.children),
+      });
     }
 
     void loadTree();

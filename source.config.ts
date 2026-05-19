@@ -11,6 +11,7 @@ export const blog = defineCollections({
   schema: z.object({
     title: z.string(),
     description: z.string().optional(),
+    date: z.string().optional(),
   }),
 });
 
