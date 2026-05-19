@@ -1,0 +1,90 @@
+---
+title: "The God Model Trap"
+description: "Several of our components were pinned to one provider's model. Then they changed it overnight. The fix wasn't finding a better model. It was building for the swap."
+---
+
+We woke up to a partially broken system. Not a crash, not an outage. Something subtler. Some of our agent's components started producing wrong answers. Others kept working fine.
+
+Nothing in our code had changed. The model had.
+
+## What Happened
+
+We run a multi-component agent system. Several of those components were pinned to the same model from the same provider. It was genuinely good: fast inference, strong structured output, competitive pricing.
+
+Then the provider silently updated the model. Same API endpoint, same model name in their docs, different behaviour. The structured output format shifted. Classification boundaries moved. Tasks that had been rock-solid started failing intermittently.
+
+The components we had on other providers were completely unaffected. That asymmetry was the wake-up call.
+
+This isn't a one-provider problem. OpenAI has done it with GPT-4 Turbo. Anthropic has done it with Claude version bumps. Google has done it with Gemini updates. Every provider optimises their models continuously, and "better on average" doesn't mean "better for your specific structured output task."
+
+<Callout type="warn" title="The real risk">
+  Model providers optimise for their benchmarks, not yours. An update that improves general quality can silently degrade the specific capability your system depends on.
+</Callout>
+
+## One Model, One Bill, One Point of Failure
+
+Most agent frameworks encourage a single model configuration. One model name in your config, one provider, one API key. Every component in your system uses the same model.
+
+This feels clean. One dependency, one bill, one thing to manage.
+
+It's also a single point of failure that compounds in three ways:
+
+**Provider risk.** When that provider has an outage, your entire system is down. When they deprecate the model, you're scrambling to migrate everything at once. When they change pricing, every component gets more expensive simultaneously.
+
+**Capability mismatch.** Different tasks need different model strengths. Some benefit from broad reasoning. Others need precise structured output. Others need focused pattern matching. No single model is best at all of these. Using one model everywhere means you're settling for "adequate at everything" instead of "excellent at each thing."
+
+**Silent regression.** When the provider updates the model, you don't know which components broke until you notice degraded output in production. The regression might be subtle enough that no single component looks broken, but the compounding effect produces noticeably worse results.
+
+## What Saved Us (and What We Changed)
+
+We already had the right infrastructure: a per-component model registry where each component is benchmarked independently and pinned to the best model for its task. That's why the components on other providers kept working. The architecture contained the blast radius.
+
+But having too many components on a single provider was still too much concentration. After the breakage, we re-benchmarked each affected component against models from multiple providers. Each component got evaluated on its own merit, not batch-migrated to a replacement.
+
+The result: different components use different models from different providers. When one provider has an outage, only some components are affected. When a model gets updated, we re-benchmark only the components pinned to it. Each component runs on the model that's actually best for its specific task.
+
+This sounds like more complexity. It's actually less risk.
+
+## The Benchmark-First Workflow
+
+Every model pin in our registry includes the benchmark that justified it: what metric was measured, what score was achieved, how many test cases were used. When a model update happens or a new model drops, the workflow is:
+
+1. Run the component's benchmark against the new model.
+2. Compare against the pinned model's recorded score.
+3. If the new model wins, update the pin. If it doesn't, keep the current one.
+
+This takes a few minutes per component and produces a clear, auditable decision. No guessing about whether the new model is "probably fine." No A/B testing in production. No gradual rollout hoping nothing breaks.
+
+The benchmarks also catch silent regressions. If we'd had complete component-level benchmarks when the provider updated their model, we would have flagged the degradation before it hit production.
+
+<Callout type="success" title="The principle">
+  If you can't benchmark it, you can't pin it. If you can't pin it, you can't trust it. Every model choice should be backed by a measured result on your specific task, not the provider's marketing page.
+</Callout>
+
+## The Surprising Findings
+
+Some of what we found during our model comparisons was counterintuitive:
+
+**Smaller models win on focused tasks.** For focused classification with structured output, a smaller open-source model was both faster and more accurate than frontier models. The larger models over-reason and produce malformed output on tasks that need a quick, precise answer.
+
+**Reasoning models aren't always better.** Some tasks benefit from chain-of-thought reasoning. Others produce worse output with reasoning models because they over-deliberate on straightforward decisions. Matching model capability to task requirement matters more than using the "smartest" model everywhere.
+
+**The same model can be best and worst.** We found models that scored perfectly on some of our benchmarks and barely above chance on others. Same model, different tasks, wildly different results. If we'd evaluated it on one task and deployed it everywhere, we'd have been blind to the failures.
+
+## Practical Advice
+
+"We use GPT-4" is a provider dependency. "We use this model for this task because it scores highest on our benchmark" is an engineering decision. The second one survives a model update because you have a way to evaluate the replacement.
+
+Before picking any model, run your specific task against a few options and measure the metric that matters. This takes an afternoon and saves you from a 3am incident when the provider changes something.
+
+If you're using the same model for everything, at minimum have a way to swap it per task. When the model breaks for one thing, you need to switch that one thing to a different model without touching the rest.
+
+Every model choice should have a recorded benchmark score somewhere. When a new model comes out, you have a bar to clear, not a vibe to match.
+
+## The Landscape Keeps Moving
+
+The model landscape is moving fast. New models every week, provider API changes, pricing shifts, deprecation notices. If your agent is built on a single model from a single provider, every one of those changes is a potential incident.
+
+The teams that will build reliable agents aren't the ones with the best model. They're the ones with the best process for evaluating, selecting, and replacing models as the landscape shifts underneath them.
+
+Build for the swap. Benchmark everything. Trust your numbers, not the provider's changelog.
