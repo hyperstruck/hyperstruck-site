@@ -2,6 +2,7 @@ import type { Root } from 'fumadocs-core/page-tree';
 
 interface FrontmatterLike {
   title?: string;
+  date?: string;
 }
 
 interface ContentTreeOptions {
@@ -14,6 +15,7 @@ interface PageNode {
   title: string;
   url: string;
   isIndex: boolean;
+  date?: string;
 }
 
 interface FolderNode {
@@ -30,6 +32,16 @@ function createFolderNode(segment: string): FolderNode {
     folders: new Map<string, FolderNode>(),
     pages: [],
   };
+}
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString + 'T00:00:00');
+
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
 }
 
 function humanizeSegment(value: string): string {
@@ -77,6 +89,10 @@ function sortFolderNode(node: FolderNode): void {
       return left.isIndex ? -1 : 1;
     }
 
+    if (left.date && right.date) {
+      return right.date.localeCompare(left.date);
+    }
+
     return left.title.localeCompare(right.title);
   });
 
@@ -109,6 +125,7 @@ function toTreeChildren(node: FolderNode): TreeChild[] {
       type: 'page' as const,
       name: page.title,
       url: page.url,
+      description: page.date ? formatDate(page.date) : undefined,
     }));
 
   return [...indexPages, ...folders, ...regularPages];
@@ -195,6 +212,7 @@ export function buildContentTree(
       title: fallbackTitle,
       url: toPageUrl(relativePath, options.baseUrl),
       isIndex,
+      date: frontmatter.date,
     });
   }
 
