@@ -1,0 +1,65 @@
+---
+title: "LLMs Can't Count to Five"
+description: "When you ask an LLM to score quality on a scale, it secretly uses three buckets. The fix: stop asking models to judge and start asking them to extract evidence."
+---
+
+You built an evaluation step. Your agent does something, then a second LLM scores the output on a few dimensions. Maybe relevance, correctness, and completeness. Each on a 0 to 1 scale. You check if the scores pass a threshold. If they don't, the agent retries.
+
+It looks rigorous. It feels like quality control. But something is off.
+
+## The Empty Band
+
+We built exactly this kind of evaluator. Three quality dimensions, continuous scores, thresholds for pass/fail. We benchmarked it across dozens of test cases, multiple runs each. The score distribution for one dimension looked like this:
+
+| Score Range | What It Means | How Often It Appeared |
+|-------------|---------------|----------------------|
+| 0.8 - 1.0   | Strong pass    | 53 times             |
+| 0.6 - 0.8   | Pass           | **0 times**          |
+| 0.3 - 0.6   | Borderline     | 52 times             |
+| 0.0 - 0.3   | Fail           | 21 times             |
+
+The pass band was completely empty. Zero out of 126 evaluations. The model jumped from "everything is great" straight to "there are issues", skipping the entire middle range.
+
+We tested 8 models across three providers. The pattern was universal. When you ask an LLM to rate quality on a multi-point scale, it collapses the scale into three effective buckets: good, bad, and terrible. The nuanced middle disappears.
+
+<Callout type="warn" title="The hidden failure mode">
+  Your evaluator has a dead zone. Cases that deserve a "mostly good" score land in either "perfect" or "has problems", and the downstream decision is wrong either way.
+</Callout>
+
+## Why This Happens
+
+LLMs are trained on human preferences, and humans are bad at Likert scales too. When you ask someone to rate a restaurant 1 to 5, most answers cluster at 1, 3, and 5. The same tendency shows up in language models: they avoid intermediate categories. Fully correct or has significant errors. All requirements met or partially addressed. The model doesn't commit to "mostly met" because that requires a precise judgment about degree, and precision is exactly what these models lack for evaluative tasks.
+
+The middle is where the interesting cases live. The API integration that returned data for 3 out of 4 endpoints. The research summary that's accurate but missed one source. The code review that found the main bug but not the edge case. Those are the cases where the pass/fail decision actually matters, and the model can't distinguish them.
+
+## Stop Asking for Scores
+
+The same model that collapsed quality scores into three buckets achieved near-perfect accuracy on focused, structured questions. When you ask "did this happen?" or "does this match?", the model is reliable. When you ask "how good is this on a scale?", it's not.
+
+So we stopped asking for scores and started asking for facts. Instead of "rate quality 0 to 1", we ask "what was completed?" and "what was verified?". The model answers focused questions. Code computes the scores from the answers.
+
+The scores now span the full range because they're arithmetic, not vibes. A completion count of 3 out of 4 always produces the same score. The model's job is to count correctly, not to feel the right number. Scoring accuracy went from 72% to 89%, and the rate of incorrect pass/fail decisions dropped from 25% to under 5%.
+
+<Callout type="success" title="The key insight">
+  Models are good at answering specific questions. They're bad at producing calibrated numbers. Stop asking for the thing they're bad at.
+</Callout>
+
+## Binary Beats Multi-Way
+
+The same pattern extends to nuance. We needed to capture subtlety that simple counts can't express: conflicting evidence from different sources, vague outputs that technically address the requirement but say nothing useful, work that's mostly done versus barely started.
+
+Multi-way classification fails for the same reason multi-point scoring fails. Ask "is this output fully satisfactory, mostly satisfactory, partially satisfactory, barely adequate, or inadequate?" and the model collapses to three options.
+
+Ask a yes/no question and it's reliable. *Is the output substantive?* Yes or no. *Do different sources conflict?* Yes or no. *Was most of the work completed?* Yes or no. Each binary decision is near-perfect. The scoring formulas combine them into nuanced results that cover the full quality spectrum, without the model ever producing a number or choosing from a five-point scale.
+
+## The Pattern
+
+If you're building any LLM evaluation, the principle is: **let the model answer questions, let code keep score.**
+
+This works because answering a specific question is a convergent task with a right answer, while scoring is divergent, the model has to invent a number. Models are good at convergent tasks and unreliable at divergent ones.
+
+In practice: ask for facts, not ratings. Verify claims individually, then compute quality from the results. Use yes/no signals for nuance instead of scales. Make scoring deterministic so the same answers always produce the same result. Weight by importance in the formula, not the prompt, because not all evidence matters equally.
+
+The broader implication is uncomfortable. The agent ecosystem is building increasingly sophisticated LLM-as-judge evaluators. Multi-dimensional rubrics. Constitutional checks. Most of them ask the model to produce calibrated scores. If our results generalise, a meaningful fraction of those evaluations are hitting the same dead zone, and the downstream decisions are wrong in ways that are hard to detect.
+
+The fix is structural. You don't solve this with better prompts or more examples in the rubric. You solve it by not asking the model to score at all.
