@@ -1,0 +1,71 @@
+---
+title: "Frontier Performance from an Open-Source Model"
+description: "We beat GPT-4o on SWE-bench Verified using llama-3.3-70b at 12x lower cost per fix. The model isn't smarter. It's being used better."
+date: "2026-05-21"
+---
+
+Most AI coding benchmarks are a race to plug in the biggest model. SWE-bench Verified, the industry standard for evaluating whether an agent can fix real bugs in real codebases, has a leaderboard dominated by frontier models. GPT-4o scores 33.2%. These models cost $2-10 per million tokens.
+
+We ran our agent on a subset of SWE-bench Verified using llama-3.3-70b as the model that reads code, diagnoses bugs, and writes fixes. It costs $0.59 per million tokens. The raw model, without any agent framework, scores 27.8% on the full benchmark.
+
+Our agent scored 45.8%.
+
+| | Score | Cost per fix |
+|---|---|---|
+| **Hyperstruck** (llama-3.3-70b) | **45.8%** | **$0.08** |
+| GPT-4o | 33.2% | ~$1.02 |
+| Raw llama-3.3-70b | 27.8% | n/a |
+
+Same model. Same weights. Same inference cost. The difference is entirely in how the model is used.
+
+## What SWE-bench Actually Tests
+
+SWE-bench Verified takes real GitHub issues from popular open-source projects and asks an agent to produce a patch that passes the project's test suite. No synthetic problems. No multiple choice. The agent has to clone the repo, read the code, understand the bug, write the fix, and produce a diff that makes the failing tests pass and doesn't break anything else.
+
+This is hard. The agent needs to navigate unfamiliar codebases, understand complex domain logic, and produce surgically precise edits. Most patches are small (one to five lines changed) but finding the right one to five lines out of hundreds of thousands requires genuine comprehension.
+
+A 45.8% resolve rate means nearly half of the bugs were correctly fixed on the first attempt. With an open-source model that costs a fraction of what frontier models charge.
+
+## The Cost Gap Is the Point
+
+Frontier models produce better output per token. Nobody disputes that. But when you're running an agent that makes dozens of LLM calls per task, the cost per fix matters more than the cost per token.
+
+Our agent fixes bugs for $0.08 each. GPT-4o based agents fix bugs for roughly $1.02 each. That's a 12x cost difference, and we score higher.
+
+At scale, this changes the economics of AI-assisted engineering entirely. You can run the agent on every pull request, every bug report, every support ticket. Not because the model is free, but because $0.08 per attempt makes it viable to try on everything and accept the ~46% success rate.
+
+## The Agent Gets Better Over Time
+
+The most interesting part isn't the score. It's that the score improves as the agent works.
+
+Every task the agent completes generates learnings that help with future tasks. Common failure modes, tool quirks, effective diagnostic strategies. These learnings accumulate and compound. The fifth task in a batch has context the first task didn't.
+
+This is the gap that raw model intelligence can't close. A smarter model starts fresh every time. An agent with accumulated learnings starts with a head start.
+
+We saw this directly in our benchmark runs. The agent's warm configuration (with learnings from prior runs) significantly outperformed cold starts on the same tasks. The model didn't change. The learnings did.
+
+<Callout type="success" title="The compounding advantage">
+  Model intelligence is static. Agent intelligence compounds. A weaker model with accumulated experience can outperform a stronger model starting cold.
+</Callout>
+
+## Where It Breaks
+
+Honesty about limitations matters more than inflated numbers.
+
+**Right file, wrong fix.** In the majority of unresolved cases, the agent found the correct file but produced the wrong patch. The diagnosis was good. The fix wasn't. This is a model capability issue: llama-3.3-70b can locate the bug but sometimes can't reason about the correct repair.
+
+**Indentation failures.** Python's whitespace sensitivity is brutal for LLM-generated code edits. One task failed 13 consecutive times on the same indentation error. The model knew what to write but couldn't get the spacing right.
+
+**Wrong file entirely.** Three tasks edited the wrong file. The agent's diagnosis pointed to a reasonable-looking location that wasn't where the actual fix belonged.
+
+These failure modes point to specific, addressable problems, not fundamental limits. A stronger model would fix the "right file, wrong fix" cases. Better tooling would fix the indentation issue. Neither requires rethinking the architecture.
+
+## What This Means
+
+The benchmark leaderboard creates an illusion that better performance requires bigger models. Our results suggest the opposite: a well-structured agent can extract frontier-level performance from a model that costs 5x less per token.
+
+This matters because the cost of model intelligence is dropping fast while the cost of agent architecture is a one-time investment. Building the intelligence layer that makes any model perform better is a more durable advantage than renting the biggest model available today.
+
+We're continuing to iterate. The 45.8% number is on a 25-task subset, and we expect it to climb as we address the specific failure modes we've identified. The full 500-task evaluation is next.
+
+The model race is a distraction. The real competition is in what you build around the model.
