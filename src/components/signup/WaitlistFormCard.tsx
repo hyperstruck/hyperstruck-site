@@ -61,6 +61,12 @@ export default function WaitlistFormCard() {
       return;
     }
 
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
+      setIsError(true);
+      setStatusMessage('Please provide a valid email address.');
+      return;
+    }
+
     if (isPlaceholderConfig) {
       setIsError(true);
       setStatusMessage(
@@ -83,7 +89,12 @@ export default function WaitlistFormCard() {
 
       if (error) {
         setIsError(true);
-        setStatusMessage(error.message);
+        const isConflict = error.code === '23505' || error.message?.includes('duplicate');
+        setStatusMessage(
+          isConflict
+            ? 'This email is already on the waitlist.'
+            : 'Something went wrong. Please try again.',
+        );
         return;
       }
 

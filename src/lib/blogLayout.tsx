@@ -5,8 +5,8 @@ export const BLOG_HOME_URL = '/blog';
 export function getBlogLayoutOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'Hyperstruck Blog',
-      url: BLOG_HOME_URL,
+      title: 'Hyperstruck',
+      url: '/',
     },
     links: [
       {

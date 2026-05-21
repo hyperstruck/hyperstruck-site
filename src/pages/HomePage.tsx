@@ -12,6 +12,7 @@ import { Link as RouterLink } from 'react-router-dom';
 
 import PageMeta from '../components/PageMeta';
 import { benchmarkStats, features } from '../data/siteContent';
+import { contactEmail } from '../theme/tokens';
 
 function HeroSection() {
   const theme = useTheme();
@@ -246,7 +247,7 @@ function FeaturesSection() {
             gap: 3,
           }}
         >
-          {features.map((feature, i) => (
+          {features.map((feature) => (
             <Card
               key={feature.title}
               sx={{
@@ -365,7 +366,7 @@ function CtaSection() {
           </Button>
           <Button
             component="a"
-            href="mailto:hello@hyperstruck.com?subject=Hyperstruck%20demo%20request"
+            href={`mailto:${contactEmail}?subject=Hyperstruck%20demo%20request`}
             variant="outlined"
             size="large"
           >

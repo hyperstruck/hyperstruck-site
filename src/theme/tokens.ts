@@ -1,5 +1,4 @@
 export const contactEmail = 'hello@hyperstruck.com';
-export const contactHref = `mailto:${contactEmail}`;
 
 export const brandTokens = {
   colors: {

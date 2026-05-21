@@ -29,6 +29,32 @@ const navItems = [
   { label: 'About', to: '/about' },
 ] as const;
 
+const footerSections = [
+  {
+    title: 'Product',
+    links: [
+      { label: 'Docs', to: '/docs' },
+      { label: 'Blog', to: BLOG_HOME_URL },
+      { label: 'Pricing', to: '/pricing' },
+    ],
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', to: '/about' },
+      { label: 'Contact', href: `mailto:${contactEmail}` },
+    ],
+  },
+  {
+    title: 'Connect',
+    links: [
+      { label: 'LinkedIn', href: 'https://linkedin.com/company/hyperstruck', external: true },
+    ],
+  },
+] as const;
+
+const footerLinkSx = { fontSize: '0.9rem' } as const;
+
 export default function AppLayout() {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -206,56 +232,36 @@ export default function AppLayout() {
               </Typography>
             </Box>
 
-            <Box>
-              <Typography
-                variant="overline"
-                sx={{ color: 'text.tertiary', display: 'block', mb: 1.5 }}
-              >
-                Product
-              </Typography>
-              <Stack spacing={1}>
-                <Link component={NavLink} to="/docs" underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  Docs
-                </Link>
-                <Link component={NavLink} to={BLOG_HOME_URL} underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  Blog
-                </Link>
-                <Link component={NavLink} to="/pricing" underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  Pricing
-                </Link>
-              </Stack>
-            </Box>
-
-            <Box>
-              <Typography
-                variant="overline"
-                sx={{ color: 'text.tertiary', display: 'block', mb: 1.5 }}
-              >
-                Company
-              </Typography>
-              <Stack spacing={1}>
-                <Link component={NavLink} to="/about" underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  About
-                </Link>
-                <Link href={`mailto:${contactEmail}`} underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  Contact
-                </Link>
-              </Stack>
-            </Box>
-
-            <Box>
-              <Typography
-                variant="overline"
-                sx={{ color: 'text.tertiary', display: 'block', mb: 1.5 }}
-              >
-                Connect
-              </Typography>
-              <Stack spacing={1}>
-                <Link href="https://linkedin.com/company/hyperstruck" target="_blank" rel="noopener" underline="hover" color="text.secondary" sx={{ fontSize: '0.9rem' }}>
-                  LinkedIn
-                </Link>
-              </Stack>
-            </Box>
+            {footerSections.map((section) => (
+              <Box key={section.title}>
+                <Typography
+                  variant="overline"
+                  sx={{ color: 'text.tertiary', display: 'block', mb: 1.5 }}
+                >
+                  {section.title}
+                </Typography>
+                <Stack spacing={1}>
+                  {section.links.map((link) =>
+                    'to' in link ? (
+                      <Link key={link.label} component={NavLink} to={link.to} underline="hover" color="text.secondary" sx={footerLinkSx}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        underline="hover"
+                        color="text.secondary"
+                        sx={footerLinkSx}
+                        {...('external' in link ? { target: '_blank', rel: 'noopener' } : {})}
+                      >
+                        {link.label}
+                      </Link>
+                    ),
+                  )}
+                </Stack>
+              </Box>
+            ))}
           </Box>
 
           <Divider sx={{ my: 4 }} />

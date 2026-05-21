@@ -23,7 +23,7 @@ export default function PageMeta({ title, description, path = '' }: PageMetaProp
       <meta property="og:url" content={url} />
       <meta property="og:site_name" content={SITE_NAME} />
       <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:card" content="summary" />
       <meta name="twitter:title" content={fullTitle} />
       <meta name="twitter:description" content={description} />
     </Helmet>

@@ -12,6 +12,7 @@ import { useTheme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 
 import PageMeta from '../components/PageMeta';
+import { contactEmail } from '../theme/tokens';
 
 const team = [
   {
@@ -116,6 +117,7 @@ export default function AboutPage() {
                     target="_blank"
                     rel="noopener"
                     size="small"
+                    aria-label={`${person.name} on LinkedIn`}
                     sx={{ ml: -0.5, color: 'text.tertiary', '&:hover': { color: 'primary.dark' } }}
                   >
                     <LinkedInIcon />
@@ -205,7 +207,7 @@ export default function AboutPage() {
             </Button>
             <Button
               component="a"
-              href="mailto:hello@hyperstruck.com"
+              href={`mailto:${contactEmail}`}
               variant="outlined"
               size="large"
             >
