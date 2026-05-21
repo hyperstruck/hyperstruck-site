@@ -1,0 +1,44 @@
+---
+title: Security and data isolation
+description: How Hyperstruck protects customer data through tenant isolation, encryption, and access controls.
+---
+
+<Callout type="info" title="In one line">
+  Every tenant's data is isolated at the database level. Credentials are encrypted. Access is scoped by API key.
+</Callout>
+
+Hyperstruck is built for teams that need to trust the platform with sensitive operational data: agent configurations, learnings from real workflows, and provider credentials. This page explains how the platform protects that data.
+
+## Tenant isolation
+
+Every customer operates in a fully isolated tenant. Data isolation is enforced at the database level through row-level security (RLS) policies. Every table that stores customer data has an RLS policy that restricts access to the owning tenant. This is not application-level filtering. It is enforced by the database engine itself, which means a bug in application code cannot leak data across tenants.
+
+Each API request is scoped to a tenant through the authenticated API key. The tenant context is set at the database connection level before any query executes.
+
+## Credential encryption
+
+Provider credentials (LLM API keys for OpenAI, Anthropic, Groq, and others) are encrypted at rest using AES-256-GCM with per-tenant encryption keys. The platform never logs, exposes, or returns credential secrets through the API. When you retrieve credentials through the API, you see metadata (provider, scope, status) but never the key itself.
+
+## API key scopes
+
+API keys are scoped to specific permissions. You can create keys that are restricted to read-only access, agent management, or credential management. This lets you give different parts of your system the minimum access they need.
+
+Available scopes include `agents:read`, `agents:write`, `credentials:read`, `credentials:write`, and `usage:read`.
+
+## PII masking
+
+For Pro and Enterprise customers, Hyperstruck offers guardrails that detect and mask personally identifiable information before it reaches the LLM. This is configurable per agent and can be combined with prompt-injection prevention.
+
+## Rate limiting
+
+API endpoints are rate-limited per tenant to prevent abuse and ensure fair access. Rate limits are enforced transactionally at the database level, not through an in-memory cache, so they remain accurate under concurrent load.
+
+## Infrastructure
+
+Hyperstruck runs on managed cloud infrastructure with encryption in transit (TLS) and at rest across all storage layers. The platform does not store raw LLM conversation logs beyond what is needed for session history and learning extraction.
+
+## Related pages
+
+- [Credentials API](/docs/credentials-api) for managing provider credentials
+- [Agents API](/docs/agents-api) for API key authentication and scopes
+- [Pricing](/pricing) for details on which tiers include compliance features

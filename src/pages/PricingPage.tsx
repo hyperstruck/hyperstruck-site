@@ -1,4 +1,3 @@
-import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import {
   Box,
   Button,
@@ -14,9 +13,10 @@ import {
   TableRow,
   Typography,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { useTheme } from '@mui/material/styles';
 import { Link as RouterLink } from 'react-router-dom';
 
+import PageMeta from '../components/PageMeta';
 import { featureRows, pricingTiers } from '../data/siteContent';
 
 export default function PricingPage() {
@@ -24,17 +24,32 @@ export default function PricingPage() {
 
   return (
     <Box component="main">
-      <Container maxWidth="xl" sx={{ pt: { xs: 7, md: 10 }, pb: { xs: 8, md: 12 } }}>
-        <Box sx={{ maxWidth: 860, mx: 'auto', textAlign: 'center' }}>
-          <Typography variant="overline" color="secondary.main">
-            Pricing
+      <PageMeta
+        title="Pricing"
+        description="Simple, transparent pricing for Hyperstruck. Start free, scale as your agents learn."
+        path="/pricing"
+      />
+      <Container maxWidth="lg" sx={{ pt: { xs: 7, md: 10 }, pb: { xs: 8, md: 12 } }}>
+        <Box sx={{ maxWidth: 640, mx: 'auto', textAlign: 'center' }}>
+          <Chip
+            label="Early access"
+            size="small"
+            sx={{
+              mb: 3,
+              backgroundColor: 'primary.light',
+              color: 'primary.dark',
+              fontWeight: 600,
+            }}
+          />
+          <Typography variant="h1" sx={{ fontSize: { xs: '2.75rem', md: '4rem' }, mb: 2 }}>
+            Simple, transparent pricing
           </Typography>
-          <Typography variant="h1" sx={{ mt: 2, fontSize: { xs: '3rem', md: '5rem' } }}>
-            Intelligence scaled to your ambition.
-          </Typography>
-          <Typography color="text.secondary" sx={{ mt: 3, fontSize: { xs: '1.05rem', md: '1.2rem' }, lineHeight: 1.75 }}>
-            Hyperstruck pricing is designed around the value your agents deliver, from early
-            experimentation to organization-wide intelligence systems.
+          <Typography
+            color="text.secondary"
+            sx={{ fontSize: { xs: '1.05rem', md: '1.15rem' }, lineHeight: 1.75 }}
+          >
+            Start free. Scale as your agents learn. Pricing is designed
+            around the value your agents deliver, not the tokens they consume.
           </Typography>
         </Box>
 
@@ -42,7 +57,7 @@ export default function PricingPage() {
           sx={{
             mt: 7,
             display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, minmax(0, 1fr))' },
+            gridTemplateColumns: { xs: '1fr', md: 'repeat(3, 1fr)' },
             gap: 3,
           }}
         >
@@ -51,158 +66,114 @@ export default function PricingPage() {
               key={tier.name}
               sx={{
                 p: 4,
-                height: '100%',
-                position: 'relative',
                 display: 'flex',
                 flexDirection: 'column',
                 borderColor: tier.featured
-                  ? alpha(theme.palette.primary.main, 0.4)
-                  : alpha(theme.palette.divider, 0.7),
-                background:
-                  tier.featured
-                    ? `linear-gradient(180deg, ${alpha(theme.palette.primary.main, 0.16)} 0%, ${alpha(
-                      theme.palette.background.paper,
-                      0.96,
-                    )} 100%)`
-                    : undefined,
+                  ? theme.palette.primary.main
+                  : theme.palette.divider,
+                borderWidth: tier.featured ? 2 : 1,
               }}
             >
-              {tier.featured ? (
-                <Chip
-                  label="Most popular"
-                  color="primary"
-                  size="small"
-                  sx={{ position: 'absolute', top: 18, right: 18 }}
-                />
-              ) : null}
-
-              <Box
-                sx={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  flexGrow: 1,
-                }}
-              >
-                <Box>
-                  <Stack
-                    direction="row"
-                    spacing={1.5}
-                    alignItems="center"
-                    sx={{ minHeight: 56 }}
-                  >
-                    <Box
-                      sx={{
-                        width: 48,
-                        height: 48,
-                        borderRadius: 1.5,
-                        display: 'grid',
-                        placeItems: 'center',
-                        color: tier.featured ? 'primary.light' : 'primary.main',
-                        backgroundColor: alpha(theme.palette.primary.main, 0.12),
-                        border: `1px solid ${alpha(theme.palette.primary.main, 0.24)}`,
-                        flexShrink: 0,
-                      }}
-                    >
-                      <tier.icon />
-                    </Box>
-                    <Typography variant="h3">{tier.name}</Typography>
-                  </Stack>
-
-                  <Box sx={{ mt: 2, minHeight: 110 }}>
-                    <Typography variant="overline" color="secondary.main">
-                      {tier.label}
-                    </Typography>
-                    <Typography color="text.secondary" sx={{ mt: 1.5 }}>
-                      {tier.description}
-                    </Typography>
-                  </Box>
-
-                  <Box sx={{ mt: 1, minHeight: 84 }}>
-                    <Typography variant="h4">{tier.price}</Typography>
-                    <Typography color="text.secondary" sx={{ mt: 1 }}>
-                      {tier.subtext ?? '\u00A0'}
-                    </Typography>
-                  </Box>
-                </Box>
-
-                <Box sx={{ flexGrow: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-                  <Stack spacing={2} sx={{ my: 4.5, minHeight: 176 }}>
-                    {tier.featureList.map((feature) => (
-                      <Stack key={feature.label} direction="row" spacing={1.5} alignItems="flex-start">
-                        <feature.icon color="primary" sx={{ mt: '2px', fontSize: 20, flexShrink: 0 }} />
-                        <Typography color="text.secondary">{feature.label}</Typography>
-                      </Stack>
-                    ))}
-                  </Stack>
-
-                  <Button
-                    component={RouterLink}
-                    to="/signup"
-                    fullWidth
-                    variant="contained"
-                    startIcon={<MailOutlineRoundedIcon />}
-                    sx={{
-                      mt: 'auto',
-                      backgroundImage: theme.custom.gradients.primary,
-                      boxShadow: theme.custom.shadows.glow,
-                    }}
-                  >
-                    Contact Us
-                  </Button>
-                </Box>
+              <Box sx={{ mb: 3 }}>
+                <Typography variant="h4" sx={{ mb: 1 }}>
+                  {tier.name}
+                </Typography>
+                <Typography color="text.secondary" sx={{ fontSize: '0.95rem', minHeight: 44 }}>
+                  {tier.description}
+                </Typography>
               </Box>
+
+              <Box sx={{ mb: 4 }}>
+                <Typography
+                  sx={{
+                    fontSize: '2.25rem',
+                    fontWeight: 700,
+                    letterSpacing: '-0.02em',
+                    lineHeight: 1.2,
+                  }}
+                >
+                  {tier.price}
+                </Typography>
+                {tier.subtext ? (
+                  <Typography color="text.tertiary" sx={{ mt: 0.5, fontSize: '0.85rem' }}>
+                    {tier.subtext}
+                  </Typography>
+                ) : null}
+              </Box>
+
+              <Stack spacing={1.5} sx={{ mb: 4, flexGrow: 1 }}>
+                {tier.featureList.map((feature) => (
+                  <Typography
+                    key={feature}
+                    color="text.secondary"
+                    sx={{ fontSize: '0.9rem', pl: 2, position: 'relative', '&::before': { content: '"\\2022"', position: 'absolute', left: 0, color: 'text.tertiary' } }}
+                  >
+                    {feature}
+                  </Typography>
+                ))}
+              </Stack>
+
+              <Button
+                component={RouterLink}
+                to="/signup"
+                fullWidth
+                variant={tier.featured ? 'contained' : 'outlined'}
+              >
+                {tier.price === 'Contact us' ? 'Talk to us' : 'Get started'}
+              </Button>
             </Card>
           ))}
         </Box>
 
-        <Card sx={{ mt: 8, p: { xs: 3, md: 4 } }}>
-          <Stack
-            direction={{ xs: 'column', md: 'row' }}
-            spacing={3}
-            justifyContent="space-between"
-            alignItems={{ xs: 'flex-start', md: 'center' }}
+        <Box sx={{ mt: 10 }}>
+          <Typography variant="h3" textAlign="center" sx={{ mb: 1 }}>
+            Feature comparison
+          </Typography>
+          <Typography
+            color="text.secondary"
+            textAlign="center"
+            sx={{ mb: 5, fontSize: '0.95rem' }}
           >
-            <Box sx={{ maxWidth: 700 }}>
-              <Typography variant="h4">Learnings</Typography>
-              <Typography color="text.secondary" sx={{ mt: 1.5, lineHeight: 1.7 }}>
-                Learning is the system’s ability to turn experience into better future judgment. It captures what matters, strengthens what proves useful, lets low-value signals fade, and applies the right insight at the right moment so agents become sharper, more specialized, and more effective over time.
-              </Typography>
-            </Box>
-            <Button component={RouterLink} to="/signup" variant="contained" size="large">
-              Join waitlist
-            </Button>
-          </Stack>
-        </Card>
-
-        <Box sx={{ mt: 8 }}>
-          <Typography variant="h3" textAlign="center" sx={{ mb: 4 }}>
-            Features and capabilities
+            Detailed breakdown of what each plan includes.
           </Typography>
           <TableContainer
             component={Card}
             sx={{
               overflowX: 'auto',
               '& .MuiTableCell-root': {
-                borderColor: alpha(theme.palette.divider, 0.5),
+                borderColor: theme.palette.divider,
+                py: 2,
               },
             }}
           >
-            <Table aria-label="Hyperstruck pricing comparison">
+            <Table aria-label="Pricing feature comparison">
               <TableHead>
                 <TableRow>
-                  <TableCell sx={{ minWidth: 220 }}>Capability</TableCell>
-                  <TableCell>Starter</TableCell>
-                  <TableCell>Pro</TableCell>
-                  <TableCell sx={{ color: 'primary.main' }}>Enterprise</TableCell>
+                  <TableCell sx={{ minWidth: 200, fontWeight: 600 }}>
+                    Capability
+                  </TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Starter</TableCell>
+                  <TableCell sx={{ fontWeight: 600 }}>Pro</TableCell>
+                  <TableCell sx={{ fontWeight: 600, color: 'primary.dark' }}>
+                    Enterprise
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {featureRows.map((row) => (
                   <TableRow key={row.capability} hover>
-                    <TableCell sx={{ color: 'text.primary', fontWeight: 600 }}>{row.capability}</TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>{row.starter}</TableCell>
-                    <TableCell sx={{ color: 'text.secondary' }}>{row.pro}</TableCell>
-                    <TableCell sx={{ color: 'primary.light', fontWeight: 600 }}>{row.enterprise}</TableCell>
+                    <TableCell sx={{ fontWeight: 600 }}>
+                      {row.capability}
+                    </TableCell>
+                    <TableCell sx={{ color: 'text.secondary' }}>
+                      {row.starter}
+                    </TableCell>
+                    <TableCell sx={{ color: 'text.secondary' }}>
+                      {row.pro}
+                    </TableCell>
+                    <TableCell sx={{ color: 'text.primary', fontWeight: 500 }}>
+                      {row.enterprise}
+                    </TableCell>
                   </TableRow>
                 ))}
               </TableBody>

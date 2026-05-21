@@ -10,112 +10,117 @@ import '@fontsource/space-grotesk/500.css';
 import '@fontsource/space-grotesk/600.css';
 import '@fontsource/space-grotesk/700.css';
 
-import { alpha, createTheme, responsiveFontSizes } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 
 import { brandTokens } from './tokens';
 
 declare module '@mui/material/styles' {
+  interface TypeText {
+    tertiary: string;
+  }
+
   interface Theme {
     custom: {
-      gradients: typeof brandTokens.gradients;
       shadows: typeof brandTokens.shadows;
-      blur: string;
     };
   }
 
   interface ThemeOptions {
     custom?: {
-      gradients?: typeof brandTokens.gradients;
       shadows?: typeof brandTokens.shadows;
-      blur?: string;
     };
   }
 }
 
+const { colors, fonts } = brandTokens;
+
 const baseTheme = createTheme({
   palette: {
-    mode: 'dark',
+    mode: 'light',
     primary: {
-      main: brandTokens.colors.primary,
-      light: brandTokens.colors.primaryBright,
-    },
-    secondary: {
-      main: brandTokens.colors.secondary,
+      main: colors.accent,
+      light: colors.accentSubtle,
+      dark: colors.accentDark,
+      contrastText: colors.accentText,
     },
     background: {
-      default: brandTokens.colors.background,
-      paper: brandTokens.colors.surface,
+      default: colors.background,
+      paper: colors.surface,
     },
     text: {
-      primary: brandTokens.colors.textPrimary,
-      secondary: brandTokens.colors.textSecondary,
+      primary: colors.text,
+      secondary: colors.textSecondary,
+      tertiary: colors.textTertiary,
     },
-    divider: alpha(brandTokens.colors.outline, 0.5),
+    divider: colors.border,
   },
   shape: {
-    borderRadius: 10,
+    borderRadius: 8,
   },
   spacing: 8,
   typography: {
-    fontFamily: '"Inter", sans-serif',
+    fontFamily: fonts.body,
     h1: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
       letterSpacing: '-0.05em',
     },
     h2: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
       letterSpacing: '-0.04em',
     },
     h3: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
       letterSpacing: '-0.03em',
     },
     h4: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
       letterSpacing: '-0.02em',
     },
     h5: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
     },
     h6: {
-      fontFamily: '"Space Grotesk", sans-serif',
+      fontFamily: fonts.display,
       fontWeight: 700,
+    },
+    body1: {
+      lineHeight: 1.7,
+    },
+    body2: {
+      lineHeight: 1.6,
     },
     button: {
       fontWeight: 700,
-      textTransform: 'none',
+      textTransform: 'none' as const,
     },
     overline: {
-      fontFamily: '"JetBrains Mono", monospace',
+      fontFamily: fonts.mono,
       fontWeight: 500,
       letterSpacing: '0.22em',
-      textTransform: 'uppercase',
+      textTransform: 'uppercase' as const,
     },
   },
   custom: {
-    gradients: brandTokens.gradients,
     shadows: brandTokens.shadows,
-    blur: brandTokens.blur,
   },
   components: {
     MuiCssBaseline: {
       styleOverrides: {
         ':root': {
-          colorScheme: 'dark',
+          colorScheme: 'light',
         },
         'html, body, #root': {
           minHeight: '100%',
         },
         body: {
           margin: 0,
-          backgroundColor: brandTokens.colors.background,
-          backgroundImage: brandTokens.gradients.ambient,
-          color: brandTokens.colors.textPrimary,
+          backgroundColor: colors.background,
+          color: colors.text,
         },
         a: {
           color: 'inherit',
@@ -124,31 +129,78 @@ const baseTheme = createTheme({
         '*': {
           boxSizing: 'border-box',
         },
+        '::selection': {
+          backgroundColor: colors.accentSubtle,
+          color: colors.accent,
+        },
       },
     },
     MuiButton: {
       styleOverrides: {
         root: {
-          borderRadius: 10,
-          paddingInline: 20,
+          borderRadius: 8,
+          paddingInline: 24,
           paddingBlock: 12,
+          boxShadow: 'none',
+          '&:hover': {
+            boxShadow: 'none',
+          },
+        },
+        contained: {
+          backgroundColor: colors.accent,
+          color: colors.accentText,
+          '&:hover': {
+            backgroundColor: colors.accentHover,
+          },
+        },
+        outlined: {
+          borderColor: colors.border,
+          color: colors.text,
+          '&:hover': {
+            borderColor: colors.borderStrong,
+            backgroundColor: colors.surfaceHover,
+          },
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          backgroundColor: alpha(brandTokens.colors.surfaceHighest, 0.55),
-          backdropFilter: brandTokens.blur,
-          border: `1px solid ${alpha(brandTokens.colors.outline, 0.32)}`,
-          boxShadow: brandTokens.shadows.soft,
+          backgroundColor: colors.surface,
+          border: `1px solid ${colors.border}`,
+          boxShadow: brandTokens.shadows.sm,
+          backgroundImage: 'none',
         },
       },
     },
     MuiChip: {
       styleOverrides: {
         root: {
-          borderRadius: 999,
+          borderRadius: 6,
+          fontWeight: 500,
+        },
+      },
+    },
+    MuiAppBar: {
+      styleOverrides: {
+        root: {
+          backgroundColor: colors.background,
+          color: colors.text,
+          boxShadow: 'none',
+        },
+      },
+    },
+    MuiTextField: {
+      styleOverrides: {
+        root: {
+          '& .MuiOutlinedInput-root': {
+            '& fieldset': {
+              borderColor: colors.border,
+            },
+            '&:hover fieldset': {
+              borderColor: colors.borderStrong,
+            },
+          },
         },
       },
     },

@@ -11,8 +11,11 @@ import {
   useLocation,
 } from 'react-router-dom';
 
+import { HelmetProvider } from 'react-helmet-async';
+
 import AppLayout from './components/AppLayout';
 import StaticSearchDialog from './components/docs/StaticSearchDialog';
+import AboutPage from './pages/AboutPage';
 import BlogPageRoute from './pages/BlogPage';
 import HomePage from './pages/HomePage';
 import DocsPageRoute from './pages/DocsPage';
@@ -45,6 +48,9 @@ const docsSearch = {
       ['Reasoning', '/docs/reasoning'],
       ['Learning', '/docs/learning'],
       ['Usage API', '/docs/usage-api'],
+      ['Framework integrations', '/docs/integrations'],
+      ['Claude Code and Cursor', '/docs/claude-skills'],
+      ['Security', '/docs/security'],
     ],
     source: '/docs-search.json',
   },
@@ -68,9 +74,9 @@ function RootRouteLayout() {
       search={search}
       theme={{
         attribute: 'class',
-        defaultTheme: 'dark',
+        defaultTheme: 'light',
         enableSystem: false,
-        forcedTheme: 'dark',
+        forcedTheme: 'light',
       }}
     >
       <ScrollToTop />
@@ -86,6 +92,7 @@ const router = createBrowserRouter(
         <Route index element={<HomePage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/signup" element={<SignupPage />} />
+        <Route path="/about" element={<AboutPage />} />
       </Route>
       <Route path="/blog/*" element={<BlogPageRoute />} />
       <Route path="/docs/*" element={<DocsPageRoute />} />
@@ -95,9 +102,11 @@ const router = createBrowserRouter(
 
 export default function App() {
   return (
-    <ThemeProvider theme={appTheme}>
-      <CssBaseline />
-      <RouterProvider router={router} />
-    </ThemeProvider>
+    <HelmetProvider>
+      <ThemeProvider theme={appTheme}>
+        <CssBaseline />
+        <RouterProvider router={router} />
+      </ThemeProvider>
+    </HelmetProvider>
   );
 }
