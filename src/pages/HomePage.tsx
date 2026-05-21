@@ -33,7 +33,7 @@ function HeroSection() {
               mb: 3,
             }}
           >
-            Your agent's 100th task should be better than its first.
+            Your agent's 100th run should be better than its first.
           </Typography>
 
           <Typography
