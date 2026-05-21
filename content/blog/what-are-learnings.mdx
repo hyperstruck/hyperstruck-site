@@ -1,0 +1,54 @@
+---
+title: "What Are Learnings?"
+description: "Every agent framework has memory. Almost none have learnings. The difference is why your agent makes the same mistake twice."
+date: "2026-05-21"
+---
+
+Your agent remembers everything and learns nothing.
+
+It has context windows, vector stores, conversation history, RAG pipelines. It can retrieve what happened last Tuesday. It can find the relevant document. It can recall the exact error message from three runs ago.
+
+And then it makes the same mistake again.
+
+## Written Down vs Absorbed
+
+There's a difference between what you wrote down and what you absorbed. A notebook full of meeting notes is not the same as understanding how your team makes decisions. A bookmark folder full of Stack Overflow links is not the same as knowing how to debug.
+
+Most agent "memory" is the notebook. It stores things. It retrieves things. When you ask the right question, it finds the right answer. But it doesn't change how the agent thinks, plans, or acts. The agent with perfect recall still approaches every task from scratch, just with better search results.
+
+A learning is different. A learning changes behaviour. The agent doesn't look up "check indentation before editing Python files." It just does it, because three tasks ago an edit was reverted five times for wrong indentation and the lesson was absorbed into how the agent approaches every future edit.
+
+That's the distinction most agent frameworks miss entirely.
+
+## What a Learning Actually Looks Like
+
+|  | Typical agent memory | Learning |
+|---|---|---|
+| **Sales outreach** | CRM notes from the last call with this prospect | "Prospects in healthcare never respond to cold email. Always warm up through LinkedIn first, response rate triples." |
+| **Data pipeline** | Log file showing yesterday's ETL job failed | "The billing API returns amounts in cents, not dollars. Divide by 100 before inserting into the revenue table." |
+| **Code editing** | README retrieved via RAG describing the repo | "When editing Python inside a nested class, count the leading spaces first. Wrong indentation silently breaks scope." |
+| **Customer support** | Previous ticket thread with this customer | "When a customer reports 'sync not working', check their API key expiry first. It's the cause 80% of the time." |
+
+Memory is a fact. A learning is a behaviour change with a trigger condition. It has three parts: when this situation arises, do this thing, because of what happened before.
+
+The memory tells you what happened. The learning tells you what to do about it. One is retrieval. The other is adaptation.
+
+## Why This Matters for Agent Quality
+
+An agent running its tenth task should be better than an agent running its first. Not because the model improved. Not because the prompt was tweaked. Because the agent accumulated learnings from the first nine tasks that make the tenth one easier.
+
+<Callout type="success" title="The compounding effect">
+  Every task generates learnings. Every learning improves the next task. The hundredth task benefits from ninety-nine prior experiences. This is how humans develop expertise, and it's how agents should too.
+</Callout>
+
+We see this directly in our benchmarks. On SWE-bench Verified, our agent with accumulated learnings resolves significantly more bugs than the same agent starting cold. Same model, same tools, same code. The only difference is what the agent absorbed from prior runs.
+
+The learnings aren't task-specific answers. They're patterns: "when editing Python inside a nested class, count the indentation of surrounding lines first." "When a test fails after your edit, the edit is wrong, not the test." "This tool returns stale data under certain conditions, always verify." These apply across tasks, across codebases, across domains.
+
+## Memory Gets You Started. Learnings Get You Good.
+
+Every agent framework ships memory. It's table stakes. Conversation history, document retrieval, context injection. Important for basic functionality, but not a differentiator.
+
+Learnings are the gap. The agent that accumulates reusable insight from every task, that changes its approach based on what worked and what didn't, that gets measurably better over time without model upgrades or prompt engineering. That's the agent people actually want.
+
+The question isn't whether your agent can remember. It's whether your agent can learn.
