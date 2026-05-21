@@ -1,6 +1,7 @@
 import { useEffect, useMemo } from 'react';
 import ApiRoundedIcon from '@mui/icons-material/ApiRounded';
 import PsychologyAltRoundedIcon from '@mui/icons-material/PsychologyAltRounded';
+import SecurityRoundedIcon from '@mui/icons-material/SecurityRounded';
 import TerminalRoundedIcon from '@mui/icons-material/TerminalRounded';
 import { useLocation } from 'react-router-dom';
 
@@ -91,8 +92,26 @@ const docsTree: Root = {
       children: [
         {
           type: 'page',
-          name: 'Claude Skills',
+          name: 'Framework integrations',
+          url: '/docs/integrations',
+        },
+        {
+          type: 'page',
+          name: 'Claude Code and Cursor',
           url: '/docs/claude-skills',
+        },
+      ],
+    },
+    {
+      type: 'folder',
+      name: 'Platform',
+      icon: <SecurityRoundedIcon fontSize="small" />,
+      defaultOpen: true,
+      children: [
+        {
+          type: 'page',
+          name: 'Security and data isolation',
+          url: '/docs/security',
         },
       ],
     },

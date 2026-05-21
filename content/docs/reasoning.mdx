@@ -1,50 +1,46 @@
 ---
-title: Reasoning that acts with context
-description: How Hyperstruck improves decision quality in the moment through structured, contextual execution.
+title: Reasoning engine
+description: How Hyperstruck plans, executes, reflects, and revises to deliver higher quality agent outcomes.
 ---
 
 <Callout type="info" title="In one line">
-  Reasoning is the Hyperstruck layer that helps agents choose better actions before they act.
+  Hyperstruck is a reasoning engine that plans multi-step work, executes with structured tool calls, reflects on output quality, and revises when needed.
 </Callout>
 
-Hyperstruck improves how agents approach a task before they act. Instead of relying on improvised prompting alone, it helps them work through goals with more structure, context, and decision discipline.
+Most agent failures are not caused by weak language generation. They come from poor sequencing, missed prerequisites, fragile tool decisions, and no ability to catch and fix mistakes mid-run. Hyperstruck addresses this with a structured reasoning loop that handles the full lifecycle of a task.
 
-Many agent failures do not come from poor language generation. They come from weak sequencing, missed prerequisites, fragile tool decisions, and poor handling of multi-step work. Hyperstruck helps reduce those failures by improving how agents approach a task before they act.
+## What happens during a run
 
-## Where it shows up
+When you dispatch a goal to an agent, Hyperstruck works through four phases:
 
-Hyperstruck gives agents a structured way to evaluate a goal, work through complexity, and act with better context. This helps shift behavior away from improvised prompting and toward more grounded execution.
+### Planning
 
-## Why it changes the outcome
+The engine decomposes your goal into a structured, multi-step plan organised into milestones. Before building the plan, it retrieves relevant learnings and similar past plans so the approach is informed by prior experience, not just the current prompt.
 
-When agents operate across APIs, tools, dependencies, and multiple steps, decision quality matters more than fluency. Better reasoning improves the likelihood that the right action happens in the right order for the right reason.
+### Execution
 
-## What gets better in practice
+Each step is executed with structured tool calls, tracked results, and cross-step data flow. If a step fails, the engine classifies the error and decides whether to retry, degrade gracefully, or fail. Side-effect tool calls are guarded against duplication, even if the engine retries.
 
-- improves sequencing across multi-step workflows
-- reduces avoidable tool and dependency mistakes
-- supports clearer planning and execution
-- makes outcomes easier to trust and explain
+### Reflection
 
-<Cards>
-  <Card title="Structured decisions" description="Agents can work through goals more deliberately instead of jumping straight to generation." />
-  <Card title="Better sequencing" description="Tasks with dependencies, prerequisites, and timing become easier to handle correctly." />
-  <Card title="Grounded execution" description="Actions can be informed by stronger context and prior outcomes, not just prompt plausibility." />
-</Cards>
+After execution, the engine evaluates the output against the original goal. It scores quality across multiple dimensions and determines whether the result is good enough to return or needs revision.
 
-## Reasoning advantages
+### Revision
 
-### Structured decisions
+When reflection identifies a problem, the engine revises only the affected milestone rather than restarting the entire task. It uses learnings relevant to the failure to guide the fix, and detects when further revision would not improve the outcome.
 
-Agents can work through goals more deliberately instead of jumping straight to generation.
+## What this means for your agents
 
-### Better sequencing
+- **Better sequencing.** Multi-step work with dependencies, prerequisites, and ordering constraints is handled correctly more often.
+- **Fewer silent failures.** Problems are caught during reflection rather than silently returned as bad output.
+- **Resilient execution.** Transient errors, tool failures, and unexpected states are handled without losing progress.
+- **Explainable outcomes.** Every run produces a structured plan and execution trace, so you can see what the agent did and why.
 
-The order of operations matters. Hyperstruck helps agents handle tasks where dependencies, prerequisites, and timing affect outcome quality.
+## Human-in-the-loop
 
-### Grounded execution
+Hyperstruck supports human approval gates at multiple levels: plan approval, milestone approval, step approval, tool approval, and escalation. You can start fully supervised and gradually increase autonomy as trust builds.
 
-Reasoning is not limited to what sounds plausible in the current prompt. It can be informed by prior outcomes and stronger contextual signals.
+See [Agents API](/docs/agents-api) for how to resume suspended runs.
 
 ## Next
 

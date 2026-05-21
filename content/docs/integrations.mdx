@@ -1,0 +1,62 @@
+---
+title: Framework integrations
+description: Use Hyperstruck with LangGraph, OpenAI Agents SDK, or CrewAI to add reasoning and learning to your existing agents.
+---
+
+<Callout type="info" title="In one line">
+  Bring agents and tools from the framework you already use. Hyperstruck adds its reasoning engine and learning system underneath.
+</Callout>
+
+Hyperstruck works as a standalone agent platform through the [REST API](/docs/agents-api), but it also integrates with popular agent frameworks. You keep your existing tools, agents, and workflows. Hyperstruck adds structured planning, reflection, revision, and compounding learnings underneath.
+
+## Supported frameworks
+
+| Framework | What you keep | What Hyperstruck adds |
+|-----------|--------------|----------------------|
+| **LangGraph** | Your StateGraph, tools, streaming, and checkpointing | Full reasoning loop with planning, reflection, and learnings. Also available as a lighter middleware that adds just memory and learnings to an existing agent. |
+| **OpenAI Agents SDK** | Your tool definitions and agent configuration | Full reasoning loop. Hyperstruck replaces the default execution with its own cognitive runtime while keeping your tools unchanged. |
+| **CrewAI** | Your agent identity (role, goal, backstory) and tool definitions | Full reasoning loop. Single-agent focus with Hyperstruck's planning, reflection, and learning. |
+
+## How it works
+
+Integrations translate between your framework's native types and Hyperstruck's reasoning engine. Your tools are converted automatically, events flow through your framework's streaming mechanism, and results are returned in your framework's expected format.
+
+All integrations share the same learning pipeline. Learnings generated during a framework integration run are stored the same way as learnings from the REST API or Claude Code skills. They are available to all future runs regardless of which integration surface triggered them.
+
+## Integration depth
+
+Not every framework supports the same depth of integration:
+
+- **Full reasoning** (all frameworks): Hyperstruck owns the reasoning loop. You get planning, milestone-scoped execution, reflection, revision, and automatic learning extraction. This is the default and recommended option.
+- **Memory and learnings only** (LangGraph): Your existing agent loop stays intact. Hyperstruck layers in learning retrieval and persistence at tool-call and LLM-call boundaries. Use this when you have an established LangGraph agent and want to add learnings without changing the execution model.
+
+## Installation
+
+Framework dependencies are optional extras. Install only what you need:
+
+```bash
+pip install hyperstruck-core                   # Core only
+pip install "hyperstruck-core[langgraph]"      # + LangGraph
+pip install "hyperstruck-core[openai-agents]"  # + OpenAI Agents SDK
+pip install "hyperstruck-core[crewai]"         # + CrewAI
+```
+
+## What stays the same
+
+- Your tool definitions work unchanged. Hyperstruck converts them automatically.
+- Your framework's streaming, checkpointing, and state management still work.
+- You do not need to learn a new API to use Hyperstruck features.
+
+## What changes
+
+- Agents plan before they act, rather than improvising step by step.
+- Output is evaluated after execution and revised if it does not meet quality thresholds.
+- Learnings from every run are captured and applied to future runs automatically.
+- Human-in-the-loop gates are available at multiple levels if you need supervisory control.
+
+## Related pages
+
+- [Quickstart](/docs/quickstart) for the fastest first-success flow using the REST API
+- [Agents API](/docs/agents-api) for standalone agent management
+- [Learnings API](/docs/learnings-api) for manual learning control
+- [Claude Code and Cursor skills](/docs/claude-skills) for the IDE integration path

@@ -1,50 +1,43 @@
 ---
 title: Welcome to Hyperstruck Docs
-description: Core product and API documentation for Hyperstruck reasoning, learning, and developer integrations.
+description: Documentation for Hyperstruck, a reasoning engine and learning system for AI agents.
 ---
 
 # Welcome to Hyperstruck Docs
 
-This documentation hub explains how Hyperstruck improves agent reasoning in the present, compounds learning over time, and exposes both capabilities through simple developer entry points.
-
-Use the pages below as the foundation for evaluating the platform and integrating it into real workflows.
+Hyperstruck is a reasoning engine and learning system for AI agents. It plans, executes, reflects, and learns from every task. Use it as a standalone agent platform, integrate it with LangGraph, OpenAI Agents SDK, or CrewAI, or work directly from Claude Code and Cursor.
 
 <Callout type="info" title="Recommended reading order">
   Start with <a href="/docs/quickstart">Quickstart</a>, then read <a href="/docs/reasoning">Reasoning</a> and <a href="/docs/learning">Learning</a> before diving into the API and integration pages.
 </Callout>
 
-## Start here
+## Concepts
 
 <Cards>
   <Card
     title="Quickstart"
     href="/docs/quickstart"
-    description="See the smallest end-to-end flow: invoke reasoning, capture a learning, and bring the workflow into developer tools."
+    description="The fastest first-success flow: create an agent, dispatch a goal, and store a learning."
   />
   <Card
-    title="Reasoning"
+    title="Reasoning engine"
     href="/docs/reasoning"
-    description="How Hyperstruck improves decision quality in the moment."
+    description="How Hyperstruck plans, executes, reflects, and revises to deliver higher quality outcomes."
   />
   <Card
     title="Learning"
     href="/docs/learning"
-    description="How Hyperstruck captures useful outcomes and compounds over time."
+    description="How Hyperstruck captures useful outcomes and compounds them over time."
   />
 </Cards>
 
-## Build with it
+## APIs
 
 <Cards>
   <Card
     title="Agents API"
     href="/docs/agents-api"
-    description="Invoke purpose-built reasoning through a simple API surface."
-  />
-  <Card
-    title="Usage API"
-    href="/docs/usage-api"
-    description="Inspect usage, estimated cost visibility, learning activity, and run history."
+    description="Create agents, dispatch goals, monitor runs, and resume suspended work."
   />
   <Card
     title="Learnings API"
@@ -54,27 +47,47 @@ Use the pages below as the foundation for evaluating the platform and integratin
   <Card
     title="Plans API"
     href="/docs/plans-api"
-    description="Search prior workflows when you need direct visibility into what agents have seen before."
+    description="Search prior workflows and review candidate learnings for reuse."
+  />
+  <Card
+    title="Credentials API"
+    href="/docs/credentials-api"
+    description="Bring your own LLM provider credentials with tenant defaults and agent overrides."
+  />
+  <Card
+    title="Usage API"
+    href="/docs/usage-api"
+    description="Inspect usage, costs, learning activity, and run history."
   />
 </Cards>
+
+## Integrations
 
 <Cards>
   <Card
-    title="Claude Skills"
+    title="Framework integrations"
+    href="/docs/integrations"
+    description="Use Hyperstruck with LangGraph, OpenAI Agents SDK, or CrewAI."
+  />
+  <Card
+    title="Claude Code and Cursor"
     href="/docs/claude-skills"
-    description="Use Hyperstruck directly from Claude Code and Cursor."
+    description="Use Hyperstruck directly from your IDE with built-in skills."
   />
 </Cards>
 
-## How these pages fit together
+## Platform
 
-- `reasoning` explains decision quality in the present.
-- `learning` explains compounding improvement over time.
-- `agents-api`, `plans-api`, `learnings-api`, and `usage-api` give technical buyers concrete entry points.
-- `claude-skills` shows how Hyperstruck fits into existing developer workflows.
+<Cards>
+  <Card
+    title="Security and data isolation"
+    href="/docs/security"
+    description="Tenant isolation, encrypted credentials, PII masking, and access controls."
+  />
+</Cards>
 
 ## Who this is for
 
 - Technical buyers evaluating whether Hyperstruck is more than a prompt wrapper
 - Engineers looking for clean API entry points into reasoning and learning
-- Developer teams that want to try Hyperstruck inside existing IDE workflows first
+- Teams that want to integrate Hyperstruck into existing agent frameworks or IDE workflows

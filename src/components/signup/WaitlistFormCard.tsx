@@ -1,27 +1,54 @@
 import { FormEvent, useMemo, useState } from 'react';
-import { Alert, Box, Button, Card, Stack, TextField, Typography } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import {
+  Alert,
+  Box,
+  Button,
+  Card,
+  MenuItem,
+  Stack,
+  TextField,
+} from '@mui/material';
 
 import { hasConfiguredSupabase, supabase } from '../../lib/supabaseClient';
 
 interface WaitlistFormState {
   fullName: string;
   email: string;
+  company: string;
+  role: string;
+  useCase: string;
 }
 
 const initialState: WaitlistFormState = {
   fullName: '',
   email: '',
+  company: '',
+  role: '',
+  useCase: '',
 };
 
+const roles = [
+  'Engineering Leader',
+  'Software Engineer',
+  'ML / AI Engineer',
+  'Product Manager',
+  'Founder / CTO',
+  'Other',
+];
+
 export default function WaitlistFormCard() {
-  const theme = useTheme();
   const [formState, setFormState] = useState<WaitlistFormState>(initialState);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [isError, setIsError] = useState(false);
 
   const isPlaceholderConfig = useMemo(() => !hasConfiguredSupabase, []);
+
+  const handleChange = (field: keyof WaitlistFormState) => (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setFormState((prev) => ({ ...prev, [field]: event.target.value }));
+  };
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -30,14 +57,20 @@ export default function WaitlistFormCard() {
 
     if (!formState.fullName.trim() || !formState.email.trim()) {
       setIsError(true);
-      setStatusMessage('Please provide both your full name and email address.');
+      setStatusMessage('Please provide your name and email address.');
+      return;
+    }
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formState.email.trim())) {
+      setIsError(true);
+      setStatusMessage('Please provide a valid email address.');
       return;
     }
 
     if (isPlaceholderConfig) {
       setIsError(true);
       setStatusMessage(
-        'Supabase placeholders are still configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable submissions.',
+        'Supabase is not configured. Add VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY to enable submissions.',
       );
       return;
     }
@@ -48,96 +81,105 @@ export default function WaitlistFormCard() {
       const { error } = await supabase.from('waitlist_signups').insert({
         full_name: formState.fullName.trim(),
         email: formState.email.trim().toLowerCase(),
+        company: formState.company.trim() || null,
+        role: formState.role || null,
+        use_case: formState.useCase.trim() || null,
         source: 'website-signup-page',
       });
 
       if (error) {
         setIsError(true);
-        setStatusMessage(error.message);
+        const isConflict = error.code === '23505' || error.message?.includes('duplicate');
+        setStatusMessage(
+          isConflict
+            ? 'This email is already on the waitlist.'
+            : 'Something went wrong. Please try again.',
+        );
         return;
       }
 
       setFormState(initialState);
-      setStatusMessage("You're on the waitlist. We'll reach out soon.");
+      setStatusMessage("You're on the list. We'll reach out soon.");
     } catch {
       setIsError(true);
-      setStatusMessage('Unexpected error while submitting. Please try again.');
+      setStatusMessage('Something went wrong. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   return (
-    <Card
-      sx={{
-        px: { xs: 2.5, sm: 4 },
-        py: { xs: 3, sm: 4 },
-        borderColor: alpha(theme.palette.divider, 0.5),
-        backgroundColor: alpha(theme.palette.background.paper, 0.75),
-        backdropFilter: theme.custom.blur,
-      }}
-    >
+    <Card sx={{ p: { xs: 3, sm: 4 } }}>
       <Box component="form" onSubmit={handleSubmit}>
         <Stack spacing={2.5}>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Full name"
+              name="full_name"
+              value={formState.fullName}
+              onChange={handleChange('fullName')}
+              required
+              fullWidth
+              autoComplete="name"
+            />
+            <TextField
+              label="Work email"
+              type="email"
+              name="email"
+              value={formState.email}
+              onChange={handleChange('email')}
+              required
+              fullWidth
+              autoComplete="email"
+            />
+          </Stack>
+          <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2}>
+            <TextField
+              label="Company"
+              name="company"
+              value={formState.company}
+              onChange={handleChange('company')}
+              fullWidth
+              autoComplete="organization"
+            />
+            <TextField
+              label="Role"
+              name="role"
+              value={formState.role}
+              onChange={handleChange('role')}
+              select
+              fullWidth
+            >
+              {roles.map((role) => (
+                <MenuItem key={role} value={role}>
+                  {role}
+                </MenuItem>
+              ))}
+            </TextField>
+          </Stack>
           <TextField
-            label="Identity / Full Name"
-            name="full_name"
-            value={formState.fullName}
-            onChange={(event) =>
-              setFormState((prev) => ({
-                ...prev,
-                fullName: event.target.value,
-              }))
-            }
-            placeholder="ALEX MERCER"
-            required
+            label="What are you building? (optional)"
+            name="use_case"
+            value={formState.useCase}
+            onChange={handleChange('useCase')}
+            multiline
+            rows={3}
             fullWidth
-            autoComplete="name"
-          />
-          <TextField
-            label="Interface / Email Address"
-            type="email"
-            name="email"
-            value={formState.email}
-            onChange={(event) =>
-              setFormState((prev) => ({
-                ...prev,
-                email: event.target.value,
-              }))
-            }
-            placeholder="alex@network.io"
-            required
-            fullWidth
-            autoComplete="email"
           />
           <Button
             type="submit"
             variant="contained"
             size="large"
             disabled={isSubmitting}
-            sx={{
-              mt: 1,
-              py: 1.5,
-              backgroundImage: theme.custom.gradients.primary,
-              boxShadow: theme.custom.shadows.glow,
-            }}
+            sx={{ py: 1.5 }}
           >
-            {isSubmitting ? 'Submitting...' : 'Get Started'}
+            {isSubmitting ? 'Submitting...' : 'Request access'}
           </Button>
           {statusMessage ? (
-            <Alert severity={isError ? 'error' : 'success'}>{statusMessage}</Alert>
+            <Alert severity={isError ? 'error' : 'success'}>
+              {statusMessage}
+            </Alert>
           ) : null}
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            sx={{
-              textTransform: 'uppercase',
-              letterSpacing: '0.12em',
-              textAlign: 'center',
-            }}
-          >
-            By initializing, you accept the protocol terms.
-          </Typography>
         </Stack>
       </Box>
     </Card>

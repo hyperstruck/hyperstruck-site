@@ -5,8 +5,8 @@ import { BLOG_HOME_URL } from './blogLayout';
 export function getDocsLayoutOptions(): BaseLayoutProps {
   return {
     nav: {
-      title: 'Hyperstruck Docs',
-      url: '/docs',
+      title: 'Hyperstruck',
+      url: '/',
     },
     links: [
       {

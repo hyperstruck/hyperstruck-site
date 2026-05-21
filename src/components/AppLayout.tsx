@@ -1,5 +1,5 @@
-import MailOutlineRoundedIcon from '@mui/icons-material/MailOutlineRounded';
 import MenuRoundedIcon from '@mui/icons-material/MenuRounded';
+import CloseRoundedIcon from '@mui/icons-material/CloseRounded';
 import {
   AppBar,
   Box,
@@ -12,69 +12,64 @@ import {
   Stack,
   Toolbar,
   Typography,
-  useMediaQuery,
 } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
-import { useMemo, useState } from 'react';
+
+
+import { useTheme } from '@mui/material/styles';
+import { useState } from 'react';
 import { NavLink, Outlet, Link as RouterLink } from 'react-router-dom';
 
 import { BLOG_HOME_URL } from '../lib/blogLayout';
 import { contactEmail } from '../theme/tokens';
 
 const navItems = [
-  { label: 'Home', to: '/' },
   { label: 'Docs', to: '/docs' },
   { label: 'Blog', to: BLOG_HOME_URL },
   { label: 'Pricing', to: '/pricing' },
-  { label: 'Sign up', to: '/signup' },
+  { label: 'About', to: '/about' },
 ] as const;
 
-const navLinkStyles = {
-  color: 'text.secondary',
-  fontFamily: '"Space Grotesk", sans-serif',
-  fontWeight: 600,
-  px: 0.5,
-  py: 0.75,
-  borderBottom: '2px solid transparent',
-  transition: 'color 180ms ease, border-color 180ms ease',
-  '&:hover': {
-    color: 'text.primary',
-  },
-  '&.active': {
-    color: 'text.primary',
-    borderColor: 'primary.main',
-  },
-} as const;
-
-export default function AppLayout() {
-  const theme = useTheme();
-  const isDesktop = useMediaQuery(theme.breakpoints.up('md'));
-  const [mobileOpen, setMobileOpen] = useState(false);
-
-  const footerLinks = useMemo(
-    () => [
+const footerSections = [
+  {
+    title: 'Product',
+    links: [
       { label: 'Docs', to: '/docs' },
       { label: 'Blog', to: BLOG_HOME_URL },
       { label: 'Pricing', to: '/pricing' },
     ],
-    [],
-  );
+  },
+  {
+    title: 'Company',
+    links: [
+      { label: 'About', to: '/about' },
+      { label: 'Contact', href: `mailto:${contactEmail}` },
+    ],
+  },
+  {
+    title: 'Connect',
+    links: [
+      { label: 'LinkedIn', href: 'https://linkedin.com/company/hyperstruck', external: true },
+    ],
+  },
+] as const;
+
+const footerLinkSx = { fontSize: '0.9rem' } as const;
+
+export default function AppLayout() {
+  const theme = useTheme();
+  const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <Box sx={{ minHeight: '100vh' }}>
+    <Box sx={{ minHeight: '100vh', backgroundColor: 'background.default' }}>
       <AppBar
         position="sticky"
-        color="transparent"
         elevation={0}
         sx={{
-          backdropFilter: theme.custom.blur,
-          backgroundColor: alpha(theme.palette.background.default, 0.78),
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.6)}`,
-          boxShadow: theme.custom.shadows.soft,
+          borderBottom: `1px solid ${theme.palette.divider}`,
         }}
       >
-        <Container maxWidth="xl">
-          <Toolbar disableGutters sx={{ minHeight: 84, gap: 3 }}>
+        <Container maxWidth="lg">
+          <Toolbar disableGutters sx={{ minHeight: 72, gap: 2 }}>
             <Link
               component={NavLink}
               to="/"
@@ -84,50 +79,66 @@ export default function AppLayout() {
                 flexShrink: 0,
                 fontFamily: '"Space Grotesk", sans-serif',
                 fontWeight: 700,
-                fontSize: { xs: '1.15rem', md: '1.4rem' },
+                fontSize: '1.4rem',
                 letterSpacing: '-0.04em',
               }}
             >
               Hyperstruck
             </Link>
 
-            {isDesktop ? (
-              <>
-                <Stack direction="row" spacing={3} sx={{ ml: 2, flexGrow: 1 }}>
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.label}
-                      component={NavLink}
-                      to={item.to}
-                      underline="none"
-                      sx={navLinkStyles}
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                </Stack>
+            <Stack
+              direction="row"
+              spacing={1}
+              sx={{
+                ml: 4,
+                flexGrow: 1,
+                display: { xs: 'none', md: 'flex' },
+              }}
+            >
+              {navItems.map((item) => (
+                <Link
+                  key={item.label}
+                  component={NavLink}
+                  to={item.to}
+                  underline="none"
+                  sx={{
+                    px: 1.5,
+                    py: 0.75,
+                    fontSize: '0.9rem',
+                    fontWeight: 500,
+                    color: 'text.secondary',
+                    borderRadius: 1,
+                    transition: 'color 150ms ease',
+                    '&:hover': { color: 'text.primary' },
+                    '&.active': { color: 'text.primary' },
+                  }}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </Stack>
 
-                <Stack direction="row" spacing={1.5}>
-                  <Button
-                    variant="contained"
-                    component={RouterLink}
-                    to="/signup"
-                    sx={{
-                      backgroundImage: theme.custom.gradients.primary,
-                      boxShadow: theme.custom.shadows.glow,
-                    }}
-                  >
-                    Request access
-                  </Button>
-                </Stack>
-              </>
-            ) : (
-              <Box sx={{ ml: 'auto' }}>
-                <IconButton color="inherit" onClick={() => setMobileOpen(true)}>
-                  <MenuRoundedIcon />
-                </IconButton>
-              </Box>
-            )}
+            <Button
+              component={RouterLink}
+              to="/signup"
+              variant="contained"
+              size="small"
+              sx={{
+                display: { xs: 'none', md: 'inline-flex' },
+                px: 3,
+                py: 1,
+              }}
+            >
+              Request access
+            </Button>
+
+            <IconButton
+              color="inherit"
+              onClick={() => setMobileOpen(true)}
+              sx={{ display: { md: 'none' }, ml: 'auto' }}
+            >
+              <MenuRoundedIcon />
+            </IconButton>
           </Toolbar>
         </Container>
       </AppBar>
@@ -138,15 +149,18 @@ export default function AppLayout() {
         onClose={() => setMobileOpen(false)}
         PaperProps={{
           sx: {
-            width: 280,
+            width: '100%',
+            maxWidth: 320,
             p: 3,
-            backgroundColor: alpha(theme.palette.background.paper, 0.96),
-            backgroundImage: 'none',
           },
         }}
       >
-        <Stack spacing={2.5}>
-          <Typography variant="h6">Navigate</Typography>
+        <Stack spacing={1}>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 1 }}>
+            <IconButton onClick={() => setMobileOpen(false)}>
+              <CloseRoundedIcon />
+            </IconButton>
+          </Box>
           {navItems.map((item) => (
             <Link
               key={item.label}
@@ -154,14 +168,29 @@ export default function AppLayout() {
               to={item.to}
               underline="none"
               onClick={() => setMobileOpen(false)}
-              sx={navLinkStyles}
+              sx={{
+                py: 1.5,
+                px: 2,
+                fontSize: '1.1rem',
+                fontWeight: 500,
+                color: 'text.secondary',
+                borderRadius: 1,
+                '&:hover': { backgroundColor: 'action.hover' },
+                '&.active': { color: 'text.primary' },
+              }}
             >
               {item.label}
             </Link>
           ))}
-          <Divider />
-          <Button component={RouterLink} to="/signup" variant="contained">
-            Contact {contactEmail}
+          <Divider sx={{ my: 1 }} />
+          <Button
+            component={RouterLink}
+            to="/signup"
+            variant="contained"
+            fullWidth
+            onClick={() => setMobileOpen(false)}
+          >
+            Request access
           </Button>
         </Stack>
       </Drawer>
@@ -171,62 +200,75 @@ export default function AppLayout() {
       <Box
         component="footer"
         sx={{
-          borderTop: `1px solid ${alpha(theme.palette.divider, 0.45)}`,
-          mt: 10,
+          borderTop: `1px solid ${theme.palette.divider}`,
+          mt: 12,
           py: { xs: 6, md: 8 },
-          backgroundColor: alpha(theme.palette.background.default, 0.8),
         }}
       >
-        <Container
-          maxWidth="xl"
-          sx={{
-            display: 'grid',
-            gridTemplateColumns: { xs: '1fr', md: '1.4fr 1fr 1fr' },
-            gap: 5,
-          }}
-        >
-          <Box>
-            <Typography variant="h5" gutterBottom>
-              Hyperstruck
-            </Typography>
-            <Typography color="text.secondary" sx={{ maxWidth: 420 }}>
-              The intelligence layer for agents that make better decisions and improve with
-              experience.
-            </Typography>
-          </Box>
-
-          <Box>
-            <Typography variant="overline" color="secondary.main">
-              Product
-            </Typography>
-            <Stack spacing={1.25} sx={{ mt: 1 }}>
-              {footerLinks.map((item) => (
-                <Link
-                  key={item.label}
-                  component={NavLink}
-                  to={item.to}
-                  underline="hover"
-                  color="text.secondary"
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </Stack>
-          </Box>
-
-          <Box>
-            <Typography variant="overline" color="secondary.main">
-              Contact
-            </Typography>
-            <Stack spacing={1.25} sx={{ mt: 1 }}>
-              <Typography color="text.secondary">
-                Ready to benchmark judgment in your workflow?
+        <Container maxWidth="lg">
+          <Box
+            sx={{
+              display: 'grid',
+              gridTemplateColumns: { xs: '1fr', md: '1.5fr 1fr 1fr 1fr' },
+              gap: { xs: 4, md: 6 },
+            }}
+          >
+            <Box>
+              <Typography
+                sx={{
+                  fontFamily: theme.typography.h1.fontFamily,
+                  fontSize: '1.25rem',
+                  mb: 1.5,
+                }}
+              >
+                Hyperstruck
               </Typography>
-              <Link component={RouterLink} to="/signup" underline="hover">
-                Request API access
-              </Link>
-            </Stack>
+              <Typography
+                color="text.secondary"
+                sx={{ maxWidth: 280, fontSize: '0.9rem', lineHeight: 1.7 }}
+              >
+                Reasoning engine and learning system for AI agents that
+                improve with experience.
+              </Typography>
+            </Box>
+
+            {footerSections.map((section) => (
+              <Box key={section.title}>
+                <Typography
+                  variant="overline"
+                  sx={{ color: 'text.tertiary', display: 'block', mb: 1.5 }}
+                >
+                  {section.title}
+                </Typography>
+                <Stack spacing={1}>
+                  {section.links.map((link) =>
+                    'to' in link ? (
+                      <Link key={link.label} component={NavLink} to={link.to} underline="hover" color="text.secondary" sx={footerLinkSx}>
+                        {link.label}
+                      </Link>
+                    ) : (
+                      <Link
+                        key={link.label}
+                        href={link.href}
+                        underline="hover"
+                        color="text.secondary"
+                        sx={footerLinkSx}
+                        {...('external' in link ? { target: '_blank', rel: 'noopener' } : {})}
+                      >
+                        {link.label}
+                      </Link>
+                    ),
+                  )}
+                </Stack>
+              </Box>
+            ))}
           </Box>
+
+          <Divider sx={{ my: 4 }} />
+
+          <Typography color="text.tertiary" sx={{ fontSize: '0.8rem' }}>
+            &copy; {new Date().getFullYear()} Hyperstruck. All rights reserved.
+          </Typography>
         </Container>
       </Box>
     </Box>

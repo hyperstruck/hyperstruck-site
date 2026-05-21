@@ -1,68 +1,56 @@
-import { Box, Container } from '@mui/material';
-import { alpha, useTheme } from '@mui/material/styles';
+import { Box, Container, Typography } from '@mui/material';
 
-import SignupPageHeader from '../components/signup/SignupPageHeader';
+import PageMeta from '../components/PageMeta';
 import WaitlistFormCard from '../components/signup/WaitlistFormCard';
 
 export default function SignupPage() {
-  const theme = useTheme();
-
   return (
     <Box
       component="main"
       sx={{
-        minHeight: 'calc(100vh - 84px)',
-        position: 'relative',
-        overflow: 'hidden',
+        minHeight: 'calc(100vh - 72px)',
+        py: { xs: 8, md: 12 },
       }}
     >
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 0,
-          opacity: 0.32,
-          filter: 'grayscale(100%) contrast(1.2)',
-          transform: 'scale(1.08)',
-          transformOrigin: 'center',
-          backgroundImage: 'url(/images/signup-network-bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          pointerEvents: 'none',
-        }}
+      <PageMeta
+        title="Request Access"
+        description="Join the Hyperstruck early access programme. Tell us about your use case and we will help you get started."
+        path="/signup"
       />
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          background:
-            'radial-gradient(circle at top right, rgba(192, 193, 255, 0.1), transparent 44%), radial-gradient(circle at bottom left, rgba(76, 215, 246, 0.08), transparent 40%)',
-          pointerEvents: 'none',
-          zIndex: 1,
-        }}
-      />
-      <Box
-        sx={{
-          position: 'absolute',
-          inset: 0,
-          zIndex: 1,
-          background: 'linear-gradient(180deg, rgba(2, 4, 8, 0.88) 0%, rgba(2, 4, 8, 0.36) 45%, rgba(2, 4, 8, 0.88) 100%)',
-          borderBottom: `1px solid ${alpha(theme.palette.divider, 0.2)}`,
-          pointerEvents: 'none',
-        }}
-      />
+      <Container maxWidth="sm">
+        <Box sx={{ textAlign: 'center', mb: 5 }}>
+          <Typography
+            variant="h1"
+            sx={{
+              fontSize: { xs: '2.5rem', md: '3.25rem' },
+              mb: 2,
+            }}
+          >
+            Request access
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ fontSize: '1.05rem', lineHeight: 1.7 }}
+          >
+            Hyperstruck is in early access. Tell us about your use case
+            and we will reach out to get you started.
+          </Typography>
+        </Box>
 
-      <Container
-        maxWidth="sm"
-        sx={{
-          position: 'relative',
-          zIndex: 2,
-          pt: { xs: 8, md: 11 },
-          pb: { xs: 10, md: 12 },
-        }}
-      >
-        <SignupPageHeader />
         <WaitlistFormCard />
+
+        <Typography
+          color="text.tertiary"
+          sx={{
+            mt: 3,
+            textAlign: 'center',
+            fontSize: '0.85rem',
+            lineHeight: 1.6,
+          }}
+        >
+          We will only use your email to contact you about Hyperstruck.
+          No spam.
+        </Typography>
       </Container>
     </Box>
   );
