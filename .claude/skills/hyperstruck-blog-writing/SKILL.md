@@ -15,6 +15,12 @@ Rules for writing Hyperstruck blog posts that sound like us, convert readers, an
 - **Use "agents" not "AI tools", "your AI", "AI assistants", or "coding assistants".** Hyperstruck is an intelligence layer for agents. The language should reflect the space we're in.
 - **Use "AI" not "artificial intelligence".** Spelling it out every time reads like an academic paper.
 
+## Content Strategy
+
+The goal of every post is to **delight through education**. The reader should walk away with an insight that leads them to see Hyperstruck as the natural solution, because we've already done it.
+
+One insight alone isn't enough for a reader to bet big on. The insight should be **generative**: it opens many possibilities, and the reader assumes we've thought through all of them. Don't just show what we built. Show the thinking that made it inevitable. The reader connects the dots to their own problems and concludes Hyperstruck has already solved them.
+
 ## Structure
 
 - **Put the strongest content at the top.** If your best paragraph is in the conclusion, move it to the opening.

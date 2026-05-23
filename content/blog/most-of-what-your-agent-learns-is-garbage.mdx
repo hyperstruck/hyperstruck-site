@@ -1,0 +1,59 @@
+---
+title: "Most of What Your Agent Learns Is Garbage"
+description: "Your agent extracts learnings from every task. But pull up the last fifty and read them. Half are just the tool's documentation with extra words."
+date: "2026-05-23"
+---
+
+If your agent has a learning system, try this: pull the last fifty learnings it extracted and read them.
+
+You'll find entries like this:
+
+> "The bash tool can be used to explore and diagnose issues with the Trunc()/Extract() functions in Django by running tests and inspecting code."
+
+Strip the task-specific nouns and what's left is "bash can run commands." That's the tool's documentation restated with filler. The agent spent tokens extracting it, more tokens storing it, and will spend more tokens retrieving it next time, where it will contribute nothing to the plan.
+
+This isn't a bug in the extraction prompt. It's a structural problem with how learning systems work, and fixing it reveals something important about what makes agent knowledge useful in the first place.
+
+## The substance problem
+
+Most learning systems gate on the *trace*, not on the *content*. Did the agent use multiple tools? Were there failures and recoveries? Did it try different parameters? If yes, extract a learning. The trace was structurally interesting, so surely the extracted knowledge must be too.
+
+It isn't. Here are real learnings extracted from production-style traces with interesting structure:
+
+> "search_api is useful for finding relevant information."
+
+> "The data export tool can export data from the system."
+
+> "Use the validation tool to validate inputs before processing."
+
+Every one passed the novelty check. Every one consumes retrieval budget. None would change a single decision in a future plan. The trace was interesting. The learning wasn't.
+
+The insight is that **trace structure and learning quality are independent variables**. A boring two-step trace can produce a learning that saves the agent hours. A complex ten-step trace with retries and recoveries can produce nothing but a restatement of what the tools do. Gating on trace structure is necessary for efficiency, but it tells you nothing about whether the extracted content is worth keeping.
+
+## Form determines impact
+
+Once you start looking at what separates useful learnings from garbage, a pattern emerges. It's not just about specificity or detail. It's about form.
+
+**Descriptive:** "The monitoring_api silently truncates exports at 10,000 rows."
+
+**Prescriptive:** "When exporting via monitoring_api, check the X-Truncated response header after each call. If present, the export exceeded 10,000 rows and data was silently dropped. Re-export with pagination at limit=5000."
+
+The descriptive version is a true statement. The prescriptive version is a true statement that changes behaviour. A fact is background noise. An instruction is a directive.
+
+This has a non-obvious implication: **two agents with identical learnings in different forms will perform differently**. The knowledge is the same. The form determines whether it gets acted on.
+
+## Quality compounds (in both directions)
+
+This is where it gets interesting. Learning systems have a compounding dynamic that most people don't think about.
+
+A tautological learning gets retrieved next time the agent uses that tool. It occupies context that could have held a real insight. Because retrieval is similarity-based, a library full of tautologies pushes down the learnings that would have changed the plan. The agent retrieves "bash can run commands" instead of "when editing Python, count the leading spaces first." The garbage crowds out the signal, and the problem gets worse with every task.
+
+Quality compounds in the other direction. A prescriptive learning about a specific failure mode gets retrieved, changes the plan, succeeds, gets reinforced. Its confidence rises. Over time, the knowledge base converges on learnings that actually change behaviour. Each task makes the next one better, not through more knowledge, but through better knowledge.
+
+<img src="/blog/tautology-filter.svg" alt="Without filtering, tautological learnings accumulate and crowd out real insights. With filtering, only actionable learnings enter the knowledge base and compound over time." width="720" />
+
+This means learning quality isn't a nice-to-have that you optimise later. It's the variable that determines whether your agent gets smarter over time or just accumulates noise. Filtering on day one is worth more than a better extraction prompt on day ninety, because by day ninety the compounding has already set the trajectory.
+
+In our benchmarks, agents with quality-filtered learnings retrieve actionable knowledge that changes plans. Agents without filtering retrieve tautologies that waste context. Same model, same tools, same traces. The only difference is what made it into the knowledge base.
+
+We spent a lot of time getting this right because everything else depends on it. The planning, the reinforcement, the confidence calibration, the retrieval. All of it assumes that what's in the knowledge base is worth retrieving. Garbage in, garbage compounded.
