@@ -14,6 +14,7 @@ import {
 import { useMDXComponents } from '../components/docs/mdx';
 import { getBlogLayoutOptions } from '../lib/blogLayout';
 import { buildContentTree, formatDate, resolveContentEntry } from '../lib/contentFiles';
+import BlogHomePage from './BlogHomePage';
 import BlogNotFoundPage from './BlogNotFoundPage';
 
 interface BlogFrontmatter {
@@ -90,23 +91,6 @@ const clientLoader = browserCollections.blog.createClientLoader({
     );
   },
 });
-
-function getBlogRootEntry(): string | null {
-  const availableEntries = Object.keys(browserCollections.blog.raw).map((entry) =>
-    entry.startsWith('./') ? entry.slice(2) : entry,
-  );
-  const indexEntry = availableEntries.find((entry) => entry === 'index.mdx' || entry === 'index.md');
-
-  if (indexEntry) {
-    return indexEntry;
-  }
-
-  return (
-    availableEntries
-      .filter((entry) => entry.endsWith('.mdx') || entry.endsWith('.md'))
-      .sort((left, right) => left.localeCompare(right))[0] ?? null
-  );
-}
 
 function BlogPageFallback() {
   useEffect(() => {
@@ -205,14 +189,16 @@ export default function BlogPageRoute() {
   const path = useMemo(
     () =>
       isBlogRoot
-        ? getBlogRootEntry()
+        ? null
         : resolveContentEntry(pathname, '/blog', browserCollections.blog.raw),
     [isBlogRoot, pathname],
   );
 
   return (
     <DocsLayout {...getBlogLayoutOptions()} tree={tree}>
-      {path ? (
+      {isBlogRoot ? (
+        <BlogHomePage />
+      ) : path ? (
         clientLoader.useContent(path) ?? <BlogPageFallback />
       ) : (
         <BlogNotFoundPage />

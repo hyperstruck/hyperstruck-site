@@ -1,120 +1,106 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 400" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 380" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif">
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0a0e1a"/>
-      <stop offset="100%" stop-color="#0d1117"/>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FAFAF7"/>
+      <stop offset="100%" stop-color="#F5F3EF"/>
     </linearGradient>
-    <linearGradient id="boxGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#161b2e"/>
-      <stop offset="100%" stop-color="#111827"/>
+    <linearGradient id="tealLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#2BA89E" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#2BA89E"/>
     </linearGradient>
-    <linearGradient id="badGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1c1017"/>
-      <stop offset="100%" stop-color="#170d12"/>
+    <linearGradient id="redLine" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#EF4444"/>
     </linearGradient>
-    <linearGradient id="goodGrad" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#0c1a17"/>
-      <stop offset="100%" stop-color="#0a1510"/>
+    <linearGradient id="tealFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2BA89E" stop-opacity="0.08"/>
+      <stop offset="100%" stop-color="#2BA89E" stop-opacity="0.02"/>
     </linearGradient>
-    <filter id="glow">
-      <feGaussianBlur stdDeviation="2" result="blur"/>
-      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
-    </filter>
+    <linearGradient id="redFill" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EF4444" stop-opacity="0.02"/>
+      <stop offset="100%" stop-color="#EF4444" stop-opacity="0.08"/>
+    </linearGradient>
   </defs>
 
   <!-- Background -->
-  <rect width="720" height="400" fill="url(#bg)" rx="8"/>
+  <rect width="720" height="380" fill="url(#bgGrad)" rx="12"/>
 
   <!-- Title -->
-  <text x="360" y="32" text-anchor="middle" fill="#94a3b8" font-size="12" font-weight="500" letter-spacing="1.5">LEARNING QUALITY COMPOUNDS</text>
+  <text x="360" y="32" text-anchor="middle" fill="#A1A1AA" font-size="11" font-weight="500" letter-spacing="2" font-family="'Space Grotesk', sans-serif">LEARNING QUALITY COMPOUNDS</text>
 
-  <!-- Divider line -->
-  <line x1="360" y1="48" x2="360" y2="380" stroke="#1e293b" stroke-width="1" stroke-dasharray="4,4"/>
+  <!-- Chart area: x=100..660, y=60..310 -->
 
-  <!-- LEFT SIDE: Without quality filtering -->
-  <text x="180" y="62" text-anchor="middle" fill="#f87171" font-size="11" font-weight="600" letter-spacing="0.5">WITHOUT FILTERING</text>
+  <!-- Y-axis -->
+  <line x1="100" y1="60" x2="100" y2="310" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="56" y="190" text-anchor="middle" fill="#A1A1AA" font-size="10" font-weight="500" transform="rotate(-90, 56, 190)">Retrieval quality</text>
 
-  <!-- Task flow left -->
-  <rect x="50" y="80" width="260" height="36" rx="5" fill="url(#boxGrad)" stroke="#334155" stroke-width="0.8"/>
-  <text x="180" y="103" text-anchor="middle" fill="#cbd5e1" font-size="11">Task 1 extracts learnings</text>
+  <!-- Y-axis ticks -->
+  <line x1="95" y1="85" x2="100" y2="85" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="88" y="89" text-anchor="end" fill="#A1A1AA" font-size="9">high</text>
+  <line x1="95" y1="185" x2="100" y2="185" stroke="#D1CEC7" stroke-width="1"/>
+  <line x1="95" y1="285" x2="100" y2="285" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="88" y="289" text-anchor="end" fill="#A1A1AA" font-size="9">low</text>
 
-  <!-- Arrow -->
-  <line x1="180" y1="116" x2="180" y2="136" stroke="#475569" stroke-width="1"/>
-  <polygon points="175,133 180,140 185,133" fill="#475569"/>
+  <!-- X-axis -->
+  <line x1="100" y1="310" x2="660" y2="310" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="380" y="340" text-anchor="middle" fill="#A1A1AA" font-size="10" font-weight="500">Tasks completed</text>
 
-  <!-- Knowledge base (polluted) -->
-  <rect x="50" y="140" width="260" height="100" rx="6" fill="url(#badGrad)" stroke="#7f1d1d" stroke-width="0.8"/>
-  <text x="180" y="160" text-anchor="middle" fill="#fca5a5" font-size="10" font-weight="500">Knowledge Base</text>
+  <!-- X-axis ticks -->
+  <line x1="100" y1="310" x2="100" y2="315" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="100" y="328" text-anchor="middle" fill="#A1A1AA" font-size="9">1</text>
+  <line x1="240" y1="310" x2="240" y2="315" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="240" y="328" text-anchor="middle" fill="#A1A1AA" font-size="9">10</text>
+  <line x1="380" y1="310" x2="380" y2="315" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="380" y="328" text-anchor="middle" fill="#A1A1AA" font-size="9">25</text>
+  <line x1="520" y1="310" x2="520" y2="315" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="520" y="328" text-anchor="middle" fill="#A1A1AA" font-size="9">50</text>
+  <line x1="660" y1="310" x2="660" y2="315" stroke="#D1CEC7" stroke-width="1"/>
+  <text x="660" y="328" text-anchor="middle" fill="#A1A1AA" font-size="9">100</text>
 
-  <rect x="65" y="170" width="230" height="18" rx="3" fill="#1f1215" stroke="#991b1b" stroke-width="0.5" opacity="0.7"/>
-  <text x="80" y="183" fill="#f87171" font-size="9" font-style="italic">"bash can run commands"</text>
+  <!-- Grid lines -->
+  <line x1="100" y1="185" x2="660" y2="185" stroke="#E4E2DD" stroke-width="0.5" stroke-dasharray="4,4"/>
+  <line x1="240" y1="60" x2="240" y2="310" stroke="#E4E2DD" stroke-width="0.5" stroke-dasharray="4,4"/>
+  <line x1="380" y1="60" x2="380" y2="310" stroke="#E4E2DD" stroke-width="0.5" stroke-dasharray="4,4"/>
+  <line x1="520" y1="60" x2="520" y2="310" stroke="#E4E2DD" stroke-width="0.5" stroke-dasharray="4,4"/>
 
-  <rect x="65" y="192" width="230" height="18" rx="3" fill="#1f1215" stroke="#991b1b" stroke-width="0.5" opacity="0.7"/>
-  <text x="80" y="205" fill="#f87171" font-size="9" font-style="italic">"search_api finds information"</text>
+  <!-- Starting point (both curves begin near the same place) -->
+  <!-- With filtering: rises from ~185 to ~85 with a nice curve -->
+  <!-- Without filtering: drops from ~185 to ~275 with a curve -->
 
-  <rect x="65" y="214" width="230" height="18" rx="3" fill="#0f1a16" stroke="#065f46" stroke-width="0.5" opacity="0.4"/>
-  <text x="80" y="227" fill="#6ee7b7" font-size="9" opacity="0.5" font-style="italic">"check X-Truncated header..."</text>
-  <text x="270" y="227" fill="#64748b" font-size="8">buried</text>
+  <!-- Shaded area under "with filtering" curve -->
+  <path d="M100,195 C170,190 220,165 280,145 C340,125 430,100 520,90 C570,86 620,83 660,80 L660,310 L100,310 Z" fill="url(#tealFill)"/>
 
-  <!-- Arrow -->
-  <line x1="180" y1="240" x2="180" y2="260" stroke="#475569" stroke-width="1"/>
-  <polygon points="175,257 180,264 185,257" fill="#475569"/>
+  <!-- Shaded area under "without filtering" curve -->
+  <path d="M100,195 C170,200 220,218 280,235 C340,252 430,268 520,278 C570,282 620,285 660,287 L660,310 L100,310 Z" fill="url(#redFill)"/>
 
-  <!-- Retrieval result -->
-  <rect x="50" y="264" width="260" height="36" rx="5" fill="url(#badGrad)" stroke="#7f1d1d" stroke-width="0.8"/>
-  <text x="180" y="282" text-anchor="middle" fill="#fca5a5" font-size="10">Task 10 retrieves: tautologies</text>
-  <text x="180" y="294" text-anchor="middle" fill="#ef4444" font-size="9">Good learnings pushed down by noise</text>
+  <!-- "With filtering" curve -->
+  <path d="M100,195 C170,190 220,165 280,145 C340,125 430,100 520,90 C570,86 620,83 660,80" fill="none" stroke="url(#tealLine)" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- Arrow -->
-  <line x1="180" y1="300" x2="180" y2="320" stroke="#475569" stroke-width="1"/>
-  <polygon points="175,317 180,324 185,317" fill="#475569"/>
+  <!-- "Without filtering" curve -->
+  <path d="M100,195 C170,200 220,218 280,235 C340,252 430,268 520,278 C570,282 620,285 660,287" fill="none" stroke="url(#redLine)" stroke-width="2.5" stroke-linecap="round"/>
 
-  <!-- Outcome left -->
-  <rect x="50" y="324" width="260" height="48" rx="6" fill="url(#badGrad)" stroke="#991b1b" stroke-width="1"/>
-  <text x="180" y="346" text-anchor="middle" fill="#fca5a5" font-size="11" font-weight="600">Same mistakes repeated</text>
-  <text x="180" y="362" text-anchor="middle" fill="#f87171" font-size="9.5">Agent doesn't improve with experience</text>
+  <!-- Divergence annotation arrow -->
+  <line x1="530" y1="90" x2="530" y2="278" stroke="#D1CEC7" stroke-width="0.8" stroke-dasharray="3,3"/>
+  <polygon points="527,96 530,90 533,96" fill="#D1CEC7"/>
+  <polygon points="527,272 530,278 533,272" fill="#D1CEC7"/>
+  <rect x="505" y="174" width="50" height="20" rx="4" fill="#FAFAF7"/>
+  <text x="530" y="188" text-anchor="middle" fill="#A1A1AA" font-size="9" font-weight="500">gap</text>
 
-  <!-- RIGHT SIDE: With quality filtering -->
-  <text x="540" y="62" text-anchor="middle" fill="#4ade80" font-size="11" font-weight="600" letter-spacing="0.5">WITH FILTERING</text>
+  <!-- Starting dot -->
+  <circle cx="100" cy="195" r="4" fill="#52525B" stroke="#FFFFFF" stroke-width="1.5"/>
 
-  <!-- Task flow right -->
-  <rect x="410" y="80" width="260" height="36" rx="5" fill="url(#boxGrad)" stroke="#334155" stroke-width="0.8"/>
-  <text x="540" y="103" text-anchor="middle" fill="#cbd5e1" font-size="11">Task 1 extracts learnings</text>
+  <!-- End dots -->
+  <circle cx="660" cy="80" r="4" fill="#2BA89E" stroke="#FFFFFF" stroke-width="1.5"/>
+  <circle cx="660" cy="287" r="4" fill="#EF4444" stroke="#FFFFFF" stroke-width="1.5"/>
 
-  <!-- Arrow with filter indicator -->
-  <line x1="540" y1="116" x2="540" y2="136" stroke="#475569" stroke-width="1"/>
-  <polygon points="535,133 540,140 545,133" fill="#475569"/>
-  <rect x="500" y="120" width="80" height="16" rx="3" fill="#1e3a5f" opacity="0.8"/>
-  <text x="540" y="132" text-anchor="middle" fill="#7dd3fc" font-size="8" font-weight="500">quality gate</text>
+  <!-- Labels -->
+  <rect x="543" y="62" width="112" height="22" rx="6" fill="#F0FDFA" stroke="#99F6E4" stroke-width="0.8"/>
+  <text x="599" y="77" text-anchor="middle" fill="#1A7A70" font-size="10" font-weight="600">with filtering</text>
 
-  <!-- Knowledge base (clean) -->
-  <rect x="410" y="140" width="260" height="100" rx="6" fill="url(#goodGrad)" stroke="#065f46" stroke-width="0.8"/>
-  <text x="540" y="160" text-anchor="middle" fill="#6ee7b7" font-size="10" font-weight="500">Knowledge Base</text>
+  <rect x="543" y="290" width="130" height="22" rx="6" fill="#FEF2F2" stroke="#FECACA" stroke-width="0.8"/>
+  <text x="608" y="305" text-anchor="middle" fill="#DC2626" font-size="10" font-weight="600">without filtering</text>
 
-  <rect x="425" y="170" width="230" height="18" rx="3" fill="#0f1a16" stroke="#065f46" stroke-width="0.5"/>
-  <text x="440" y="183" fill="#6ee7b7" font-size="9" font-style="italic">"check X-Truncated header after export..."</text>
-
-  <rect x="425" y="192" width="230" height="18" rx="3" fill="#0f1a16" stroke="#065f46" stroke-width="0.5"/>
-  <text x="440" y="205" fill="#6ee7b7" font-size="9" font-style="italic">"UnicodeDecodeError? use ISO-8859-1..."</text>
-
-  <rect x="425" y="214" width="230" height="18" rx="3" fill="#0f1a16" stroke="#065f46" stroke-width="0.5"/>
-  <text x="440" y="227" fill="#6ee7b7" font-size="9" font-style="italic">"rate limit is 50 req/60s, use 1.5s delay"</text>
-
-  <!-- Arrow -->
-  <line x1="540" y1="240" x2="540" y2="260" stroke="#475569" stroke-width="1"/>
-  <polygon points="535,257 540,264 545,257" fill="#475569"/>
-
-  <!-- Retrieval result -->
-  <rect x="410" y="264" width="260" height="36" rx="5" fill="url(#goodGrad)" stroke="#065f46" stroke-width="0.8"/>
-  <text x="540" y="282" text-anchor="middle" fill="#6ee7b7" font-size="10">Task 10 retrieves: actionable insights</text>
-  <text x="540" y="294" text-anchor="middle" fill="#22c55e" font-size="9">Every retrieval changes the plan</text>
-
-  <!-- Arrow -->
-  <line x1="540" y1="300" x2="540" y2="320" stroke="#475569" stroke-width="1"/>
-  <polygon points="535,317 540,324 545,317" fill="#475569"/>
-
-  <!-- Outcome right -->
-  <rect x="410" y="324" width="260" height="48" rx="6" fill="url(#goodGrad)" stroke="#22c55e" stroke-width="1" filter="url(#glow)"/>
-  <text x="540" y="346" text-anchor="middle" fill="#6ee7b7" font-size="11" font-weight="600">Measurably better over time</text>
-  <text x="540" y="362" text-anchor="middle" fill="#4ade80" font-size="9.5">Each task benefits from all prior experience</text>
+  <!-- Annotation: what happens at the divergence point -->
+  <text x="195" y="360" fill="#52525B" font-size="9">Both start equal.</text>
+  <text x="195" y="373" fill="#52525B" font-size="9">Quality filtering determines the trajectory.</text>
 </svg>
