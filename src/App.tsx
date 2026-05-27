@@ -21,6 +21,7 @@ import HomePage from './pages/HomePage';
 import DocsPageRoute from './pages/DocsPage';
 import PricingPage from './pages/PricingPage';
 import SignupPage from './pages/SignupPage';
+import UseCasesPage from './pages/UseCasesPage';
 import { BLOG_HOME_URL } from './lib/blogLayout';
 import appTheme from './theme/appTheme';
 
@@ -90,6 +91,7 @@ const router = createBrowserRouter(
     <Route element={<RootRouteLayout />}>
       <Route element={<AppLayout />}>
         <Route index element={<HomePage />} />
+        <Route path="/use-cases" element={<UseCasesPage />} />
         <Route path="/pricing" element={<PricingPage />} />
         <Route path="/signup" element={<SignupPage />} />
         <Route path="/about" element={<AboutPage />} />
