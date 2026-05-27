@@ -1,0 +1,45 @@
+---
+title: "Labels Are a Liability"
+description: "We built a taxonomy for agent learnings, with categories and routing logic in every consumer. Then we deleted all of it and got better results."
+date: "2026-05-27"
+---
+
+Every agent memory system eventually builds a taxonomy. You start with two categories, maybe "facts" and "strategies". Then edge cases appear. A learning about tool behaviour doesn't fit "strategy". A coverage gap isn't really a "fact". So you add more categories. Pretty soon you have a dozen, with routing logic in every consumer that reads from the knowledge store.
+
+We did exactly this. Every time our system extracted a learning, the LLM assigned it a category. Then every downstream component trusted that category: which section of the prompt it appeared in, whether it was mandatory or optional, whether two learnings could be merged together. One label, assigned once, governing everything.
+
+It worked. Until we measured it.
+
+## The label is not the knowledge
+
+We ran our planning quality benchmark and discovered that the LLM was miscategorising a significant fraction of learnings. Not dramatically wrong, usually adjacent categories that a human would debate too. But each miscategorisation placed the learning in the wrong section of the planning prompt, surrounded by learnings about different topics, where the planner was less likely to apply it.
+
+That's the core problem with write-time classification. You're asking the LLM to make a judgement call at extraction time, then freezing that judgement into a label that every downstream consumer trusts. If the label is wrong, every consumer is wrong in the same way. And you won't notice, because the learning's content is still correct. It just lives in the wrong neighbourhood.
+
+<img src="/blog/label-bottleneck.svg" alt="A learning classified at write time, with the same category label used by every downstream consumer." width="720" />
+
+## Prescriptive content describes itself
+
+The insight that changed our approach: the content of a well-written learning already tells you everything the category label was supposed to convey.
+
+"Always validate encoding before loading CSV files" is obviously a constraint. "The payments API resets its rate limit every 60 seconds" is obviously operational knowledge. You don't need a label to know how to use them. The planner reads the content and applies it, or doesn't, based on relevance to the current task.
+
+When we tested flat rendering (all learnings in a single list, no category sections) against the categorised version, the flat version performed better. Not by a huge margin, but consistently. The categories weren't helping the planner. They were adding noise.
+
+## Evidence over labels
+
+We didn't just remove labels. We replaced them with something more useful: evidence.
+
+Instead of classifying a learning into a category, we now store what was actually observed in the execution trace. How many steps supported this learning? Did any evidence contradict it? Could the agent have discovered this before committing resources?
+
+These are factual, verifiable properties of the trace. They don't require an LLM judgement call. And each downstream consumer can interpret them differently based on what it needs. One consumer cares about confidence. Another cares about tool overlap. A third cares about whether the pattern was discoverable in advance. None of them need a category label. They each derive their own answer from the evidence.
+
+<img src="/blog/evidence-approach.svg" alt="The same learning with evidence instead of a label. Each consumer derives its own conclusion." width="720" />
+
+## The result
+
+The system got simpler. Thousands of lines of routing logic, gone. And it got better. Not because categories are inherently bad, but because write-time classification is a bottleneck that creates a single point of failure for every consumer downstream.
+
+The broader lesson applies to any system where an LLM assigns metadata at ingestion time and downstream systems branch on it. RAG pipelines with document type tags. Workflow engines with intent classifiers. Any time you freeze an LLM's judgement into a routing label, you're betting that one call will be right for every future use case.
+
+Store the evidence. Let each consumer decide for itself.

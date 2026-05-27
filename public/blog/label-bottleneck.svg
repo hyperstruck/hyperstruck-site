@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 260" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FAFAF7"/>
+      <stop offset="100%" stop-color="#F5F3EF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="260" fill="url(#bgGrad)" rx="12"/>
+
+  <!-- The learning card with its classification inside -->
+  <rect x="240" y="24" width="240" height="72" rx="10" fill="#FFFFFF" stroke="#D1CEC7" stroke-width="1.2"/>
+  <text x="360" y="50" text-anchor="middle" fill="#52525B" font-size="13" font-weight="500">Learning</text>
+  <rect x="296" y="60" width="128" height="24" rx="5" fill="#FEF2F2" stroke="#FECACA" stroke-width="1"/>
+  <text x="360" y="77" text-anchor="middle" fill="#DC2626" font-size="10" font-weight="600">category: best practice</text>
+
+  <!-- "classified at write time" annotation -->
+  <text x="360" y="114" text-anchor="middle" fill="#A1A1AA" font-size="9" font-style="italic">classified at write time</text>
+
+  <!-- Arrows radiating outward to destinations -->
+  <!-- Left -->
+  <path d="M290,96 C250,120 140,130 100,160" fill="none" stroke="#EF4444" stroke-width="1" stroke-opacity="0.35"/>
+  <!-- Center-left -->
+  <path d="M330,96 C310,125 260,140 250,160" fill="none" stroke="#EF4444" stroke-width="1" stroke-opacity="0.35"/>
+  <!-- Center-right -->
+  <path d="M390,96 C410,125 460,140 470,160" fill="none" stroke="#EF4444" stroke-width="1" stroke-opacity="0.35"/>
+  <!-- Right -->
+  <path d="M430,96 C470,120 580,130 620,160" fill="none" stroke="#EF4444" stroke-width="1" stroke-opacity="0.35"/>
+
+  <!-- Destination tags: same red label appearing everywhere -->
+  <rect x="52" y="162" width="96" height="22" rx="5" fill="#FEF2F2" stroke="#FECACA" stroke-width="0.8"/>
+  <text x="100" y="177" text-anchor="middle" fill="#DC2626" font-size="9" font-weight="600">best practice</text>
+
+  <rect x="202" y="162" width="96" height="22" rx="5" fill="#FEF2F2" stroke="#FECACA" stroke-width="0.8"/>
+  <text x="250" y="177" text-anchor="middle" fill="#DC2626" font-size="9" font-weight="600">best practice</text>
+
+  <rect x="422" y="162" width="96" height="22" rx="5" fill="#FEF2F2" stroke="#FECACA" stroke-width="0.8"/>
+  <text x="470" y="177" text-anchor="middle" fill="#DC2626" font-size="9" font-weight="600">best practice</text>
+
+  <rect x="572" y="162" width="96" height="22" rx="5" fill="#FEF2F2" stroke="#FECACA" stroke-width="0.8"/>
+  <text x="620" y="177" text-anchor="middle" fill="#DC2626" font-size="9" font-weight="600">best practice</text>
+
+  <!-- Subtle labels under each -->
+  <text x="100" y="200" text-anchor="middle" fill="#A1A1AA" font-size="8">prompt rendering</text>
+  <text x="250" y="200" text-anchor="middle" fill="#A1A1AA" font-size="8">quality checks</text>
+  <text x="470" y="200" text-anchor="middle" fill="#A1A1AA" font-size="8">merge decisions</text>
+  <text x="620" y="200" text-anchor="middle" fill="#A1A1AA" font-size="8">prioritisation</text>
+
+  <!-- Bottom annotation -->
+  <text x="360" y="236" text-anchor="middle" fill="#52525B" font-size="10">One classification, assigned once, trusted everywhere.</text>
+</svg>

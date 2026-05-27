@@ -1,0 +1,54 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 720 280" font-family="'Inter', 'SF Pro', -apple-system, system-ui, sans-serif">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FAFAF7"/>
+      <stop offset="100%" stop-color="#F5F3EF"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="720" height="280" fill="url(#bgGrad2)" rx="12"/>
+
+  <!-- The learning card: just content and evidence, no category -->
+  <rect x="240" y="24" width="240" height="58" rx="10" fill="#FFFFFF" stroke="#D1CEC7" stroke-width="1.2"/>
+  <text x="360" y="48" text-anchor="middle" fill="#52525B" font-size="13" font-weight="500">Learning</text>
+  <text x="360" y="68" text-anchor="middle" fill="#A1A1AA" font-size="9">content + evidence, no label</text>
+
+  <!-- Arrows to four consumers -->
+  <path d="M290,82 C250,110 140,125 100,148" fill="none" stroke="#D1CEC7" stroke-width="1" stroke-opacity="0.5"/>
+  <path d="M330,82 C310,115 260,130 250,148" fill="none" stroke="#D1CEC7" stroke-width="1" stroke-opacity="0.5"/>
+  <path d="M390,82 C410,115 460,130 470,148" fill="none" stroke="#D1CEC7" stroke-width="1" stroke-opacity="0.5"/>
+  <path d="M430,82 C470,110 580,125 620,148" fill="none" stroke="#D1CEC7" stroke-width="1" stroke-opacity="0.5"/>
+
+  <!-- Consumer boxes: each reads the same learning, arrives at its own conclusion -->
+
+  <!-- Consumer 1: Prompt rendering -->
+  <rect x="30" y="148" width="140" height="62" rx="8" fill="#FFFFFF" stroke="#99F6E4" stroke-width="1"/>
+  <text x="100" y="168" text-anchor="middle" fill="#A1A1AA" font-size="8">prompt rendering</text>
+  <text x="100" y="186" text-anchor="middle" fill="#52525B" font-size="10" font-weight="500">reads the content</text>
+  <rect x="52" y="194" width="96" height="20" rx="4" fill="#F0FDFA" stroke="#99F6E4" stroke-width="0.8"/>
+  <text x="100" y="208" text-anchor="middle" fill="#1A7A70" font-size="9" font-weight="600">"show it first"</text>
+
+  <!-- Consumer 2: Quality checks -->
+  <rect x="190" y="148" width="140" height="62" rx="8" fill="#FFFFFF" stroke="#99F6E4" stroke-width="1"/>
+  <text x="260" y="168" text-anchor="middle" fill="#A1A1AA" font-size="8">quality checks</text>
+  <text x="260" y="186" text-anchor="middle" fill="#52525B" font-size="10" font-weight="500">checks observation count</text>
+  <rect x="212" y="194" width="96" height="20" rx="4" fill="#F0FDFA" stroke="#99F6E4" stroke-width="0.8"/>
+  <text x="260" y="208" text-anchor="middle" fill="#1A7A70" font-size="9" font-weight="600">"flag as critical"</text>
+
+  <!-- Consumer 3: Merge decisions -->
+  <rect x="390" y="148" width="140" height="62" rx="8" fill="#FFFFFF" stroke="#99F6E4" stroke-width="1"/>
+  <text x="460" y="168" text-anchor="middle" fill="#A1A1AA" font-size="8">merge decisions</text>
+  <text x="460" y="186" text-anchor="middle" fill="#52525B" font-size="10" font-weight="500">compares tool overlap</text>
+  <rect x="412" y="194" width="96" height="20" rx="4" fill="#F0FDFA" stroke="#99F6E4" stroke-width="0.8"/>
+  <text x="460" y="208" text-anchor="middle" fill="#1A7A70" font-size="9" font-weight="600">"merge these two"</text>
+
+  <!-- Consumer 4: Prioritisation -->
+  <rect x="550" y="148" width="140" height="62" rx="8" fill="#FFFFFF" stroke="#99F6E4" stroke-width="1"/>
+  <text x="620" y="168" text-anchor="middle" fill="#A1A1AA" font-size="8">prioritisation</text>
+  <text x="620" y="186" text-anchor="middle" fill="#52525B" font-size="10" font-weight="500">checks confidence</text>
+  <rect x="572" y="194" width="96" height="20" rx="4" fill="#F0FDFA" stroke="#99F6E4" stroke-width="0.8"/>
+  <text x="620" y="208" text-anchor="middle" fill="#1A7A70" font-size="9" font-weight="600">"rank it high"</text>
+
+  <!-- Bottom annotation -->
+  <text x="360" y="248" text-anchor="middle" fill="#52525B" font-size="10">Same learning. Each consumer reads the evidence and makes its own call.</text>
+</svg>
