@@ -1,5 +1,9 @@
 import ArrowForwardRoundedIcon from '@mui/icons-material/ArrowForwardRounded';
+import ExpandMoreRoundedIcon from '@mui/icons-material/ExpandMoreRounded';
 import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
   Box,
   Button,
   Card,
@@ -13,6 +17,57 @@ import { Link as RouterLink } from 'react-router-dom';
 import PageMeta from '../components/PageMeta';
 import { benchmarkStats, features } from '../data/siteContent';
 import { contactEmail } from '../theme/tokens';
+
+const faqs = [
+  {
+    question: 'Is Hyperstruck just another LLM wrapper?',
+    answer:
+      'No. Hyperstruck is not a thin layer that simply forwards prompts to an LLM. A heavy amount of algorithmic processing, NLP, retrieval, ranking, filtering, planning, and orchestration happens before the model is called, so the agent receives the right context, constraints, and execution strategy. That makes the system more scalable, useful, and repeatable than a prompt wrapper sitting on top of a model.',
+  },
+  {
+    question: "What's the difference between Learning and RAG or memory?",
+    answer:
+      'Memory is storage. RAG is retrieval. Both are useful, but neither is enough if the agent does not know when to use something, where it applies, or what to do with it. At large scale, similarity search across millions of documents can return duplicated, stale, or conflicting content, and the agent may never know. Hyperstruck Learning turns execution outcomes into reusable operational judgment, helping agents remember what worked, what failed, and how to approach similar work better next time.',
+  },
+  {
+    question: 'How does Learning work?',
+    answer:
+      'Hyperstruck can extract useful lessons automatically from reasoning runs, then make those learnings available to future runs. Learnings can include prose plus structured evidence about specific observed outcomes, so they stay compact and reusable without storing raw logs. Teams can also inject, curate, search, retrieve, and reinforce learnings manually through the Learnings API.',
+  },
+  {
+    question: "What's the benefit of using Hyperstruck reasoning over built-in thinking models?",
+    answer:
+      'Built-in thinking helps a model deliberate inside a single response. Hyperstruck reasoning manages the full lifecycle of agent work: plan, execute, reflect, revise, and learn. It also coordinates tools, retries, dependencies, approval gates, and accumulated learnings across runs, so the same model and tools can produce better outcomes over time.',
+  },
+  {
+    question: 'How can my organization benefit from Hyperstruck Learning?',
+    answer:
+      'Your agents stop starting from zero. Teams can capture hard-won operational knowledge, reduce repeated mistakes, improve recurring workflows, and build domain-specialized agents whose judgment compounds with use. For larger teams, that means institutional knowledge becomes available to future agent work instead of staying trapped in one-off runs, individuals, or chat history.',
+  },
+] as const;
+
+const problemSolutions = [
+  {
+    problem: 'Agents repeat the same mistakes',
+    solution:
+      'Hyperstruck captures useful lessons from each run so known failure modes do not happen again.',
+  },
+  {
+    problem: 'Context gets re-explained every time',
+    solution:
+      'Hyperstruck carries forward operational knowledge so agents can start future work with relevant experience.',
+  },
+  {
+    problem: 'Memory and RAG return information, not judgment',
+    solution:
+      'Hyperstruck helps agents understand when prior knowledge applies and how to use it.',
+  },
+  {
+    problem: 'Expert knowledge stays trapped in people and chats',
+    solution:
+      'Hyperstruck turns successful patterns into reusable organizational intelligence.',
+  },
+] as const;
 
 function HeroSection() {
   const theme = useTheme();
@@ -33,7 +88,7 @@ function HeroSection() {
               mb: 3,
             }}
           >
-            Your agent's 100th run should be better than its first.
+            Your agent's next run should be better than its first.
           </Typography>
 
           <Typography
@@ -45,10 +100,10 @@ function HeroSection() {
               mb: 5,
             }}
           >
-            Hyperstruck is a reasoning engine and learning system for AI
-            agents. It plans, executes, reflects, and learns from every
-            task. Prior mistakes become future knowledge. Same model, same
-            tools, measurably better judgment over time.
+            Hyperstruck makes AI agents better with experience. Your teams
+            spend less time fixing repeated mistakes, re-explaining context,
+            and rebuilding hard-won knowledge, because every run can improve
+            the next one.
           </Typography>
 
           <Stack direction={{ xs: 'column', sm: 'row' }} spacing={2} alignItems="flex-start">
@@ -71,6 +126,61 @@ function HeroSection() {
               Read the docs
             </Button>
           </Stack>
+        </Box>
+      </Container>
+    </Box>
+  );
+}
+
+function ProblemSolutionSection() {
+  const theme = useTheme();
+
+  return (
+    <Box sx={{ py: { xs: 6, md: 10 } }}>
+      <Container maxWidth="lg">
+        <Box sx={{ maxWidth: 680, mb: { xs: 5, md: 7 } }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '2rem', md: '2.75rem' }, mb: 2 }}
+          >
+            AI agents should not start from scratch every time
+          </Typography>
+          <Typography color="text.secondary" sx={{ fontSize: '1.05rem', lineHeight: 1.75 }}>
+            Most agent stacks remember information, but they do not reliably
+            turn experience into better execution. Hyperstruck gives teams a
+            compounding layer for agent judgment.
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            display: 'grid',
+            gridTemplateColumns: { xs: '1fr', sm: 'repeat(2, 1fr)' },
+            gap: 3,
+          }}
+        >
+          {problemSolutions.map((item) => (
+            <Card
+              key={item.problem}
+              sx={{
+                p: { xs: 3, md: 4 },
+                borderTop: `2px solid ${theme.palette.primary.main}`,
+              }}
+            >
+              <Typography
+                variant="h4"
+                sx={{ fontSize: '1.15rem', mb: 1.5 }}
+              >
+                {item.problem}
+              </Typography>
+              <Typography
+                color="text.secondary"
+                sx={{ fontSize: '0.95rem', lineHeight: 1.75 }}
+              >
+                {item.solution}
+              </Typography>
+            </Card>
+          ))}
         </Box>
       </Container>
     </Box>
@@ -328,6 +438,89 @@ function VideoSection() {
   );
 }
 
+function FaqSection() {
+  const theme = useTheme();
+
+  return (
+    <Box
+      sx={{
+        py: { xs: 8, md: 12 },
+        borderTop: `1px solid ${theme.palette.divider}`,
+      }}
+    >
+      <Container maxWidth="md">
+        <Box sx={{ textAlign: 'center', mb: { xs: 4, md: 6 } }}>
+          <Typography
+            variant="h2"
+            sx={{ fontSize: { xs: '2rem', md: '2.75rem' }, mb: 2 }}
+          >
+            Frequently asked questions
+          </Typography>
+          <Typography
+            color="text.secondary"
+            sx={{ fontSize: '1.05rem', lineHeight: 1.75, mx: 'auto', maxWidth: 620 }}
+          >
+            Clear answers on how Hyperstruck reasoning and learning differ from
+            wrappers, memory, and retrieval-only systems.
+          </Typography>
+        </Box>
+
+        <Box
+          sx={{
+            border: `1px solid ${theme.palette.divider}`,
+            borderRadius: 2,
+            overflow: 'hidden',
+            backgroundColor: 'background.paper',
+          }}
+        >
+          {faqs.map((faq, index) => (
+            <Accordion
+              key={faq.question}
+              disableGutters
+              elevation={0}
+              sx={{
+                backgroundColor: 'transparent',
+                borderBottom:
+                  index < faqs.length - 1
+                    ? `1px solid ${theme.palette.divider}`
+                    : 'none',
+                '&:before': {
+                  display: 'none',
+                },
+              }}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreRoundedIcon />}
+                aria-controls={`faq-${index}-content`}
+                id={`faq-${index}-header`}
+                sx={{
+                  px: { xs: 2.5, md: 3 },
+                  py: 1,
+                  '& .MuiAccordionSummary-content': {
+                    my: 1.5,
+                  },
+                }}
+              >
+                <Typography
+                  variant="h4"
+                  sx={{ fontSize: { xs: '1rem', md: '1.1rem' } }}
+                >
+                  {faq.question}
+                </Typography>
+              </AccordionSummary>
+              <AccordionDetails sx={{ px: { xs: 2.5, md: 3 }, pt: 0, pb: 3 }}>
+                <Typography color="text.secondary" sx={{ lineHeight: 1.75 }}>
+                  {faq.answer}
+                </Typography>
+              </AccordionDetails>
+            </Accordion>
+          ))}
+        </Box>
+      </Container>
+    </Box>
+  );
+}
+
 function CtaSection() {
   return (
     <Box sx={{ py: { xs: 8, md: 14 } }}>
@@ -383,13 +576,15 @@ export default function HomePage() {
     <Box component="main">
       <PageMeta
         title="Hyperstruck"
-        description="Reasoning engine and learning system for AI agents. Plans, executes, reflects, and learns from every task. Same model, same tools, measurably better outcomes."
+        description="Hyperstruck makes AI agents better with experience by carrying forward what works and turning every run into compounding operational intelligence."
         path="/"
       />
       <HeroSection />
+      <ProblemSolutionSection />
       <ProofSection />
       <FeaturesSection />
       <VideoSection />
+      <FaqSection />
       <CtaSection />
     </Box>
   );
