@@ -23,6 +23,7 @@ import { BLOG_HOME_URL } from '../lib/blogLayout';
 import { contactEmail } from '../theme/tokens';
 
 const navItems = [
+  { label: 'Use cases', to: '/use-cases' },
   { label: 'Docs', to: '/docs' },
   { label: 'Blog', to: BLOG_HOME_URL },
   { label: 'Pricing', to: '/pricing' },
@@ -33,6 +34,7 @@ const footerSections = [
   {
     title: 'Product',
     links: [
+      { label: 'Use cases', to: '/use-cases' },
       { label: 'Docs', to: '/docs' },
       { label: 'Blog', to: BLOG_HOME_URL },
       { label: 'Pricing', to: '/pricing' },
