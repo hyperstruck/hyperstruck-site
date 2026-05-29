@@ -28,11 +28,13 @@ One insight alone isn't enough for a reader to bet big on. The insight should be
 - **Let demos speak for themselves.** If there's a video, frame what to watch for. Don't narrate every detail the reader is about to see.
 - **End on a strong line, not a sales pitch.** No signup CTAs at the bottom. If the post did its job, the reader is already convinced. Site navigation handles conversion.
 - **Name competitors once, early, when defining the problem.** LangGraph, OpenAI Agents SDK, CrewAI, etc. Frame as shared experience ("if you've built with X, you know the pattern"), not as an attack. Then never mention them again. The rest of the post is about our value, not their limitations.
+- **Always include author frontmatter.** Every post must have `author` and `authorUrl` fields. Thomas Lynch: `authorUrl: "https://linkedin.com/in/tahlynch"`. Tony Truong: `authorUrl: "https://www.linkedin.com/in/truongt/"`.
 
 ## Avoiding AI-generated tells
 
 These patterns are dead giveaways that a post was written by a language model:
 
+- **Re-establishing the premise in every section.** State the core idea once in the opening, then build forward. Each section should make a new point, not re-anchor the reader on what they already know. If you can cut a paragraph and the section still makes sense, cut it. A 24-line post that says 3 things beats a 44-line post that says the same 3 things with restatement padding.
 - **Dramatic standalone thesis statements.** A one-liner on its own line after a list. Fold it into the surrounding paragraph.
 - **Direct reader address as a transition.** "And here's the part that should worry you:" or "Let's break this down." Just state the point.
 - **Jargon dressed up as insight.** "Accumulated organizational intelligence", "operationalize learnings", "holistic approach". Use words you'd say out loud.
@@ -41,6 +43,7 @@ These patterns are dead giveaways that a post was written by a language model:
 - **LinkedIn cliches.** "Knowledge walks out the door", "move the needle", "unlock value". Write something specific instead.
 - **Em dashes.** Use commas, periods, or separate sentences. Em dashes are the most common AI writing tell.
 - **Numbered lists of benefits that all follow the same sentence template.** Vary the structure or use a different format entirely.
+- **Implying competitors have learnings.** Never write "every learning system" or "the standard approach" as if others have comparable systems. Most frameworks have memory (append-only logs), not learnings. Frame problems as ones we discovered by building something novel. Use "we found", "when agents do learn" rather than "every learning system assumes".
 
 ## IP Protection
 

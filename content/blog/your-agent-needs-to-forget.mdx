@@ -1,0 +1,31 @@
+---
+title: "Agents Need to Forget"
+description: "When agents learn from experience, a new failure mode appears: they don't know when to stop believing what they learned."
+date: "2026-05-29"
+author: "Thomas Lynch"
+authorUrl: "https://linkedin.com/in/tahlynch"
+---
+
+Your agent learns that a particular API retries three times on failure. It works. Confidence grows. Weeks later, the API vendor changes their retry policy. Now the correct behaviour is to back off and wait. But your agent still "knows" the old pattern. It retries aggressively, gets rate-limited, and fails a task it would have succeeded at with no knowledge at all.
+
+Most agent frameworks don't have this problem because they don't have learnings. They have memory, append-only logs of past conversations, but nothing that gets stronger with use and weaker when it's wrong. When agents do learn, when knowledge compounds across sessions and shapes planning, a new failure mode appears: the system has no concept of knowledge becoming wrong. And because stale learnings carry high confidence from past successes, they don't just sit idle. They actively compete with correct information for attention and often win.
+
+## Time is not a signal
+
+The obvious fix is decay: reduce confidence over time, let stale learnings fade. We tried this. Decay rates aggressive enough to catch contradictions within days also erode valid knowledge that happens to go unused for a while. Rates that preserve valid knowledge let stale learnings persist for months.
+
+The underlying issue: a learning's age tells you nothing about whether it's still true. A six-month-old learning about database connection limits is probably fine. A two-day-old learning about a vendor's API behaviour might already be wrong.
+
+<img src="/blog/agents-need-to-forget.svg" alt="Corpus quality over time: active forgetting dips briefly at contradictions but recovers and improves, while passive decay degrades steadily" width="720" />
+
+## Evidence is
+
+When the system encounters a contradiction, it acts in the same session. Not on a timer, not flagged for review. And the response is proportional: a learning that was followed but the task still succeeded gets a gentle correction. A learning that caused a step to fail gets a stronger one. A learning that sank the entire plan is suppressed immediately.
+
+<img src="/blog/graduated-severity.svg" alt="Three severity tiers: mild correction when the task succeeded, aggressive when a step failed, immediate suppression when the plan failed" width="720" />
+
+In regulated industries, this is the difference between a nuisance and a liability. An agent operating on outdated compliance rules or deprecated API contracts creates real risk. When an external system, a compliance check, a policy update, an operator, determines that a learning is wrong, it should be retired immediately with a full audit trail.
+
+## The counterintuitive part
+
+A corpus that forgets actively gets more reliable as it grows. Each new piece of evidence doesn't just add knowledge, it also pressure-tests what's already there. The surviving learnings are the ones that held up. An agent with a hundred well-tested learnings outperforms one with a thousand unvetted ones, and the gap widens over time.
