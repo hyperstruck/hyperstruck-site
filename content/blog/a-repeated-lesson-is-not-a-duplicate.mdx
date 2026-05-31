@@ -1,0 +1,27 @@
+---
+title: "A Repeated Lesson Is Not a Duplicate"
+description: "Agents learn the same lesson over and over. Deduplicating those copies throws away the best signal you have."
+date: "2026-05-30"
+author: "Thomas Lynch"
+authorUrl: "https://linkedin.com/in/tahlynch"
+---
+
+Agents can keep on learning the same things over and over again. Same lessons that are dressed up in slightly different words and turning up again a few tasks later. So of course we thought the best thing to do was to deduplicate them. Why wouldn't you? Fifty near-identical copies of one insight is just bloat, and in this case bloat costs tokens to store and tokens to fetch. Good housekeeping right? Well, it took me an embarrassingly long time to clock what we were actually throwing out!
+
+I stumbled onto it sideways whilst chasing a completely different question about what makes a learning change behaviour in the first place. The learnings were fine by themselves. I sat and read them, every one was correct and specific which is exactly the kind of thing you'd want an agent to know. But through trying to dedupe them I broke them.
+
+Most agents never run into this, because they don't really learn the way Hyperstruck Agents do. LangGraph, CrewAI, etc give you memory, a searchable log and a vector store, a perfectly nice little filing cabinet. But as we've shown in other blogs, a learning is a different animal.
+
+## The second copy is the point
+
+Counterintuitively in our system we've found that multiple copies aren't actually clutter. It's the agent running into the same wall on a different task and landing on the same conclusion again. And importantly, with nobody nudging it there. Deleting it to save a little space doesn't make sense as these copies are effectively the agent checking its own work. The first time round, the agent might have got lucky. The second time, on a different task with different noise around it, it landed in exactly the same place anyway. Anywhere else you'd call that a replicated result and trust it more, not less. So why were we binning it?
+
+## How a useful learning becomes a fortune cookie
+
+And merging the copies is even worse than deleting them. Fusing two lessons about the same problem has a way of dissolving the only part worth keeping - the step that tells you what to do. "A lead's job title in the CRM is usually stale, so check their LinkedIn before you personalise anything" gets flattened into "personalise outreach with the lead's current title." Both are true. Only one of them is an instruction. The agent reads the tidy version back, has no idea the CRM might be out of date or where to find anything better, and cheerfully congratulates someone on a promotion they got a year ago. It still gets stored and retrieved, it just stops doing anything useful.
+
+## Stop treating it like a cache
+
+Both of these really come from the same borrowed instinct - treat the store like a cache. Caches are meant to shrink, so you dedupe, compress, and evict. And you feel productive about it! But this is the evidence an agent has built up about how its world actually behaves, and evidence doesn't get better when you toss out the parts that agree with each other, does it?
+
+What all of this means is we now treat a repeat as _signal_ instead of surplus and the store starts sorting itself out. The lessons that keep coming back get sturdier, the one-offs fade, and the agent gets harder to fool the longer it runs.
