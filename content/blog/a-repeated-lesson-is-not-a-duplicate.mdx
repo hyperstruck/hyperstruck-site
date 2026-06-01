@@ -6,9 +6,9 @@ author: "Thomas Lynch"
 authorUrl: "https://linkedin.com/in/tahlynch"
 ---
 
-Agents can keep on learning the same things over and over again. Same lessons that are dressed up in slightly different words and turning up again a few tasks later. So of course we thought the best thing to do was to deduplicate them. Why wouldn't you? Fifty near-identical copies of one insight is just bloat, and in this case bloat costs tokens to store and tokens to fetch. Good housekeeping right? Well, it took me an embarrassingly long time to clock what we were actually throwing out!
+Agents can keep on learning the same things over and over again. Same lessons that are dressed up in slightly different words and turning up again a few tasks later. So of course we thought the best thing to do was to deduplicate them. Why wouldn't you? Fifty near-identical copies of one insight is just bloat, and in this case bloat costs tokens to store and tokens to fetch. Good housekeeping right? Well, it took us an embarrassingly long time to clock what we were actually throwing out!
 
-I stumbled onto it sideways whilst chasing a completely different question about what makes a learning change behaviour in the first place. The learnings were fine by themselves. I sat and read them, every one was correct and specific which is exactly the kind of thing you'd want an agent to know. But through trying to dedupe them I broke them.
+We stumbled onto it sideways whilst chasing a completely different question about what makes a learning change behaviour in the first place. The learnings were fine by themselves. We sat and read them, every one was correct and specific which is exactly the kind of thing you'd want an agent to know. But through trying to dedupe them we broke them.
 
 Most agents never run into this, because they don't really learn the way Hyperstruck Agents do. LangGraph, CrewAI, etc give you memory, a searchable log and a vector store, a perfectly nice little filing cabinet. But as we've shown in other blogs, a learning is a different animal.
 
